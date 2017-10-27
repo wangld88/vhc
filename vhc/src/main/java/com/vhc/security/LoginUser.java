@@ -1,37 +1,61 @@
 package com.vhc.security;
 
-import com.vhc.model.User;
 
+import com.vhc.model.Userrole;
+import org.springframework.security.core.userdetails.User;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-public class LoginUser implements UserDetails {
 
-	public LoginUser(User user) {
-		
+public class LoginUser extends User {
+
+	private static final long serialVersionUID = 1L;
+	
+	private com.vhc.model.User user;
+	
+	public LoginUser(com.vhc.model.User user) {
+		super(user.getUsername(), user.getPassword(), AuthorityUtils.createAuthorityList(user.getRoles()));
+		System.out.println("user.getUsername(): "+user.getUsername() + ", Password:" +user.getPassword()+", roles: "+user.getRoles());
+		String[] roles = user.getRoles();
+		for(String i: roles) {
+			System.out.println("i :" + i);
+		}
+		this.user = user;
 	}
 
 	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<GrantedAuthority> getAuthorities() {
+	    List<GrantedAuthority> simpleGrantedAuthorityList = new ArrayList<>();
+	    for(Userrole role : user.getUserroles()) {
+	        simpleGrantedAuthorityList.add(new SimpleGrantedAuthority(role.getRole().getName()));
+	    }
+	    
+	    return simpleGrantedAuthorityList;
 	}
 
 	@Override
 	public String getPassword() {
 		// TODO Auto-generated method stub
-		return null;
+		return user.getPassword();
 	}
 
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
-		return null;
+		return user.getUsername();
 	}
 
-	@Override
+	public com.vhc.model.User getUser() {
+		return this.user;
+	}
+	
+/*	@Override
 	public boolean isAccountNonExpired() {
 		// TODO Auto-generated method stub
 		return false;
@@ -40,7 +64,7 @@ public class LoginUser implements UserDetails {
 	@Override
 	public boolean isAccountNonLocked() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
@@ -54,4 +78,5 @@ public class LoginUser implements UserDetails {
 		// TODO Auto-generated method stub
 		return false;
 	}
+*/	
 }

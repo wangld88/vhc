@@ -18,20 +18,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
+
 @Configuration
-public class ApplicationWebConfigurer
-  extends WebMvcConfigurerAdapter
-{
-  private static final String[] MESSAGESOURCE_BASENAME = { "classpath:/i18n/messages", "classpath:/i18n/validationmessages" };
+public class ApplicationWebConfigurer extends WebMvcConfigurerAdapter {
+	
+	private static final String[] MESSAGESOURCE_BASENAME = { "classpath:/i18n/messages", "classpath:/i18n/validationmessages" };
   
-  public void addResourceHandlers(ResourceHandlerRegistry registry)
-  {
-    registry.addResourceHandler(new String[] { "/static/**" }).addResourceLocations(new String[] { "classpath:/static/" });
-  }
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler(new String[] { "/static/**" }).addResourceLocations(new String[] { "classpath:/static/" });
+	}
   
   @Bean
-  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer()
-  {
+  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
     PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
     
     Resource[] resources = { new ClassPathResource("application.properties") };
@@ -44,8 +42,7 @@ public class ApplicationWebConfigurer
   }
   
   @Bean(name={"messageSource"})
-  public MessageSource getMessageSource()
-  {
+  public MessageSource getMessageSource() {
     ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
     
     messageSource.setBasenames(MESSAGESOURCE_BASENAME);
@@ -56,8 +53,7 @@ public class ApplicationWebConfigurer
   }
   
   @Bean
-  public LocaleResolver localeResolver()
-  {
+  public LocaleResolver localeResolver() {
     CookieLocaleResolver resolver = new CookieLocaleResolver();
     resolver.setDefaultLocale(new Locale("en"));
     resolver.setCookieName("vhcLocaleCookie");
@@ -65,23 +61,21 @@ public class ApplicationWebConfigurer
     return resolver;
   }
   
-  public void addInterceptors(InterceptorRegistry registry)
-  {
+  public void addInterceptors(InterceptorRegistry registry)  {
     LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
     interceptor.setParamName("lang");
     registry.addInterceptor(interceptor);
   }
   
-  @Bean(name={"validator"})
-  public LocalValidatorFactoryBean validator()
-  {
+  /*@Bean(name={"validator"})
+  public LocalValidatorFactoryBean validator() {
     LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
     bean.setValidationMessageSource(getMessageSource());
     return bean;
   }
   
-  public Validator getValidator()
-  {
+  @Override
+  public Validator getValidator() {
     return validator();
-  }
+  }*/
 }

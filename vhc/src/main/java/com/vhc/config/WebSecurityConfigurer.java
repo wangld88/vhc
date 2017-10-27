@@ -3,9 +3,10 @@ package com.vhc.config;
 import com.vhc.security.CustomSuccessHandler;
 import com.vhc.security.UserAdminAuthenticationProvider;
 import com.vhc.security.UserLoginService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -18,11 +19,12 @@ import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+
 @Configuration
 @EnableWebSecurity
-@ComponentScan({"com.vhc.security"})
-@Order(2147483640)
+@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
+	
 	@Autowired
 	UserLoginService userLoginService;
 	
@@ -30,6 +32,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 	CustomSuccessHandler customSuccessHandler;
 	
 	
+    @Override
 	protected void configure(HttpSecurity http)
 	    throws Exception {
 	    http.authorizeRequests()
@@ -43,23 +46,29 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 	    	.formLogin().loginPage("/admin/login").successHandler(this.customSuccessHandler)
 	    	.failureUrl("/admin/login?error")
 	    	.usernameParameter("username")
+	    	.passwordParameter("password")
 	    	.permitAll()
 	    .and()
 	    	.logout()
 	    	.logoutUrl("/admin/logout")
-	    	.deleteCookies(new String[] { "remember-me" })
+	    	.deleteCookies(new String[] {"remember-me"})
 	    	.logoutSuccessUrl("/admin/login")
 	    	.permitAll()
 	    .and()
 	    	.rememberMe();
 	}
 	  
+    @Override
 	public void configure(AuthenticationManagerBuilder auth)
 	    throws Exception {
-	    auth.userDetailsService(this.userLoginService);
+    	//auth.inMemoryAuthentication()
+        //.withUser("vhc").password("vhc").roles("SUPERADMIN"); 
+
+	    auth.userDetailsService(userLoginService);
 	    auth.authenticationProvider(getAuthProvider());
 	}
 	  
+    @Override
 	public void configure(WebSecurity web)
 	    throws Exception {
 	    web.ignoring()
@@ -69,16 +78,15 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 	
 	@Bean
 	public DaoAuthenticationProvider getAuthProvider() {
-	    System.out.println("***********getAuthProvider************");
-	    UserAdminAuthenticationProvider authProvider = new UserAdminAuthenticationProvider();
-	    authProvider.setUserDetailsService(this.userLoginService);
+	    final UserAdminAuthenticationProvider authProvider = new UserAdminAuthenticationProvider();
+	    authProvider.setUserDetailsService(userLoginService);
 	    authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
 	    
 	    return authProvider;
 	}
 	  
-	@Bean
+	/*@Bean
 	public SessionRegistry sessionRegistry() {
 	    return new SessionRegistryImpl();
-	}
+	}*/
 }

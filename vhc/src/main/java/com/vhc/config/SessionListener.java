@@ -7,8 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SessionListener
-  implements HttpSessionListener
-{
+  implements HttpSessionListener {
   private static final Logger logger = LoggerFactory.getLogger(SessionListener.class);
   private String timeout;
   

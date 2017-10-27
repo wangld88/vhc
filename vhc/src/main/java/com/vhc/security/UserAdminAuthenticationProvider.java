@@ -2,47 +2,58 @@ package com.vhc.security;
 
 import com.vhc.model.User;
 import com.vhc.service.UserService;
-import java.io.PrintStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import org.springframework.security.core.AuthenticationException;
 
-@Component
+
 public class UserAdminAuthenticationProvider
-  extends DaoAuthenticationProvider
-{
-  private static final Logger logger = LoggerFactory.getLogger(UserAdminAuthenticationProvider.class);
-  @Autowired
-  private UserService userService;
+	extends DaoAuthenticationProvider {
+	
+	private static final Logger logger = LoggerFactory.getLogger(UserAdminAuthenticationProvider.class);
+	
+	@Autowired
+	private UserService userService;
   
-  public Authentication authenticate(Authentication auth)
-    throws BadCredentialsException
-  {
-    System.out.println("++++++++++++++++UserAuthenticationProvider++++++++++++++++");
-    if (auth == null) {
-      System.out.println("auth is NULL");
-    } else {
-      System.out.println("auth.getName(): " + auth.getName() + ", " + auth.getCredentials());
-    }
-    User user = this.userService.findByUsername(auth.getName());
-    if (user == null)
-    {
-      logger.error("User " + auth.getName() + "can not be found!!!!");
-      throw new BadCredentialsException("Invalid username or password");
-    }
-    Authentication result = super.authenticate(auth);
+	@Override
+	public Authentication authenticate(Authentication auth)
+		throws AuthenticationException {
     
-    logger.info("result.getCredentials(): " + result.getCredentials().toString());
+		System.out.println("++++++++++++++++UserAuthenticationProvider++++++++++++++++");
+
+		if (auth == null) {
+			System.out.println("auth is NULL");
+	    } else {
+	    	System.out.println("auth.getName(): " + auth.getName() + ", password: " + auth.getCredentials() + ", principal:" + auth.getPrincipal());
+	    }
     
-    return new UsernamePasswordAuthenticationToken(new LoginUser(user), result.getCredentials(), result.getAuthorities());
-  }
+		//User user = this.userService.authenticate(auth.getName(), auth.getCredentials().toString());
+		User user = this.userService.findByUsername(auth.getName());
+    
+		if (user == null) {
+			logger.error("User " + auth.getName() + " can not be found!!!!");
+			throw new BadCredentialsException("Invalid username or password");
+		}
+		Authentication result = null;
+		try {
+			result = super.authenticate(auth);
+		//System.out.println("!!!!!!!!!!result.getCredentials(): " + result.getCredentials().toString());
+		//logger.info("result.getCredentials(): " + result.getCredentials().toString());
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return new UsernamePasswordAuthenticationToken(new LoginUser(user), result.getCredentials(), result.getAuthorities());
+	}
   
-  public boolean supports(Class<?> authentication)
-  {
-    return authentication.equals(UsernamePasswordAuthenticationToken.class);
-  }
+	@Override
+	public boolean supports(Class<?> authentication) {
+		return authentication.equals(UsernamePasswordAuthenticationToken.class);
+	}
 }
