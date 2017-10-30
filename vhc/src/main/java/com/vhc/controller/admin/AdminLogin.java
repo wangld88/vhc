@@ -10,38 +10,36 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping({"/admin"})
-public class AdminLogin
-  extends BaseController
-{
-  private static final Logger logger = LoggerFactory.getLogger(AdminLogin.class);
+public class AdminLogin extends BaseController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(AdminLogin.class);
   
-  @RequestMapping(method={org.springframework.web.bind.annotation.RequestMethod.GET}, value={"/login"})
-  public String dspLogin(ModelMap model)
-  {
-    return "admin/login/login";
-  }
+	@RequestMapping(method={RequestMethod.GET}, value={"/login"})
+	public String dspLogin(ModelMap model) {
+		return "admin/login/login";
+	}
   
-  @RequestMapping(value={"/Access_Denied"}, method={org.springframework.web.bind.annotation.RequestMethod.GET})
-  public String accessDeniedPage(ModelMap model)
-  {
-    model.addAttribute("user", getPrincipal());
-    return "/error/accessDenied";
-  }
+	@RequestMapping(value={"/Access_Denied"}, method={RequestMethod.GET})
+	public String accessDeniedPage(ModelMap model) {
+		model.addAttribute("user", getPrincipal());
+		return "/error/accessDenied";
+	}
   
-  private String getPrincipal()
-  {
-    String userName = null;
-    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	
+	private String getPrincipal()	{
+		String userName = null;
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     
-    logger.info("Get Logged in User : " + ((UserDetails)principal).toString());
-    if ((principal instanceof UserDetails)) {
-      userName = ((UserDetails)principal).getUsername();
-    } else {
-      userName = principal.toString();
-    }
-    return userName;
-  }
+		logger.info("Get Logged in User : " + ((UserDetails)principal).toString());
+		if ((principal instanceof UserDetails)) {
+			userName = ((UserDetails)principal).getUsername();
+		} else {
+			userName = principal.toString();
+		}
+		return userName;
+	}
 }

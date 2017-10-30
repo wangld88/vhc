@@ -38,7 +38,7 @@ public class UserAdminAuthenticationProvider
     
 		if (user == null) {
 			logger.error("User " + auth.getName() + " can not be found!!!!");
-			throw new BadCredentialsException("Invalid username or password");
+			throw new BadCredentialsException("Invalid username");
 		}
 		Authentication result = null;
 		try {
@@ -47,6 +47,7 @@ public class UserAdminAuthenticationProvider
 		//logger.info("result.getCredentials(): " + result.getCredentials().toString());
 		} catch(Exception e) {
 			e.printStackTrace();
+			throw new BadCredentialsException("Invalid username or password");
 		}
 		
 		return new UsernamePasswordAuthenticationToken(new LoginUser(user), result.getCredentials(), result.getAuthorities());

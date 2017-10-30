@@ -7,10 +7,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -21,19 +21,19 @@ import org.jsondoc.core.annotation.ApiObjectField;
 @Entity
 @Table(name="USERS")
 @NamedQuery(name="User.findAll", query="SELECT s FROM User s")
-public class User
- 	implements Serializable {
+public class User implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	
 	@Id
-	@SequenceGenerator(name="USERS_USERID_GENERATOR", sequenceName="USER_SEQ")
-	@GeneratedValue(generator="USERS_USERID_GENERATOR")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name = "userid", updatable = false, nullable = false)
 	private long userid;
 	
-	@Column(nullable=true, unique=true, length=40)
+	@Column(nullable=false, unique=true, length=40)
 	@Size(max=40)
-	@ApiObjectField(description="Unique Username", format="Not Null, maxlength = 40", required=false)
+	@ApiObjectField(description="Unique Username", format="Not Null, maxlength = 40", required=true)
 	private String username;
 	
 	@Column(nullable=false, length=40)

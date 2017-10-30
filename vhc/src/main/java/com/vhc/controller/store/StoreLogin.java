@@ -7,27 +7,28 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping({"/store"})
-public class StoreLogin
-  extends BaseController
-{
-  private static final Logger logger = LoggerFactory.getLogger(StoreLogin.class);
+public class StoreLogin extends BaseController {
   
-  @RequestMapping(method={org.springframework.web.bind.annotation.RequestMethod.GET}, value={"/errorpage/{errorid}"})
-  public String globalerrorpage(ModelMap model, @PathVariable("errorid") Long errorid)
-  {
-    model.addAttribute("errorid", errorid);
-    model.addAttribute("title", "Error");
+	private static final Logger logger = LoggerFactory.getLogger(StoreLogin.class);
+  
+	@RequestMapping(method={RequestMethod.GET}, value={"/errorpage/{errorid}"})
+	public String globalerrorpage(ModelMap model, @PathVariable("errorid") Long errorid) {
+		
+		logger.info("globalerrorpage is called");
+		String toRet = "error";
+		model.addAttribute("errorid", errorid);
+		model.addAttribute("title", "Error");
     
-    String toRet = "errorpage";
-    return toRet;
-  }
+		return toRet;
+	}
   
-  @RequestMapping(method={org.springframework.web.bind.annotation.RequestMethod.GET}, value={"/login"})
-  public String dspLogin(ModelMap model)
-  {
-    return "store/login/login";
-  }
+	@RequestMapping(method={RequestMethod.GET}, value={"/login"})
+	public String dspLogin(ModelMap model) {
+		return "store/login/login";
+	}
+	
 }
