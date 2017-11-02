@@ -67,6 +67,9 @@ public class Manufacture implements Serializable {
 	@ApiObjectField(description="Unique Address", format="Not Null", required=false)
 	private Address address;
 
+	public Manufacture () {
+		
+	}
 	
 	public long getManufactureid() {
 		return manufactureid;

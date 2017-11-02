@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html layout:decorator="admin/layout">
+	<div layout:fragment="content">
+
+		<section id="main-content">
+			<section class="wrapper">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Product Management</h3>
+						<ol class="breadcrumb">
+							<li><i class="fa fa-home"></i><a th:href="@{/admin/home}">Home</a></li>
+							<li><i class="icon_document_alt"></i>Products</li>
+							<li><i class="fa fa-file-text-o"></i><span th:text="${product==null?'New Product':'Modify Product'}"></span></li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+						<section class="panel">
+							<header class="panel-heading">
+								Product
+							</header>
+							<div class="panel-body">
+								<div class="form">
+									<form class="form-validate form-horizontal " id="product" name="product" method="post" th:action="@{/admin/product}">
+										<div class="form-group">
+										    <label for="fullname" class="control-label col-lg-2">Full Name <span class="required">*</span></label>
+										    <div class="col-lg-10">
+										        <input class=" form-control" id="name" name="name" th:value="${product==null?'':product.name}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="stree" class="control-label col-lg-2">Code </label>
+										    <div class="col-lg-10">
+										        <input class=" form-control" id="code" name="code" th:value="${product==null?'':product.code}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="postalcode" class="control-label col-lg-2">Description </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="description" name="description" th:value="${product==null?'':product.description}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="brandid" class="control-label col-lg-2">Brand </label>
+										    <div class="col-lg-10">
+												<select class="form-control m-bot15" id="brandid" name="brandid">
+													<option th:each="brand: ${brands}" th:value="${brand.brandid}" th:text="${brand.name}" th:selected="${product==null?'':(product.brand.brandid.equals(brand.brandid)?'Selected':'')}"></option>
+												</select>
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="comments" class="control-label col-lg-2">Comments </label>
+										    <div class="col-lg-10">
+										        <textarea class="form-control " id="comments" name="comments" th:value="${product==null?'':product.comments}" ></textarea>
+										    </div>
+										</div>
+										<div class="form-group">
+										    <div class="col-lg-offset-2 col-lg-10">
+										        <button class="btn btn-primary" type="submit"> Save </button>
+										        <button class="btn btn-default" type="button">Cancel</button>
+										        <input type="hidden" id="productid" name="productid" th:value="${product==null?'':product.productid}" />
+										    </div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</section>
+					</div>
+				</div>
+			</section>
+		</section>
+      <!--main content end-->
+	</div>
+</html>

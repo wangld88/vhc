@@ -22,7 +22,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 @Entity
 @Table(name="CITIES", uniqueConstraints={@UniqueConstraint(columnNames = {"name" , "provinceid"})})
 @ApiObject
-@NamedQuery(name="City.findAll", query="SELECT c FROM City c")
+//@NamedQuery(name="City.findAll", query="SELECT c FROM City c")
 public class City implements Serializable {
 
 	private static final long serialVersionUID = -2787102776094092844L;
@@ -43,6 +43,10 @@ public class City implements Serializable {
 	@ApiObjectField(description="Unique Province", required=false)
 	private Province province;
 
+	public City() {
+		
+	}
+	
 	public long getCityid() {
 		return cityid;
 	}

@@ -39,15 +39,19 @@ public class Country implements Serializable {
 	@ApiObjectField(description="Unique Name", format="Not Null, maxlength = 100", required=true)
 	private String name;
 
-	@Column(nullable=true, unique=true, length=3)
+/*	@Column(nullable=true, unique=true, length=3)
 	@Size(max=3)
 	@ApiObjectField(description="Unique Name", format="Not Null, maxlength = 3", required=false)
 	private String code;
-
+*/
 	
-	public Country(String name, String code) {
+	public Country() {
+		
+	}
+	
+	public Country(String name) { //, String code) {
 		this.name = name;
-		this.code = code;
+		//this.code = code;
 	}
 	
 	public long getCountryid() {
@@ -66,12 +70,12 @@ public class Country implements Serializable {
 		this.name = name;
 	}
 
-	public String getCode() {
+	/*public String getCode() {
 		return code;
 	}
 
 	public void setCode(String code) {
 		this.code = code;
-	}
+	}*/
 
 }

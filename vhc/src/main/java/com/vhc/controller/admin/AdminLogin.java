@@ -1,6 +1,5 @@
 package com.vhc.controller.admin;
 
-import com.vhc.controller.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -11,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.vhc.controller.BaseController;
 
 @Controller
 @RequestMapping({"/admin"})
@@ -28,7 +29,13 @@ public class AdminLogin extends BaseController {
 		model.addAttribute("user", getPrincipal());
 		return "/error/accessDenied";
 	}
-  
+
+	
+	@RequestMapping(method={RequestMethod.GET}, value={"/"})
+	public String dspHome(ModelMap model) {
+		return "index";
+	}
+	
 	
 	private String getPrincipal()	{
 		String userName = null;

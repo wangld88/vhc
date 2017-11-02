@@ -58,6 +58,10 @@ public class Product implements Serializable {
 	private Brand brand;
 
 	
+	public Product() {
+		
+	}
+	
 	public long getProductid() {
 		return productid;
 	}

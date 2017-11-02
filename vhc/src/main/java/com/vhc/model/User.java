@@ -78,6 +78,11 @@ public class User implements Serializable {
 	@OneToMany(cascade={javax.persistence.CascadeType.ALL}, mappedBy="user", fetch=FetchType.EAGER)
 	private List<Userrole> userroles;
   
+	
+	public User() {
+		
+	}
+	
 	public long getUserid() {
 		return this.userid;
 	}

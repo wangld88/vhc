@@ -41,6 +41,10 @@ public class Brand implements Serializable {
 	private Manufacture manufacture;
 
 	
+	public Brand() {
+		
+	}
+	
 	public long getBrandid() {
 		return brandid;
 	}

@@ -37,16 +37,20 @@ public class Province implements Serializable {
 	@ApiObjectField(description="Unique Name", format="Not Null, maxlength = 100", required=true)
 	private String name;
 
-	@Column(nullable=true, unique=true, length=3)
+	/*@Column(nullable=true, unique=true, length=3)
 	@Size(max=3)
 	@ApiObjectField(description="Unique Code", format="maxlength = 3", required=false)
-	private String code;
+	private String code;*/
 
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="countryid")
 	@ApiObjectField(description="Unique Country", required=false)
 	private Country country;
 
+	
+	public Province() {
+		
+	}
 	
 	public long getProvinceid() {
 		return provinceid;
@@ -64,13 +68,13 @@ public class Province implements Serializable {
 		this.name = name;
 	}
 
-	public String getCode() {
+	/*public String getCode() {
 		return code;
 	}
 
 	public void setCode(String code) {
 		this.code = code;
-	}
+	}*/
 
 	public Country getCountry() {
 		return country;
