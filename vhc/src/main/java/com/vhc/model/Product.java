@@ -37,25 +37,50 @@ public class Product implements Serializable {
 	@ApiObjectField(description="Manufacture's Name", format="Not Null, maxlength = 200", required=true)
 	private String name;
 	
-	@Column(nullable=true, unique=true, length=40)
+	@Column(nullable=true, length=40)
 	@Size(max=40)
-	@ApiObjectField(description="Unique Name", format="Not Null, maxlength = 40", required=false)
-	private String code;
+	@ApiObjectField(description="Model Number", format="maxlength = 40", required=false)
+	private String modelnum;
+
+	@Column(nullable=true, length=50)
+	@Size(max=50)
+	@ApiObjectField(description="Universal Product Code", format="maxlength = 50", required=false)
+	private String upc;
 
 	@Column(nullable=true, length=400)
 	@Size(max=400)
-	@ApiObjectField(description="Description", format="Not Null, maxlength = 400", required=false)
+	@ApiObjectField(description="Description", format="maxlength = 400", required=false)
 	private String description;
+	        
+	@Column(nullable=true, length=80)
+	@Size(max=80)
+	@ApiObjectField(description="Style", format="maxlength = 80", required=false)
+	private String style;
+	        
+	@Column(nullable=true, length=80)
+	@Size(max=80)
+	@ApiObjectField(description="Material", format="maxlength = 80", required=false)
+	private String material;
 	        
 	@Column(nullable=true, length=600)
 	@Size(max=600)
-	@ApiObjectField(description="Web Site", format="maxlength = 600", required=false)
+	@ApiObjectField(description="Commnents", format="maxlength = 600", required=false)
 	private String comments;
 	
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="brandid")
 	@ApiObjectField(description="Unique Brand", required=true)
 	private Brand brand;
+
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="typeid")
+	@ApiObjectField(description="Product Type", required=true)
+	private Type type;
+
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="colorid")
+	@ApiObjectField(description="Product Color", required=true)
+	private Color color;
 
 	
 	public Product() {
@@ -76,14 +101,6 @@ public class Product implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
 	}
 
 	public String getDescription() {
@@ -108,6 +125,54 @@ public class Product implements Serializable {
 
 	public void setBrand(Brand brand) {
 		this.brand = brand;
+	}
+
+	public String getModelnum() {
+		return modelnum;
+	}
+
+	public void setModelnum(String modelnum) {
+		this.modelnum = modelnum;
+	}
+
+	public String getUpc() {
+		return upc;
+	}
+
+	public void setUpc(String upc) {
+		this.upc = upc;
+	}
+
+	public String getStyle() {
+		return style;
+	}
+
+	public void setStyle(String style) {
+		this.style = style;
+	}
+
+	public String getMaterial() {
+		return material;
+	}
+
+	public void setMaterial(String material) {
+		this.material = material;
+	}
+
+	public Type getType() {
+		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
 	}
 
 }

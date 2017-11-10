@@ -1,6 +1,7 @@
 package com.vhc.controller.admin;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,10 +21,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.vhc.controller.BaseController;
 import com.vhc.model.Address;
 import com.vhc.model.City;
+import com.vhc.model.Item;
+import com.vhc.model.Product;
+import com.vhc.model.Region;
 import com.vhc.model.Shipment;
+import com.vhc.model.Size;
 import com.vhc.model.Supplier;
+import com.vhc.model.User;
+import com.vhc.security.LoginUser;
 
 
+/**
+ * 
+ * 
+ * @author Jerry
+ *
+ */
 @Controller
 @RequestMapping({"/admin"})
 public class AdminShipment extends BaseController {
@@ -36,6 +50,7 @@ public class AdminShipment extends BaseController {
 		
 		List<Supplier> mfs = supplierService.getAll();
 		model.addAttribute("suppliers", mfs);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
@@ -48,6 +63,7 @@ public class AdminShipment extends BaseController {
 		List<City> cities = cityService.getAll();
 		
 		model.addAttribute("cities", cities);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
@@ -63,6 +79,7 @@ public class AdminShipment extends BaseController {
 		List<City> cities = cityService.getAll();
 		model.addAttribute("mf", mf);
 		model.addAttribute("cities", cities);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
@@ -107,6 +124,7 @@ public class AdminShipment extends BaseController {
 		mf.setWebsite(website);
 		mf.setComments(comments);
 		supplierService.save(mf);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return "redirect: " + rtn;
 	}
@@ -118,6 +136,7 @@ public class AdminShipment extends BaseController {
 		
 		List<Shipment> mfs = shipmentService.getAll();
 		model.addAttribute("shipments", mfs);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
@@ -127,9 +146,10 @@ public class AdminShipment extends BaseController {
 	public String dspShipment(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/shipment";
 		
-		List<City> cities = cityService.getAll();
+		List<Supplier> suppliers = supplierService.getAll();
 		
-		model.addAttribute("cities", cities);
+		model.addAttribute("suppliers", suppliers);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
@@ -142,9 +162,13 @@ public class AdminShipment extends BaseController {
 		long mfid = shipmentid.longValue();
 		Shipment mf = shipmentService.getById(mfid);
 		
-		List<City> cities = cityService.getAll();
-		model.addAttribute("mf", mf);
-		model.addAttribute("cities", cities);
+		List<Supplier> suppliers = supplierService.getAll();
+		List<Item> items = itemService.getByShipment(mfid);
+		
+		model.addAttribute("items", items);
+		model.addAttribute("suppliers", suppliers);
+		model.addAttribute("shipment", mf);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
@@ -155,17 +179,21 @@ public class AdminShipment extends BaseController {
 		throws Exception {
 		
 		String rtn = "shipments";
+		User recordedby = this.getPrincipal();
 		
-		logger.info("doShipment is call!!!!!");
-		
-		Address ads = new Address();
+		logger.info("doShipment is call!!!!! - " + recordedby.getUsername());
 		
 		String mfid = requestParams.get("shipmentid");
 		String code = requestParams.get("code");
 		String supplierid = requestParams.get("supplierid");
-		String receivedby = requestParams.get("receivedby");
-		String receivedate = requestParams.get("receivedate");
+		long receivedby = Long.parseLong(requestParams.get("receivedby"));
+		User recUser = userService.getById(receivedby);
+		Calendar cal = Calendar.getInstance(); 
 		String comments = requestParams.get("comments");
+		String receivedate = requestParams.get("receivedate");  //
+		SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+		Calendar rcdCal = Calendar.getInstance();
+		rcdCal.setTime(formatter.parse(receivedate));
 		
 		Supplier supplier = supplierService.getById(Long.parseLong(supplierid));
 		
@@ -175,15 +203,154 @@ public class AdminShipment extends BaseController {
 		}
 		mf.setSupplier(supplier);
 		mf.setCode(code);
-		mf.setReceivedby(receivedby);
+		mf.setReceivedby(recUser);
+		mf.setReceivedate(rcdCal);
 		mf.setComments(comments);
-		SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(formatter.parse(receivedate));
 		mf.setReceivedate(cal);
-		
+		mf.setRecordedby(recordedby);
+		mf.setRecorddate(cal);
+		try {
 		shipmentService.save(mf);
-		
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		model.addAttribute("loginUser", getPrincipal());
+
 		return "redirect: " + rtn;
 	}
+
+	@RequestMapping(method={RequestMethod.GET}, value={"/items"})
+	public String dspItems(ModelMap model, HttpSession httpSession) {
+		String rtn = "admin/items";
+		
+		
+		List<Item> items = itemService.getAll();
+		model.addAttribute("items", items);
+		model.addAttribute("loginUser", getPrincipal());
+		
+		return rtn;
+	}
+	
+	
+	@RequestMapping(method={RequestMethod.GET}, value={"/item"})
+	public String dspItem(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
+		String rtn = "admin/item";
+		String shipmentid = requestParams.get("shipmentid");
+		List<Shipment> shipments = new ArrayList<>();
+		
+		if(shipmentid != null && !shipmentid.isEmpty()) {
+			shipments.add(shipmentService.getById(Long.parseLong(shipmentid)));
+		} else {
+			shipments = shipmentService.getAll();
+		}
+		
+		List<Size> sizes = sizeService.getAll();
+		List<Region> regions = regionService.getAll();
+		List<Product> products = productService.getAll();
+		
+		model.addAttribute("sizes", sizes);
+		model.addAttribute("regions", regions);
+		model.addAttribute("products", products);
+		model.addAttribute("shipments", shipments);
+		model.addAttribute("loginUser", getPrincipal());
+		
+		return rtn;
+	}
+	
+	
+	@RequestMapping(method={RequestMethod.GET}, value={"/item/{itemid}"})
+	public String updateItem(ModelMap model, @PathVariable("itemid") Long itemid, HttpSession httpSession) {
+		String rtn = "admin/item";
+		
+		long mfid = itemid.longValue();
+		Item mf = itemService.getById(mfid);
+		
+		List<Shipment> shipments = shipmentService.getAll();
+		List<Product> products = productService.getAll();
+		List<Size> sizes = sizeService.getAll();
+		List<Region> regions = regionService.getAll();
+		
+		model.addAttribute("sizes", sizes);
+		model.addAttribute("regions", regions);
+		model.addAttribute("shipments", shipments);
+		model.addAttribute("products", products);
+		model.addAttribute("item", mf);
+		model.addAttribute("loginUser", getPrincipal());
+		
+		return rtn;
+	}
+
+	
+	@RequestMapping(method={RequestMethod.POST}, value={"/item"})
+	public String doItem(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) 
+		throws Exception {
+		
+		String rtn = "items";
+		User receivedby = this.getPrincipal();
+		
+		logger.info("doShipment is call!!!!! - " + receivedby.getUsername());
+		
+		String mfid = requestParams.get("itemid");
+		String sku = requestParams.get("sku");
+		String sizeid = requestParams.get("sizeid");
+		String quantity = requestParams.get("quantity");
+		String cost = requestParams.get("cost");
+		String price = requestParams.get("price");
+		String shipmentid = requestParams.get("shipmentid");
+		String productid = requestParams.get("productid");
+		String comments = requestParams.get("comments");
+		
+		String rtn_shipmentid = requestParams.get("rtn_shipmentid");
+		//long receivedby = Long.parseLong(requestParams.get("receivedby"));
+		System.out.println("++++++++++++++++rtn_shipmentid:" + rtn_shipmentid);
+		Calendar cal = Calendar.getInstance(); 
+		/*String receivedate = requestParams.get("receivedate");  //
+		SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(formatter.parse(receivedate));*/
+		
+		Shipment shipment = shipmentService.getById(Long.parseLong(shipmentid));
+		Product product = productService.getById(Long.parseLong(productid));
+		Size size = sizeService.getById(Long.parseLong(sizeid));
+		
+		Item item = new Item();
+		if(mfid != null && !mfid.isEmpty()) {
+			item.setItemid(Long.parseLong(mfid));
+		}
+		item.setShipment(shipment);
+		item.setSku(sku);
+		item.setSize(size);
+		item.setCost(Double.parseDouble(cost));
+		item.setPrice(Double.parseDouble(price));
+		item.setProduct(product);
+		item.setReceivedby(receivedby);
+		item.setComments(comments);
+		item.setQuantity(Long.parseLong(quantity));
+		item.setReceivedate(cal);
+		try {
+			itemService.save(item);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		if(rtn_shipmentid != null && !rtn_shipmentid.isEmpty()) {
+			rtn = "shipment/" + rtn_shipmentid;
+		}
+		
+		model.addAttribute("loginUser", getPrincipal());
+
+		return "redirect: " + rtn;
+	}
+
+	private User getPrincipal(){
+    	User user = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        //System.out.println("Role is : "+((LoginStudent)principal).toString());
+        if (principal instanceof LoginUser) {
+            user = ((LoginUser)principal).getUser();
+        } else {
+            user = userService.findByUsername("");
+        }
+        return user;
+    }
 }

@@ -55,7 +55,7 @@ var Script = function () {
 
 
 
-    $(function() {
+    /*$(function() {
 
         // Tags Input
         $(".tagsinput").tagsInput();
@@ -63,16 +63,16 @@ var Script = function () {
         // Switch
         $("[data-toggle='switch']").wrap('<div class="switch" />').parent().bootstrapSwitch();
 
-    });
+    });*/
 
 
 
     //color picker
 
-    $('.cp1').colorpicker({
+    /*$('.cp1').colorpicker({
         format: 'hex'
     });
-    $('.cp2').colorpicker();
+    $('.cp2').colorpicker();*/
 
 
     //date picker
@@ -81,8 +81,8 @@ var Script = function () {
         top.location.href = document.location.href ;
     }
     $(function(){
-        window.prettyPrint && prettyPrint();
-        $('#dp1').datepicker({
+        //window.prettyPrint && prettyPrint();
+        $('#receivedate').datepicker({
             format: 'mm-dd-yyyy'
         });
         $('#dp2').datepicker();
@@ -147,7 +147,7 @@ var Script = function () {
 
     //daterange picker
 
-    $('#reservation').daterangepicker();
+    /*$('#reservation').daterangepicker();
 
     $('#reportrange').daterangepicker(
         {
@@ -184,7 +184,7 @@ var Script = function () {
     );
 
     //Set the initial state of the picker label
-    $('#reportrange span').html(Date.today().add({ days: -29 }).toString('MMMM d, yyyy') + ' - ' + Date.today().toString('MMMM d, yyyy'));
+    $('#reportrange span').html(Date.today().add({ days: -29 }).toString('MMMM d, yyyy') + ' - ' + Date.today().toString('MMMM d, yyyy'));*/
 
 
 }();

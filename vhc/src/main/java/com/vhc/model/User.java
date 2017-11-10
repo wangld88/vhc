@@ -66,6 +66,11 @@ public class User implements Serializable {
 	@ApiObjectField(description="User's password", format="Not Null, maxlength = 60", required=true)
 	private String password;
 	
+	@Column(nullable=false, length=10)
+	@Size(max=10)
+	@ApiObjectField(description="User's Gender", format="Not Null, maxlength = 10", required=true)
+	private String gender;
+
 	@Temporal(TemporalType.DATE)
 	@Column(nullable=false)
 	@ApiObjectField(description="User's creationdate", format="Not Null, maxlength = 60", required=true)

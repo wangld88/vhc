@@ -9,20 +9,29 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.thymeleaf.exceptions.TemplateProcessingException;
 
 import com.vhc.service.AddressService;
 import com.vhc.service.BrandService;
 import com.vhc.service.CityService;
-import com.vhc.service.ManufactureService;
+import com.vhc.service.ColorService;
+import com.vhc.service.ItemService;
+import com.vhc.service.TypeService;
 import com.vhc.service.ProductService;
+import com.vhc.service.RegionService;
 import com.vhc.service.ShipmentService;
+import com.vhc.service.SizeService;
+import com.vhc.service.StoreService;
 import com.vhc.service.SupplierService;
+import com.vhc.service.UserService;
 
 
 public class BaseController {
@@ -39,7 +48,7 @@ public class BaseController {
 	protected AddressService addressService;
 
 	@Autowired
-	protected ManufactureService manufactureService;
+	protected TypeService typeService;
 
 	@Autowired
 	protected BrandService brandService;
@@ -50,11 +59,58 @@ public class BaseController {
 	@Autowired
 	protected ShipmentService shipmentService;
 	
+	@Autowired
+	protected ItemService itemService;
+	
+	@Autowired
+	protected StoreService storeService;
+	
+	@Autowired
+	protected UserService userService;
+	
+	@Autowired
+	protected ColorService colorService;
+	
+	@Autowired
+	protected RegionService regionService;
+	
+	@Autowired
+	protected SizeService sizeService;
+
+	
 	protected static final String DATE_FORMAT = "yyyy-MM-dd";
 	
 	protected static final String ERROR_VIEW = "error/error";
 	
 	
+	@ExceptionHandler(TemplateProcessingException.class)
+	public ModelAndView handleTemplateProcessingException(Exception e) {
+		
+		final ModelAndView model = initModelView(null);
+		
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+		model.setStatus(HttpStatus.NOT_FOUND);
+		model.addObject("errordetails", "No such page found!");
+		//model.addObject(RETURN_MESSAGE, new Message(Message.ERROR, "The requested resource could not be found!"));
+		logger.info("Error: " + e.getMessage());
+		
+        return model;
+    }
+	
+
+	@ExceptionHandler(NoHandlerFoundException.class)
+	public ModelAndView handleNoHandlerFoundException(Exception e) {
+		
+		final ModelAndView model = initModelView("norule");
+		model.setStatus(HttpStatus.NOT_FOUND);
+		model.addObject("errordetails", "No such page found!");
+		//model.addObject(RETURN_MESSAGE, new Message(Message.ERROR, "The requested resource could not be found!"));
+		logger.info("Error: " + e.getMessage());
+		
+        return model;
+    }
+	
+
 	@ExceptionHandler({ Exception.class })
 	public ModelAndView uncaughtExceptionHandling (Exception e, HttpServletResponse httpresponse) {
 

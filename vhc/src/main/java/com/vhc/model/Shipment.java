@@ -32,18 +32,26 @@ public class Shipment implements Serializable {
 	
 	@Column(nullable=false, unique=true, length=200)
 	@Size(max=200)
-	@ApiObjectField(description="Item's Name", format="Not Null, maxlength = 200", required=true)
+	@ApiObjectField(description="Shipment's Name", format="Not Null, maxlength = 200", required=true)
 	private String code;
 	
-	@Column(nullable=true, length=10)
-	@Size(max=10)
-	@ApiObjectField(description="receivedby", format="maxlength = 10", required=false)
-	private String receivedby;
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="receivedby")
+	@ApiObjectField(description="Receive User", required=true)
+	private User receivedby;
 
-	@Column(nullable=true, length=10)
-	@Size(max=10)
-	@ApiObjectField(description="receivedate", format="maxlength = 10", required=false)
+	@Column(nullable=true)
+	@ApiObjectField(description="receivedate", required=false)
 	private Calendar receivedate;
+
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="recordedby")
+	@ApiObjectField(description="Recording User", required=true)
+	private User recordedby;
+
+	@Column(nullable=true)
+	@ApiObjectField(description="recorddate", required=false)
+	private Calendar recorddate;
 
 	@Column(nullable=true, length=600)
 	@Size(max=600)
@@ -76,11 +84,11 @@ public class Shipment implements Serializable {
 		this.code = code;
 	}
 
-	public String getReceivedby() {
+	public User getReceivedby() {
 		return receivedby;
 	}
 
-	public void setReceivedby(String receivedby) {
+	public void setReceivedby(User receivedby) {
 		this.receivedby = receivedby;
 	}
 
@@ -106,6 +114,22 @@ public class Shipment implements Serializable {
 
 	public void setSupplier(Supplier supplier) {
 		this.supplier = supplier;
+	}
+
+	public User getRecordedby() {
+		return recordedby;
+	}
+
+	public void setRecordedby(User recordedby) {
+		this.recordedby = recordedby;
+	}
+
+	public Calendar getRecorddate() {
+		return recorddate;
+	}
+
+	public void setRecorddate(Calendar recorddate) {
+		this.recorddate = recorddate;
 	}
 
 }

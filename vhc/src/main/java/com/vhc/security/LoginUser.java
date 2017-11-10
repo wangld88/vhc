@@ -13,6 +13,11 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 
+/**
+ * 
+ * @author Jerry
+ *
+ */
 public class LoginUser extends User {
 
 	private static final long serialVersionUID = 1L;
@@ -21,11 +26,11 @@ public class LoginUser extends User {
 	
 	public LoginUser(com.vhc.model.User user) {
 		super(user.getUsername(), user.getPassword(), AuthorityUtils.createAuthorityList(user.getRoles()));
-		System.out.println("user.getUsername(): "+user.getUsername() + ", Password:" +user.getPassword()+", roles: "+user.getRoles());
+		/*System.out.println("user.getUsername(): "+user.getUsername() + ", Password:" +user.getPassword()+", roles: "+user.getRoles());
 		String[] roles = user.getRoles();
 		for(String i: roles) {
 			System.out.println("i :" + i);
-		}
+		}*/
 		this.user = user;
 	}
 

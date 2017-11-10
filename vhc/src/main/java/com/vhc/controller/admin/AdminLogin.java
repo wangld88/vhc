@@ -33,6 +33,7 @@ public class AdminLogin extends BaseController {
 	
 	@RequestMapping(method={RequestMethod.GET}, value={"/"})
 	public String dspHome(ModelMap model) {
+		model.addAttribute("loginUser", getPrincipal());
 		return "index";
 	}
 	

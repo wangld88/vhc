@@ -26,15 +26,25 @@
 								<tbody>
 									<tr>
 										<th><i class="icon_documents"></i> Brand Name</th>
-										<th><i class="icon_pin_alt"></i> Manufacture</th>
-										<th><i class="icon_cogs"></i> Action</th>
+										<th><i class="icon_pin_alt"></i> Description</th>
+										<th><i class="icon_calendar"></i> Address</th>
+										<th><i class="icon_pin_alt"></i> City</th>
+										<th><i class="icon_contacts_alt"></i> Contact</th>
+										<th><i class="icon_mail_alt"></i> Email</th>
+										<th><i class="icon_mobile"></i> Phone</th>
+									<th><i class="icon_cogs"></i> Action</th>
 									</tr>
 									<tr th:each="brand:${brands}">
 										<td th:text="${brand.name}"></td>
-										<td th:text="${brand.manufacture.name}"></td>
+										<td th:text="${brand.description}"></td>
+										<td th:text="${brand.address.street}"></td>
+										<td th:text="${brand.address.city.name}"></td>
+										<td th:text="${brand.contact}"></td>
+										<td th:text="${brand.email}"></td>
+										<td th:text="${brand.phone}"></td>
 										<td>
 											<div class="btn-group">
-												<a class="btn btn-primary" th:href="@{/admin/brand}" title="Add New Brand"><i class="icon_plus_alt2"></i></a>
+												<!-- <a class="btn btn-primary" th:href="@{/admin/brand}" title="Add New Brand"><i class="icon_plus_alt2"></i></a> -->
 												<a class="btn btn-success" th:href="@{/admin/brand/}+${brand.brandid}" title="Edit Brand"><i class="icon_pencil-edit_alt"></i></a>
 												<!-- <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a> -->
 											</div>

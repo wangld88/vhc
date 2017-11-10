@@ -26,22 +26,32 @@
 								<tbody>
 									<tr>
 										<th><i class="icon_documents"></i> Product Name</th>
-										<th><i class="icon_calendar"></i> Code</th>
-										<th><i class="icon_pin_alt"></i> Description</th>
 										<th><i class="icon_contacts_alt"></i> Brand</th>
+										<th><i class="icon_calendar"></i> Model No.</th>
+										<th><i class="icon_pin_alt"></i> Description</th>
+										<th><i class="icon_pin_alt"></i> UPC</th>
+										<th><i class="icon_mail_alt"></i> Type</th>
+										<th><i class="icon_mail_alt"></i> Color</th>
+										<th><i class="icon_mail_alt"></i> Style</th>
+										<th><i class="icon_mail_alt"></i> Material</th>
 										<th><i class="icon_mail_alt"></i> Comments</th>
 										<th><i class="icon_cogs"></i> Action</th>
 									</tr>
 									<tr th:each="product:${products}">
 										<td th:text="${product.name}"></td>
-										<td th:text="${product.code}"></td>
-										<td th:text="${product.description}"></td>
 										<td th:text="${product.brand.name}"></td>
+										<td th:text="${product.modelnum}"></td>
+										<td th:text="${product.description}"></td>
+										<td th:text="${product.upc}"></td>
+										<td th:text="${product.type.name}"></td>
+										<td th:text="${product.color.name}"></td>
+										<td th:text="${product.style}"></td>
+										<td th:text="${product.material}"></td>
 										<td th:text="${product.comments}"></td>
 										<td>
 											<div class="btn-group">
-												<a class="btn btn-primary" th:href="@{/admin/product}" title="Add New Product"><i class="icon_plus_alt2"></i></a>
 												<a class="btn btn-success" th:href="@{/admin/product/}+${product.productid}" title="Edit Product"><i class="icon_pencil-edit_alt"></i></a>
+												<a class="btn btn-primary" th:href="@{/admin/product}" title="Add New Product"><i class="icon_plus_alt2"></i></a>
 												<!-- <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a> -->
 											</div>
 										</td>

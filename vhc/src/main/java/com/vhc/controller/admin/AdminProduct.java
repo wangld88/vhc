@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,12 +20,17 @@ import com.vhc.controller.BaseController;
 import com.vhc.model.Address;
 import com.vhc.model.Brand;
 import com.vhc.model.City;
-import com.vhc.model.Manufacture;
+import com.vhc.model.Color;
+import com.vhc.model.Type;
+import com.vhc.model.User;
+import com.vhc.security.LoginUser;
 import com.vhc.model.Product;
+import com.vhc.model.Region;
+import com.vhc.model.Size;
 import com.vhc.service.AddressService;
 import com.vhc.service.BrandService;
 import com.vhc.service.CityService;
-import com.vhc.service.ManufactureService;
+import com.vhc.service.TypeService;
 import com.vhc.service.ProductService;
 
 @Controller
@@ -34,83 +40,51 @@ public class AdminProduct extends BaseController {
 	private final Logger logger = LoggerFactory.getLogger(AdminProduct.class);
 	
 	
-	@RequestMapping(method={RequestMethod.GET}, value={"/manufactures"})
-	public String dspManufactures(ModelMap model, HttpSession httpSession) {
-		String rtn = "admin/manufactures";
+	@RequestMapping(method={RequestMethod.GET}, value={"/types"})
+	public String dspTypes(ModelMap model, HttpSession httpSession) {
+		String rtn = "admin/types";
 		
-		List<Manufacture> mfs = manufactureService.getAll();
-		model.addAttribute("manufactures", mfs);
-		
-		return rtn;
-	}
-	
-	
-	@RequestMapping(method={RequestMethod.GET}, value={"/manufacture"})
-	public String dspManufacture(ModelMap model, HttpSession httpSession) {
-		String rtn = "admin/manufacture";
-		
-		List<City> cities = cityService.getAll();
-		
-		model.addAttribute("cities", cities);
+		List<Type> types = typeService.getAll();
+		model.addAttribute("types", types);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
 	
 	
-	@RequestMapping(method={RequestMethod.GET}, value={"/manufacture/{manufactureid}"})
-	public String updateManufacture(ModelMap model, @PathVariable("manufactureid") Long manufactureid, HttpSession httpSession) {
-		String rtn = "admin/manufacture";
+	@RequestMapping(method={RequestMethod.GET}, value={"/type"})
+	public String dspType(ModelMap model, HttpSession httpSession) {
+		String rtn = "admin/type";
 		
-		long mfid = manufactureid.longValue();
-		Manufacture mf = manufactureService.getById(mfid);
+		return rtn;
+	}
+	
+	
+	@RequestMapping(method={RequestMethod.GET}, value={"/type/{typeid}"})
+	public String updateType(ModelMap model, @PathVariable("typeid") Long typeid, HttpSession httpSession) {
+		String rtn = "admin/type";
 		
-		List<City> cities = cityService.getAll();
-		model.addAttribute("mf", mf);
-		model.addAttribute("cities", cities);
+		long mfid = typeid.longValue();
+		Type type = typeService.getById(mfid);
+		
+		model.addAttribute("type", type);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
 
 	
-	@RequestMapping(method={RequestMethod.POST}, value={"/manufacture"})
-	public String doManufacture(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
-		String rtn = "manufactures";
+	@RequestMapping(method={RequestMethod.POST}, value={"/type"})
+	public String doType(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
+		String rtn = "types";
 		
-		logger.info("doManufacture is call!!!!!");
+		logger.info("doType is call!!!!!");
+		String name = requestParams.get("name");
 		
-		Address ads = new Address();
-		
-		String mfid = requestParams.get("manufactureid");
-		String street = (String) requestParams.get("street");
-		String cityid = requestParams.get("cityid");
-		String postalcode = (String) requestParams.get("postalcode");
-		String name = (String) requestParams.get("name");
-		String contact = (String) requestParams.get("contact");
-		String phone = (String) requestParams.get("phone");
-		String email = (String) requestParams.get("email");
-		String website = (String) requestParams.get("website");
-		String comments = (String) requestParams.get("comments");
-		
-		logger.info("cityid: " + cityid);
-		City city = cityService.getById(Long.parseLong(cityid));
-		ads.setCity(city);
-		ads.setStreet(street);
-		ads.setPostalcode(postalcode);
-		
-		addressService.save(ads);
-		
-		Manufacture mf = new Manufacture();
-		if(mfid != null && !mfid.isEmpty()) {
-			mf.setManufactureid(Long.parseLong(mfid));
-		}
-		mf.setAddress(ads);
-		mf.setContact(contact);
-		mf.setEmail(email);
-		mf.setName(name);
-		mf.setPhone(phone);
-		mf.setWebsite(website);
-		mf.setComments(comments);
-		manufactureService.save(mf);
+		Type type = new Type();
+		type.setName(name);
+		typeService.save(type);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return "redirect: " + rtn;
 	}
@@ -122,6 +96,7 @@ public class AdminProduct extends BaseController {
 		
 		List<Brand> brands = brandService.getAll();
 		model.addAttribute("brands", brands);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
@@ -131,8 +106,10 @@ public class AdminProduct extends BaseController {
 	public String dspBrand(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/brand";
 		
-		List<Manufacture> mfs = manufactureService.getAll();
-		model.addAttribute("manufactures", mfs);
+		List<City> cities = cityService.getAll();
+		
+		model.addAttribute("cities", cities);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
@@ -145,9 +122,11 @@ public class AdminProduct extends BaseController {
 		long mfid = brandid.longValue();
 		Brand brand = brandService.getById(mfid);
 		
-		List<Manufacture> mfs = manufactureService.getAll();
-		model.addAttribute("manufactures", mfs);
+		List<City> cities = cityService.getAll();
+		
+		model.addAttribute("cities", cities);
 		model.addAttribute("brand", brand);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
@@ -159,9 +138,27 @@ public class AdminProduct extends BaseController {
 		
 		logger.info("doBrand is call!!!!!");
 		
-		String brandid = requestParams.get("brandid");
+		String street = requestParams.get("street");
+		String cityid = requestParams.get("cityid");
+		String postalcode = requestParams.get("postalcode");
 		String name = requestParams.get("name");
-		String manufactureid = requestParams.get("manufactureid");
+		String description = requestParams.get("description");
+		String contact = requestParams.get("contact");
+		String phone = requestParams.get("phone");
+		String email = requestParams.get("email");
+		String website = requestParams.get("website");
+		String comments = requestParams.get("comments");
+		String brandid = requestParams.get("brandid");
+		
+		Address ads = new Address();
+		
+		logger.info("cityid: " + cityid);
+		City city = cityService.getById(Long.parseLong(cityid));
+		ads.setCity(city);
+		ads.setStreet(street);
+		ads.setPostalcode(postalcode);
+		
+		ads = addressService.save(ads);
 		
 		Brand brand = new Brand();
 		
@@ -170,9 +167,16 @@ public class AdminProduct extends BaseController {
 		}
 		
 		brand.setName(name);
-		Manufacture mf = manufactureService.getById(Long.parseLong(manufactureid));
-		brand.setManufacture(mf);
+		brand.setDescription(description);
+		brand.setPhone(phone);
+		brand.setAddress(ads);
+		brand.setContact(contact);
+		brand.setEmail(email);
+		brand.setWebsite(website);
+		brand.setComments(comments);
+		
 		brand = brandService.save(brand);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return "redirect: " + rtn;
 	}
@@ -184,6 +188,7 @@ public class AdminProduct extends BaseController {
 		
 		List<Product> products = productService.getAll();
 		model.addAttribute("products", products);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
@@ -193,8 +198,14 @@ public class AdminProduct extends BaseController {
 	public String dspProduct(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/product";
 		
+		List<Type> types = typeService.getAll();
 		List<Brand> brands = brandService.getAll();
+		List<Color> colors = colorService.getAll();
+		
+		model.addAttribute("types", types);
 		model.addAttribute("brands", brands);
+		model.addAttribute("colors", colors);
+		model.addAttribute("loginUser", getPrincipal());
 
 		return rtn;
 	}
@@ -202,14 +213,20 @@ public class AdminProduct extends BaseController {
 	
 	@RequestMapping(method={RequestMethod.GET}, value={"/product/{productid}"})
 	public String updateProduct(ModelMap model, @PathVariable("productid") Long productid, HttpSession httpSession) {
-		String rtn = "admin/brand";
+		String rtn = "admin/product";
 		
 		long prodid = productid.longValue();
 		Product product = productService.getById(prodid);
 		
+		List<Type> types = typeService.getAll();
 		List<Brand> brands = brandService.getAll();
+		List<Color> colors = colorService.getAll();
+
+		model.addAttribute("types", types);
 		model.addAttribute("brands", brands);
+		model.addAttribute("colors", colors);
 		model.addAttribute("product", product);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
 	}
@@ -223,27 +240,53 @@ public class AdminProduct extends BaseController {
 		
 		String productid = requestParams.get("productid");
 		String name = requestParams.get("name");
-		String code = requestParams.get("code");
+		String modelnum = requestParams.get("modelnum");
+		String upc = requestParams.get("upc");
 		String brandid = requestParams.get("brandid");
+		String colorid = requestParams.get("colorid");
+		String typeid = requestParams.get("typeid");
 		String description = requestParams.get("description");
+		String style = requestParams.get("style");
+		String material = requestParams.get("material");
 		String comments = requestParams.get("comments");
 		
 		Brand brand = brandService.getById(Long.parseLong(brandid));
+		Color color = colorService.getById(Long.parseLong(colorid));
+		Type type = typeService.getById(Long.parseLong(typeid));
 		
 		Product product = new Product();
 		if(productid != null && !productid.isEmpty()) {
 			product.setProductid(Long.parseLong(productid));
 		}
+		
 		product.setName(name);
+		product.setModelnum(modelnum);
+		product.setUpc(upc);
 		product.setBrand(brand);
-		product.setCode(code);
+		product.setUpc(upc);
 		product.setDescription(description);
+		product.setColor(color);
+		product.setType(type);
+		product.setStyle(style);
+		product.setMaterial(material);
 		product.setComments(comments);
 		
 		product = productService.save(product);
+		model.addAttribute("loginUser", getPrincipal());
 		
 		return "redirect: " + rtn;
 	}
 	
+	private User getPrincipal(){
+    	User user = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        //System.out.println("Role is : "+((LoginStudent)principal).toString());
+        if (principal instanceof LoginUser) {
+            user = ((LoginUser)principal).getUser();
+        } else {
+            user = userService.findByUsername("");
+        }
+        return user;
+    }
 	
 }

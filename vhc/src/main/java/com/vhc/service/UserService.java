@@ -16,6 +16,9 @@ public class UserService {
 		return this.userRepository.findByUsername(username);
 	}
 
+	public User getById(long userid) {
+		return userRepository.findOne(userid);
+	}
 	
 	public User authenticate(String username, String password) {
 		return this.userRepository.findByUsernameAndPassword(username, password);

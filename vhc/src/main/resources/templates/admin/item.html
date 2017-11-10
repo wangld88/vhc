@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html layout:decorator="admin/layout">
+	<div layout:fragment="content">
+
+		<section id="main-content">
+			<section class="wrapper">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Inventory Management</h3>
+						<ol class="breadcrumb">
+							<li><i class="fa fa-home"></i><a th:href="@{/admin/home}">Home</a></li>
+							<li><i class="icon_document_alt"></i>Inventories</li>
+							<li><i class="fa fa-file-text-o"></i><span th:text="${item==null?'New Item':'Modify Item'}"></span></li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+						<section class="panel">
+							<header class="panel-heading">
+								Item
+							</header>
+							<div class="panel-body">
+								<div class="form">
+									<form class="form-validate form-horizontal " id="item" name="item" method="post" th:action="@{/admin/item}">
+										<div class="form-group">
+										    <label for="productid" class="control-label col-lg-2">Product </label>
+										    <div class="col-lg-10">
+												<select class="form-control m-bot15" id="productid" name="productid">
+													<option th:each="product: ${products}" th:value="${product.productid}" th:text="${product.name}" th:selected="${item==null?'':(item.product.productid.equals(product.productid)?'Selected':'')}"></option>
+												</select>
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="sku" class="control-label col-lg-2">SKU </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="sku" name="sku" th:value="${item==null?'':item.sku}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="size" class="control-label col-lg-2">Size </label>
+										    <div class="col-lg-5">
+												<select class="form-control m-bot15" id="regionid" name="regionid">
+													<option th:each="region: ${regions}" th:value="${region.regionid}" th:text="${region.name}" th:selected="${product==null?'':(product.size.region.regionid.equals(region.regionid)?'Selected':'')}"></option>
+												</select>
+										    </div>
+										    <div class="col-lg-5">
+												<select class="form-control m-bot15" id="sizeid" name="sizeid">
+													<option th:each="size: ${sizes}" th:value="${size.sizeid}" th:text="${size.sizenum}" th:selected="${product==null?'':(product.size.sizeid.equals(size.sizeid)?'Selected':'')}"></option>
+												</select>
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="cost" class="control-label col-lg-2">Cost </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="cost" name="cost" type="text" th:value="${item==null?'':#numbers.formatDecimal(item.cost, 0, 'DEFAULT', 2, 'DEFAULT')}" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="price" class="control-label col-lg-2">Price </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="price" name="price" type="text" th:value="${item==null?'':#numbers.formatDecimal(item.price, 0, 'DEFAULT', 2, 'DEFAULT')}" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="quantity" class="control-label col-lg-2">Quantity </label>
+										    <div class="col-lg-10">
+										        <input type="text" class="form-control " id="quantity" name="quantity" th:value="${item==null?'':item.quantity}" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="shipmentid" class="control-label col-lg-2">Shipment </label>
+										    <div class="col-lg-10">
+												<select class="form-control m-bot15" id="shipmentid" name="shipmentid">
+													<option th:each="shipment: ${shipments}" th:value="${shipment.shipmentid}" th:text="${shipment.code}" th:selected="${item==null?'':(item.shipment.shipmentid.equals(shipment.shipmentid)?'Selected':'')}"></option>
+												</select>
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="comments" class="control-label col-lg-2">Comments </label>
+										    <div class="col-lg-10">
+										        <textarea class="form-control " id="comments" name="comments" th:value="${item==null?'':item.comments}" ></textarea>
+										    </div>
+										</div>
+										<div class="form-group">
+										    <div class="col-lg-offset-2 col-lg-10">
+										        <button class="btn btn-primary" type="submit"> Save </button>
+										        <button class="btn btn-default" type="button">Cancel</button>
+										        <input type="hidden" id="itemid" name="itemid" th:value="${item==null?'':item.itemid}" />
+										        <input type="hidden" th:if="${shipments!=null} and ${shipments.size()}==1" id="rtn_shipmentid" name="rtn_shipmentid" th:value="${shipments.get(0).shipmentid}" />
+										    </div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</section>
+					</div>
+				</div>
+			</section>
+		</section>
+      <!--main content end-->
+	</div>
+</html>

@@ -30,40 +30,10 @@ public class Item implements Serializable {
 	@Column(name = "itemid", updatable = false, nullable = false)
 	private long itemid;
 	
-	@Column(nullable=false, unique=true, length=200)
-	@Size(max=200)
-	@ApiObjectField(description="Item's Name", format="Not Null, maxlength = 200", required=true)
-	private String name;
-	
-	@Column(nullable=true, unique=true, length=40)
-	@Size(max=40)
-	@ApiObjectField(description="Unique Code", format="Not Null, maxlength = 40", required=false)
-	private String code;
-
-	@Column(nullable=true, unique=true, length=50)
-	@Size(max=50)
-	@ApiObjectField(description="Unique Barcode", format="Not Null, maxlength = 50", required=false)
-	private String barcode;
-
 	@Column(nullable=true, length=20)
 	@Size(max=20)
 	@ApiObjectField(description="Unique sku", format="Not Null, maxlength = 20", required=false)
 	private String sku;
-
-	@Column(nullable=true, length=10)
-	@Size(max=10)
-	@ApiObjectField(description="size", format="maxlength = 10", required=false)
-	private String size;
-
-	@Column(nullable=true, length=20)
-	@Size(max=20)
-	@ApiObjectField(description="color", format="maxlength = 20", required=false)
-	private String color;
-
-	@Column(nullable=true, length=10)
-	@Size(max=10)
-	@ApiObjectField(description="sex", format="maxlength = 10", required=false)
-	private String sex;
 
 	@Column(nullable=true, length=10, columnDefinition="Decimal(6,2)")
 	//@Size(max=10)
@@ -75,23 +45,27 @@ public class Item implements Serializable {
 	@ApiObjectField(description="price", format="maxlength = 10", required=false)
 	private double price;
 
-	@Column(nullable=true, length=10)
-	@Size(max=10)
-	@ApiObjectField(description="receivedby", format="maxlength = 10", required=false)
-	private String receivedby;
+	@Column(nullable=true)
+	@ApiObjectField(description="Quantity", required=false)
+	private long quantity;
+
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="receivedby")
+	@ApiObjectField(description="Receive User", required=true)
+	private User receivedby;
 
 	@Column(nullable=true, length=10)
-	@Size(max=10)
+	//@Size(max=10)
 	@ApiObjectField(description="receivedate", format="maxlength = 10", required=false)
 	private Calendar receivedate;
 
-	@Column(nullable=true, length=10)
-	@Size(max=10)
-	@ApiObjectField(description="sentby", format="maxlength = 10", required=false)
-	private String sentby;
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="sentby")
+	@ApiObjectField(description="Sent User", required=true)
+	private User sentby;
 
 	@Column(nullable=true, length=10)
-	@Size(max=10)
+	//@Size(max=10)
 	@ApiObjectField(description="senddate", format="maxlength = 10", required=false)
 	private Calendar senddate;
 
@@ -104,6 +78,16 @@ public class Item implements Serializable {
 	@JoinColumn(name="productid")
 	@ApiObjectField(description="Unique Product", required=true)
 	private Product product;
+
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="sizeid")
+	@ApiObjectField(description="Product Size", required=true)
+	private com.vhc.model.Size size;
+
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="shipmentid")
+	@ApiObjectField(description="Unique Shipment", required=true)
+	private Shipment shipment;
 
 	
 	public Item() {
@@ -118,28 +102,13 @@ public class Item implements Serializable {
 		this.itemid = itemid;
 	}
 
-	public String getName() {
-		return name;
+
+	public long getQuantity() {
+		return quantity;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getBarcode() {
-		return barcode;
-	}
-
-	public void setBarcode(String barcode) {
-		this.barcode = barcode;
+	public void setQuantity(long quantity) {
+		this.quantity = quantity;
 	}
 
 	public String getSku() {
@@ -148,30 +117,6 @@ public class Item implements Serializable {
 
 	public void setSku(String sku) {
 		this.sku = sku;
-	}
-
-	public String getSize() {
-		return size;
-	}
-
-	public void setSize(String size) {
-		this.size = size;
-	}
-
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
-	}
-
-	public String getSex() {
-		return sex;
-	}
-
-	public void setSex(String sex) {
-		this.sex = sex;
 	}
 
 	public double getCost() {
@@ -190,11 +135,11 @@ public class Item implements Serializable {
 		this.price = price;
 	}
 
-	public String getReceivedby() {
+	public User getReceivedby() {
 		return receivedby;
 	}
 
-	public void setReceivedby(String receivedby) {
+	public void setReceivedby(User receivedby) {
 		this.receivedby = receivedby;
 	}
 
@@ -206,11 +151,11 @@ public class Item implements Serializable {
 		this.receivedate = receivedate;
 	}
 
-	public String getSentby() {
+	public User getSentby() {
 		return sentby;
 	}
 
-	public void setSentby(String sentby) {
+	public void setSentby(User sentby) {
 		this.sentby = sentby;
 	}
 
@@ -237,5 +182,21 @@ public class Item implements Serializable {
 	public void setProduct(Product product) {
 		this.product = product;
 	}
+
+	public Shipment getShipment() {
+		return shipment;
+	}
+
+	public void setShipment(Shipment shipment) {
+		this.shipment = shipment;
+	}
 	
+	public com.vhc.model.Size getSize() {
+		return size;
+	}
+
+	public void setSize(com.vhc.model.Size size) {
+		this.size = size;
+	}
+
 }

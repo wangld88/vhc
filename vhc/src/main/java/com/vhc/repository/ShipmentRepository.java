@@ -10,5 +10,4 @@ public interface ShipmentRepository extends CrudRepository<Shipment, Long> {
 
 	public Shipment findByShipmentid(long shipmentid);
 	public List<Shipment> findAll();
-	
 }

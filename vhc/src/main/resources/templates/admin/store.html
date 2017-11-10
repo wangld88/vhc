@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html layout:decorator="admin/layout">
+	<div layout:fragment="content">
+
+		<section id="main-content">
+			<section class="wrapper">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Business Management</h3>
+						<ol class="breadcrumb">
+							<li><i class="fa fa-home"></i><a th:href="@{/admin/home}">Home</a></li>
+							<li><i class="icon_document_alt"></i>Business</li>
+							<li><i class="fa fa-file-text-o"></i><span th:text="${store==null?'New Store':'Modify Store'}"></span></li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+						<section class="panel">
+							<header class="panel-heading">
+								Store
+							</header>
+							<div class="panel-body">
+								<div class="form">
+									<form class="form-validate form-horizontal " id="store" name="store" method="post" th:action="@{/admin/store}">
+										<div class="form-group">
+										    <label for="fullname" class="control-label col-lg-2">Store Name <span class="required">*</span></label>
+										    <div class="col-lg-10">
+										        <input class=" form-control" id="name" name="name" th:value="${store==null?'':store.name}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="code" class="control-label col-lg-2">Code </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="code" name="code" th:value="${item==null?'':item.code}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="stree" class="control-label col-lg-2">Address </label>
+										    <div class="col-lg-10">
+										        <input class=" form-control" id="street" name="street" th:value="${store==null?'':store.address.street}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="cityid" class="control-label col-lg-2">City </label>
+										    <div class="col-lg-10">
+												<select class="form-control m-bot15" id="cityid" name="cityid">
+													<option th:each="city: ${cities}" th:value="${city.cityid}" th:text="${city.name}" th:selected="${store==null?'':(store.address.city.cityid.equals(city.cityid)?'Selected':'')}"></option>
+												</select>
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="postalcode" class="control-label col-lg-2">Postal Code </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="postalcode" name="postalcode" th:value="${store==null?'':store.address.postalcode}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="contact" class="control-label col-lg-2">Contact </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="contact" name="contact" th:value="${store==null?'':store.contact}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="phone" class="control-label col-lg-2">Phone </label>
+										    <div class="col-lg-10">
+										        <input type="text" class="form-control" id="phone" name="phone" th:value="${store==null?'':store.phone}" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="mobile" class="control-label col-lg-2">Mobile </label>
+										    <div class="col-lg-10">
+										        <input type="text" class="form-control" id="mobile" name="mobile" th:value="${store==null?'':store.mobile}" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="email" class="control-label col-lg-2">Email </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="email" name="email" type="email" th:value="${store==null?'':store.email}" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="website" class="control-label col-lg-2">Web Site </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="website" name="website" type="text" th:value="${store==null?'':store.website}" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="facebook" class="control-label col-lg-2">Facebook </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="facebook" name="facebook" type="text" th:value="${store==null?'':store.facebook}" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="google" class="control-label col-lg-2">Google </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="google" name="google" type="text" th:value="${store==null?'':store.google}" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="twitter" class="control-label col-lg-2">Twitter </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="twitter" name="twitter" type="text" th:value="${store==null?'':store.twitter}" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="comments" class="control-label col-lg-2">Comments </label>
+										    <div class="col-lg-10">
+										        <textarea class="form-control " id="comments" name="comments" th:value="${store==null?'':store.comments}" ></textarea>
+										    </div>
+										</div>
+										<div class="form-group">
+										    <div class="col-lg-offset-2 col-lg-10">
+										        <button class="btn btn-primary" type="submit"> Save </button>
+										        <button class="btn btn-default" type="button">Cancel</button>
+										        <input type="hidden" id="storeid" name="storeid" th:value="${store==null?'':store.storeid}" />
+										    </div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</section>
+					</div>
+				</div>
+			</section>
+		</section>
+      <!--main content end-->
+	</div>
+</html>

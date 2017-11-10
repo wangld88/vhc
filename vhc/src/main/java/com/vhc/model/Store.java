@@ -14,38 +14,45 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
-import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="MANUFACTURES")
-@ApiObject
-@NamedQuery(name="Manufacture.findAll", query="SELECT m FROM Manufacture m")
-public class Manufacture implements Serializable {
+@Table(name="STORES")
+@NamedQuery(name="Store.findAll", query="SELECT s FROM Store s")
+public class Store implements Serializable {
 
-	private static final long serialVersionUID = 8794993608772238695L;
-
+	private static final long serialVersionUID = -59147124950351619L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name = "manufactureid", updatable = false, nullable = false)
-	private long manufactureid;
+	@Column(name = "storeid", updatable = false, nullable = false)
+	private long storeid;
 	
 	@Column(nullable=false, unique=true, length=200)
 	@Size(max=200)
-	@ApiObjectField(description="Manufacture's Name", format="Not Null, maxlength = 200", required=true)
+	@ApiObjectField(description="Store's Name", format="Not Null, maxlength = 200", required=true)
 	private String name;
+	
+	@Column(nullable=false, unique=true, length=20)
+	@Size(max=20)
+	@ApiObjectField(description="Store's Name", format="Not Null, maxlength = 20", required=true)
+	private String code;
 	
 	@Column(nullable=true, length=50)
 	@Size(max=50)
-	@ApiObjectField(description="Manufacture's Contact Name", format="maxlength = 50", required=false)
+	@ApiObjectField(description="Store's Contact Name", format="maxlength = 50", required=false)
 	private String contact;
 	
 	@Column(nullable=true, length=30)
 	@Size(max=30)
 	@ApiObjectField(description="Phone Number", format="maxlength = 30", required=false)
 	private String phone;
+	
+	@Column(nullable=true, length=30)
+	@Size(max=30)
+	@ApiObjectField(description="Mobile Number", format="maxlength = 30", required=false)
+	private String mobile;
 	
 	@Column(nullable=true, length=50)
 	@Size(max=50)
@@ -57,6 +64,21 @@ public class Manufacture implements Serializable {
 	@ApiObjectField(description="Web Site", format="maxlength = 100", required=false)
 	private String website;
 
+	@Column(nullable=true, length=100)
+	@Size(max=100)
+	@ApiObjectField(description="Facebook", format="maxlength = 100", required=false)
+	private String facebook;
+	
+	@Column(nullable=true, length=100)
+	@Size(max=100)
+	@ApiObjectField(description="Facebook", format="maxlength = 100", required=false)
+	private String google;
+	
+	@Column(nullable=true, length=100)
+	@Size(max=100)
+	@ApiObjectField(description="Facebook", format="maxlength = 100", required=false)
+	private String twitter;
+
 	@Column(nullable=true, length=600)
 	@Size(max=600)
 	@ApiObjectField(description="Web Site", format="maxlength = 600", required=false)
@@ -67,16 +89,17 @@ public class Manufacture implements Serializable {
 	@ApiObjectField(description="Unique Address", format="Not Null", required=false)
 	private Address address;
 
-	public Manufacture () {
+	
+	public Store() {
 		
 	}
 	
-	public long getManufactureid() {
-		return manufactureid;
+	public long getStoreid() {
+		return storeid;
 	}
 
-	public void setManufactureid(long manufactureid) {
-		this.manufactureid = manufactureid;
+	public void setStoreid(long storeid) {
+		this.storeid = storeid;
 	}
 
 	public String getName() {
@@ -85,6 +108,14 @@ public class Manufacture implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getContact() {
@@ -103,6 +134,14 @@ public class Manufacture implements Serializable {
 		this.phone = phone;
 	}
 
+	public String getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+
 	public String getEmail() {
 		return email;
 	}
@@ -117,6 +156,30 @@ public class Manufacture implements Serializable {
 
 	public void setWebsite(String website) {
 		this.website = website;
+	}
+
+	public String getFacebook() {
+		return facebook;
+	}
+
+	public void setFacebook(String facebook) {
+		this.facebook = facebook;
+	}
+
+	public String getGoogle() {
+		return google;
+	}
+
+	public void setGoogle(String google) {
+		this.google = google;
+	}
+
+	public String getTwitter() {
+		return twitter;
+	}
+
+	public void setTwitter(String twitter) {
+		this.twitter = twitter;
 	}
 
 	public String getComments() {
@@ -134,5 +197,6 @@ public class Manufacture implements Serializable {
 	public void setAddress(Address address) {
 		this.address = address;
 	}
-	
+
+
 }
