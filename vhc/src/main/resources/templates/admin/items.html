@@ -25,32 +25,24 @@
 							<table class="table table-striped table-advance table-hover">
 								<tbody>
 									<tr>
-										<th><i class="icon_documents"></i> Item Name</th>
-										<th><i class="icon_calendar"></i> Code</th>
-										<th><i class="icon_pin_alt"></i> BarCode</th>
-										<th><i class="icon_contacts_alt"></i> Product</th>
+										<th><i class="icon_documents"></i> Product</th>
 										<th><i class="icon_mail_alt"></i> SKU</th>
 										<th><i class="icon_mobile"></i> Size</th>
-										<th><i class="icon_mobile"></i> Color</th>
-										<th><i class="icon_mobile"></i> Gender</th>
 										<th><i class="icon_mobile"></i> Cost</th>
 										<th><i class="icon_mobile"></i> Price</th>
+										<th><i class="icon_pin_alt"></i> Quantity</th>
 										<th><i class="icon_mobile"></i> Shipment</th>
 										<th><i class="icon_pin_alt"></i> Received By</th>
 										<th><i class="icon_contacts_alt"></i> Received Date</th>
 										<th><i class="icon_cogs"></i> Action</th>
 									</tr>
 									<tr th:each="mf:${items}">
-										<td th:text="${mf.name}"></td>
-										<td th:text="${mf.code}"></td>
-										<td th:text="${mf.barcode}"></td>
 										<td th:text="${mf.product.name}"></td>
 										<td th:text="${mf.sku}"></td>
-										<td th:text="${mf.color}"></td>
-										<td th:text="${mf.size}"></td>
-										<td th:text="${mf.gender}"></td>
+										<td th:text="${mf.size.sizenum + '(' + mf.size.region.name + ')'}"></td>
 										<td th:text="${mf.cost}"></td>
 										<td th:text="${mf.price}"></td>
+										<td th:text="${mf.quantity}"></td>
 										<td th:text="${mf.shipment.code}"></td>
 										<td th:text="${mf.receivedby.firstname}"></td>
 										<td th:text="${#calendars.format(mf.receivedate,'dd MMMM yyyy')}"></td>

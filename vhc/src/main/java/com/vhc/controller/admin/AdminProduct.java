@@ -1,13 +1,16 @@
 package com.vhc.controller.admin;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.sql.Blob;
 
 import javax.servlet.http.HttpSession;
 
+import org.hibernate.engine.jdbc.LobCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -15,29 +18,35 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.vhc.controller.BaseController;
 import com.vhc.model.Address;
 import com.vhc.model.Brand;
 import com.vhc.model.City;
 import com.vhc.model.Color;
+import com.vhc.model.Image;
 import com.vhc.model.Type;
 import com.vhc.model.User;
 import com.vhc.security.LoginUser;
+import com.vhc.util.ImageProcessor;
 import com.vhc.model.Product;
-import com.vhc.model.Region;
-import com.vhc.model.Size;
-import com.vhc.service.AddressService;
-import com.vhc.service.BrandService;
-import com.vhc.service.CityService;
-import com.vhc.service.TypeService;
-import com.vhc.service.ProductService;
 
+
+/**
+ * 
+ * 
+ * @author Jerry
+ *
+ */
 @Controller
 @RequestMapping({"/admin"})
 public class AdminProduct extends BaseController {
 
 	private final Logger logger = LoggerFactory.getLogger(AdminProduct.class);
+	
+	private final int img_fixed_width = 180;
+	private final int img_fixed_height = 200;
 	
 	
 	@RequestMapping(method={RequestMethod.GET}, value={"/types"})
@@ -276,6 +285,54 @@ public class AdminProduct extends BaseController {
 		
 		return "redirect: " + rtn;
 	}
+	
+	
+	//Upload images
+	@RequestMapping(value = "uploadImage", method = RequestMethod.POST)
+	public String uploadImage(@RequestParam("picture") MultipartFile picture,
+			@RequestParam("productid") String productid,
+			ModelMap model, HttpSession httpSession)
+			throws IllegalStateException, IOException {
+		
+		logger.debug("Entering ProductController uploadImage");
+		model.addAttribute("loginUser", getPrincipal());
+		
+		Image image = new Image();
+
+		String rtn = "";
+
+		// Image processing
+		Blob blob = null;
+		
+		if (!picture.isEmpty()) {
+			int x1 = (int) Double.parseDouble("0"); //loginUser.getX()
+			int y1 = (int) Double.parseDouble("0"); //loginUser.getY()
+			int w1 = (int) Double.parseDouble("0"); //loginUser.getW()
+			int h1 = (int) Double.parseDouble("0"); //loginUser.getH()
+			int width = (int) Double.parseDouble("1");  //loginUser.getImgWidth()
+			int height = (int) Double.parseDouble("1");  //loginUser.getImgHeight()
+
+			ImageProcessor processor = new ImageProcessor();
+			processor.setSize(width, height);
+			InputStream in = processor.process(picture, x1, y1, w1, h1,
+					img_fixed_width, img_fixed_height);
+			LobCreator lc = imageService.getLobCreator();
+			blob = lc.createBlob(in, picture.getSize());
+		}
+		// End of Image processing
+		
+		Product product = productService.getById(Long.parseLong(productid));
+		
+		image.setProduct(product);
+		image.setImage(blob);
+		imageService.save(image);
+		
+		logger.debug("Exiting ProfileController.createProfile");
+		
+		return rtn;
+	}
+
+	
 	
 	private User getPrincipal(){
     	User user = null;

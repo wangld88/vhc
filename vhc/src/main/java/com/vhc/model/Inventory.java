@@ -13,7 +13,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
 
 import org.jsondoc.core.annotation.ApiObjectField;
 
@@ -25,28 +24,31 @@ public class Inventory implements Serializable {
 
 	private static final long serialVersionUID = -748565879849839762L;
 
+	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name = "inventory", updatable = false, nullable = false)
+	@Column(name = "inventoryid", updatable = false, nullable = false)
 	private long inventoryid;
 	
-	@Column(nullable=true, length=10)
-	@Size(max=10)
-	@ApiObjectField(description="receivedby", format="maxlength = 10", required=false)
-	private String receivedby;
+	@Column(nullable=true)
+	@ApiObjectField(description="Quantity", required=false)
+	private long quantity;
+
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="receivedby")
+	@ApiObjectField(description="Receive User", required=true)
+	private User receivedby;
 
 	@Column(nullable=true, length=10)
-	@Size(max=10)
 	@ApiObjectField(description="receivedate", format="maxlength = 10", required=false)
 	private Calendar receivedate;
 
-	@Column(nullable=true, length=10)
-	@Size(max=10)
-	@ApiObjectField(description="sentby", format="maxlength = 10", required=false)
-	private String sentby;
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="sentby")
+	@ApiObjectField(description="Recording User", required=true)
+	private User sentby;
 
 	@Column(nullable=true, length=10)
-	@Size(max=10)
 	@ApiObjectField(description="senddate", format="maxlength = 10", required=false)
 	private Calendar senddate;
 
@@ -78,11 +80,11 @@ public class Inventory implements Serializable {
 		this.inventoryid = inventoryid;
 	}
 
-	public String getReceivedby() {
+	public User getReceivedby() {
 		return receivedby;
 	}
 
-	public void setReceivedby(String receivedby) {
+	public void setReceivedby(User receivedby) {
 		this.receivedby = receivedby;
 	}
 
@@ -94,11 +96,11 @@ public class Inventory implements Serializable {
 		this.receivedate = receivedate;
 	}
 
-	public String getSentby() {
+	public User getSentby() {
 		return sentby;
 	}
 
-	public void setSentby(String sentby) {
+	public void setSentby(User sentby) {
 		this.sentby = sentby;
 	}
 
@@ -132,6 +134,14 @@ public class Inventory implements Serializable {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	public long getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(long quantity) {
+		this.quantity = quantity;
 	}
 
 }

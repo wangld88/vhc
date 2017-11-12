@@ -8,6 +8,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.orm.jpa.vendor.HibernateJpaSessionFactoryBean;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
@@ -65,6 +66,11 @@ public class ApplicationWebConfigurer extends WebMvcConfigurerAdapter {
     LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
     interceptor.setParamName("lang");
     registry.addInterceptor(interceptor);
+  }
+
+  @Bean
+  public HibernateJpaSessionFactoryBean sessionFactory() {
+      return new HibernateJpaSessionFactoryBean();
   }
   
   /*@Bean(name={"validator"})

@@ -21,11 +21,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.vhc.controller.BaseController;
 import com.vhc.model.Address;
 import com.vhc.model.City;
+import com.vhc.model.Inventory;
 import com.vhc.model.Item;
 import com.vhc.model.Product;
 import com.vhc.model.Region;
 import com.vhc.model.Shipment;
 import com.vhc.model.Size;
+import com.vhc.model.Status;
+import com.vhc.model.Store;
 import com.vhc.model.Supplier;
 import com.vhc.model.User;
 import com.vhc.security.LoginUser;
@@ -269,17 +272,29 @@ public class AdminShipment extends BaseController {
 		List<Product> products = productService.getAll();
 		List<Size> sizes = sizeService.getAll();
 		List<Region> regions = regionService.getAll();
+		List<Store> stores = storeService.getAll();
+		List<Inventory> inventories = inventoryService.getByItem(mf);
 		
+		long sum = 0;
+		for(Inventory i: inventories) { 
+			sum += i.getQuantity();
+		}
+		
+		model.addAttribute("sum", sum);
+	
 		model.addAttribute("sizes", sizes);
 		model.addAttribute("regions", regions);
 		model.addAttribute("shipments", shipments);
 		model.addAttribute("products", products);
 		model.addAttribute("item", mf);
+		model.addAttribute("stores", stores);
 		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("inventories", inventories);
 		
 		return rtn;
 	}
 
+	
 	
 	@RequestMapping(method={RequestMethod.POST}, value={"/item"})
 	public String doItem(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) 
@@ -342,6 +357,89 @@ public class AdminShipment extends BaseController {
 		return "redirect: " + rtn;
 	}
 
+
+	@RequestMapping(method={RequestMethod.GET}, value={"/inventorys"})
+	public String dspInventorys(ModelMap model, HttpSession httpSession) {
+		String rtn = "admin/inventorys";
+		
+		
+		List<Inventory> inventorys = inventoryService.getAll();
+		model.addAttribute("inventorys", inventorys);
+		model.addAttribute("loginUser", getPrincipal());
+		
+		return rtn;
+	}
+	
+	
+	@RequestMapping(method={RequestMethod.GET}, value={"/inventory"})
+	public String dspInventory(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
+		String rtn = "admin/inventory";
+		String shipmentid = requestParams.get("shipmentid");
+		List<Shipment> shipments = new ArrayList<>();
+		
+		if(shipmentid != null && !shipmentid.isEmpty()) {
+			shipments.add(shipmentService.getById(Long.parseLong(shipmentid)));
+		} else {
+			shipments = shipmentService.getAll();
+		}
+		
+		List<Item> items = itemService.getAll();
+		List<Store> stores = storeService.getAll();
+		List<Status> status = statusService.getAll();
+		
+		model.addAttribute("items", items);
+		model.addAttribute("stores", stores);
+		model.addAttribute("status", status);
+		model.addAttribute("loginUser", getPrincipal());
+		
+		return rtn;
+	}
+	
+	@RequestMapping(method={RequestMethod.POST}, value={"/inventory"})
+	public String doInventory(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) 
+		throws Exception {
+		
+		logger.info("!!!!! doInventory is called");
+		String rtn = "redirect: item/" ;
+		
+		User receivedby = this.getPrincipal();
+		
+		String itemid = requestParams.get("itemid");
+		String storeid = requestParams.get("storeid");
+		String statusid = requestParams.get("statusid");
+		String quantity = requestParams.get("quantity");
+		Calendar cal = Calendar.getInstance(); 
+		Item item = itemService.getById(Long.parseLong(itemid));
+		Store store = storeService.getById(Long.parseLong(storeid));
+		Status status = statusService.getById(Long.parseLong(statusid));
+		
+		Inventory inventory = new Inventory();
+		inventory.setItem(item);
+		inventory.setStore(store);
+		inventory.setStatus(status);
+		inventory.setQuantity(Long.parseLong(quantity));
+		inventory.setReceivedby(receivedby);
+		inventory.setReceivedate(cal);
+		//try {
+		inventory = inventoryService.save(inventory);
+		/*} catch(Exception e) {
+			e.
+		}*/
+		
+		List<Inventory> inventories = inventoryService.getByItem(item);
+		long sum = 0;
+		for(Inventory i: inventories) { 
+			sum += i.getQuantity();
+		}
+		
+		model.addAttribute("sum", sum);
+		model.addAttribute("inventories", inventories);
+		
+		rtn += itemid;
+				
+		return rtn;
+	}
+	
 	private User getPrincipal(){
     	User user = null;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();

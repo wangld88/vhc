@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vhc.model.Inventory;
+import com.vhc.model.Item;
 import com.vhc.repository.InventoryRepository;
 
 
@@ -15,11 +16,15 @@ public class InventoryService {
 	@Autowired
 	private InventoryRepository inventoryRepository;
 	
-	public Inventory findByInventoryid(long inventoryid) {
+	public Inventory getById(long inventoryid) {
 		return inventoryRepository.findByInventoryid(inventoryid);
 	}
 	
-	public List<Inventory> findAll() {
+	public List<Inventory> getByItem(Item item) {
+		return inventoryRepository.findByItem(item);
+	}
+
+	public List<Inventory> getAll() {
 		return inventoryRepository.findAll();
 	}
 	

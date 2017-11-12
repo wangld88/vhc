@@ -19,11 +19,11 @@ public class StatusService {
 		return statusRepository.findByStatusid(statusid);
 	}
 
-	public List<Status> findAll() {
+	public List<Status> getAll() {
 		return statusRepository.findAll();
 	}
 	
-	public List<Status> findByReftbl(String reftbl) {
+	public List<Status> getByReftbl(String reftbl) {
 		return statusRepository.findByReftbl(reftbl);
 	}
 	

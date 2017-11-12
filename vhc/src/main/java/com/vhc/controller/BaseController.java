@@ -10,11 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
@@ -23,12 +19,15 @@ import com.vhc.service.AddressService;
 import com.vhc.service.BrandService;
 import com.vhc.service.CityService;
 import com.vhc.service.ColorService;
+import com.vhc.service.ImageService;
+import com.vhc.service.InventoryService;
 import com.vhc.service.ItemService;
 import com.vhc.service.TypeService;
 import com.vhc.service.ProductService;
 import com.vhc.service.RegionService;
 import com.vhc.service.ShipmentService;
 import com.vhc.service.SizeService;
+import com.vhc.service.StatusService;
 import com.vhc.service.StoreService;
 import com.vhc.service.SupplierService;
 import com.vhc.service.UserService;
@@ -77,6 +76,15 @@ public class BaseController {
 	@Autowired
 	protected SizeService sizeService;
 
+	@Autowired
+	protected InventoryService inventoryService;
+	
+	@Autowired
+	protected StatusService statusService;
+	
+	@Autowired
+	protected ImageService imageService;
+	
 	
 	protected static final String DATE_FORMAT = "yyyy-MM-dd";
 	
@@ -114,7 +122,9 @@ public class BaseController {
 	@ExceptionHandler({ Exception.class })
 	public ModelAndView uncaughtExceptionHandling (Exception e, HttpServletResponse httpresponse) {
 
-		String errorMsg = "";
+		logger.info("General Error is caught" + e.getMessage());
+		e.printStackTrace();
+		//String errorMsg = "";
 		String errorDetails = "N/A";
 		
 		final ModelAndView model = initModelView(ERROR_VIEW);
