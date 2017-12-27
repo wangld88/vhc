@@ -2,6 +2,7 @@ package com.vhc.controller.admin;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.sql.Blob;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vhc.controller.BaseController;
+import com.vhc.dto.ImageForm;
 import com.vhc.model.Address;
 import com.vhc.model.Brand;
 import com.vhc.model.City;
@@ -95,7 +97,7 @@ public class AdminProduct extends BaseController {
 		typeService.save(type);
 		model.addAttribute("loginUser", getPrincipal());
 		
-		return "redirect: " + rtn;
+		return "redirect:" + rtn;
 	}
 	
 	
@@ -187,7 +189,7 @@ public class AdminProduct extends BaseController {
 		brand = brandService.save(brand);
 		model.addAttribute("loginUser", getPrincipal());
 		
-		return "redirect: " + rtn;
+		return "redirect:" + rtn;
 	}
 	
 	
@@ -231,10 +233,16 @@ public class AdminProduct extends BaseController {
 		List<Brand> brands = brandService.getAll();
 		List<Color> colors = colorService.getAll();
 
+		List<Image> images = imageService.getByProduct(productid);
+		List<ImageForm> imageForms = new ArrayList<>();
+		
+		images.forEach(image->imageForms.add(new ImageForm(image)));
+		
 		model.addAttribute("types", types);
 		model.addAttribute("brands", brands);
 		model.addAttribute("colors", colors);
 		model.addAttribute("product", product);
+		model.addAttribute("images", imageForms);
 		model.addAttribute("loginUser", getPrincipal());
 		
 		return rtn;
@@ -283,14 +291,15 @@ public class AdminProduct extends BaseController {
 		product = productService.save(product);
 		model.addAttribute("loginUser", getPrincipal());
 		
-		return "redirect: " + rtn;
+		return "redirect:" + rtn;
 	}
 	
 	
 	//Upload images
-	@RequestMapping(value = "uploadImage", method = RequestMethod.POST)
+	@RequestMapping(value = "/uploadImage", method = RequestMethod.POST)
 	public String uploadImage(@RequestParam("picture") MultipartFile picture,
-			@RequestParam("productid") String productid,
+			@RequestParam("productid") Long productid,
+			@RequestParam("name") String name,
 			ModelMap model, HttpSession httpSession)
 			throws IllegalStateException, IOException {
 		
@@ -299,7 +308,7 @@ public class AdminProduct extends BaseController {
 		
 		Image image = new Image();
 
-		String rtn = "";
+		String rtn = "product/" + productid;
 
 		// Image processing
 		Blob blob = null;
@@ -307,32 +316,47 @@ public class AdminProduct extends BaseController {
 		if (!picture.isEmpty()) {
 			int x1 = (int) Double.parseDouble("0"); //loginUser.getX()
 			int y1 = (int) Double.parseDouble("0"); //loginUser.getY()
-			int w1 = (int) Double.parseDouble("0"); //loginUser.getW()
-			int h1 = (int) Double.parseDouble("0"); //loginUser.getH()
-			int width = (int) Double.parseDouble("1");  //loginUser.getImgWidth()
-			int height = (int) Double.parseDouble("1");  //loginUser.getImgHeight()
+			int w1 = (int) Double.parseDouble("240"); //loginUser.getW()
+			int h1 = (int) Double.parseDouble("240"); //loginUser.getH()
+			int width = (int) Double.parseDouble("240");  //loginUser.getImgWidth()
+			int height = (int) Double.parseDouble("240");  //loginUser.getImgHeight()
 
 			ImageProcessor processor = new ImageProcessor();
 			processor.setSize(width, height);
-			InputStream in = processor.process(picture, x1, y1, w1, h1,
-					img_fixed_width, img_fixed_height);
+			InputStream in = processor.process(picture, x1, y1, w1, h1,	img_fixed_width, img_fixed_height);
 			LobCreator lc = imageService.getLobCreator();
 			blob = lc.createBlob(in, picture.getSize());
 		}
 		// End of Image processing
 		
-		Product product = productService.getById(Long.parseLong(productid));
+		Product product = productService.getById(productid);
 		
+		if(name != null && !name.trim().isEmpty()) {
+			image.setName(name);
+		}
 		image.setProduct(product);
 		image.setImage(blob);
 		imageService.save(image);
 		
-		logger.debug("Exiting ProfileController.createProfile");
+		logger.debug("Exiting ProductController.uploadImage");
 		
-		return rtn;
+		return "redirect:" + rtn;
 	}
 
 	
+	@RequestMapping(value = "/removeImage", method = RequestMethod.POST)
+	public String uploadImage(@RequestParam("imageid") Long imageid,
+			@RequestParam("productid") Long productid,
+			ModelMap model, HttpSession httpSession) {
+
+		String rtn = "product/" + productid;
+		model.addAttribute("loginUser", getPrincipal());
+		Image image = new Image();
+		image.setImageid(imageid);
+		imageService.delete(image);
+		
+		return "redirect:" + rtn;
+	}
 	
 	private User getPrincipal(){
     	User user = null;

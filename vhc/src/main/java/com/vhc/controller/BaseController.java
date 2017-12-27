@@ -86,7 +86,7 @@ public class BaseController {
 	protected ImageService imageService;
 	
 	
-	protected static final String DATE_FORMAT = "yyyy-MM-dd";
+	protected static final String DATE_FORMAT = "MM/dd/yyyy";
 	
 	protected static final String ERROR_VIEW = "error/error";
 	

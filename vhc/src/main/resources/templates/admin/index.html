@@ -2,6 +2,9 @@
 <html layout:decorator="admin/layout">
 	<div layout:fragment="content">
 	
+	    <!-- full calendar css-->
+	    <link rel="stylesheet" th:href="@{/assets/fullcalendar/fullcalendar/bootstrap-fullcalendar.css}" />
+		<link rel="stylesheet" th:href="@{/assets/fullcalendar/fullcalendar/fullcalendar.css}" />
       <!--main content start-->
 		<section id="main-content">
 			<section class="wrapper">            
@@ -680,6 +683,8 @@
 	});
 
   </script>
+		<!-- container section start -->
+		<script type="text/javascript" th:src="@{/js/calendar-custom.js}"></script>
 
 	</div>
 </html>

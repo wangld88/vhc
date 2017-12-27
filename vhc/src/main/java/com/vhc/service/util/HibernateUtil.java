@@ -17,7 +17,7 @@ public class HibernateUtil {
 
 	
 	public Session openSession(){
-		Session session = this.sessionFactory.getCurrentSession();
+		Session session = this.sessionFactory.openSession();
 		return session;
 	}
 	

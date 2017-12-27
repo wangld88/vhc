@@ -24,6 +24,10 @@ public class InventoryService {
 		return inventoryRepository.findByItem(item);
 	}
 
+	public List<Inventory> getByStoreid(long storeid) {
+		return inventoryRepository.findByStore_storeid(storeid);
+	}
+
 	public List<Inventory> getAll() {
 		return inventoryRepository.findAll();
 	}

@@ -121,7 +121,7 @@ public class AdminStore extends BaseController {
 		storeService.save(store);
 		model.addAttribute("loginUser", getPrincipal());
 		
-		return "redirect: " + rtn;
+		return "redirect:" + rtn;
 	}
 
 	private User getPrincipal(){

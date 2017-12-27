@@ -44,4 +44,8 @@ public class ImageService {
 	public Image save(Image image) {
 		return imageRepository.save(image);
 	}
+	
+	public void delete(Image image) {
+		imageRepository.delete(image);
+	}
 }

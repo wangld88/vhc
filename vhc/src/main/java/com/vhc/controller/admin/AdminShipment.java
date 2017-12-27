@@ -129,7 +129,7 @@ public class AdminShipment extends BaseController {
 		supplierService.save(mf);
 		model.addAttribute("loginUser", getPrincipal());
 		
-		return "redirect: " + rtn;
+		return "redirect:" + rtn;
 	}
 
 
@@ -219,7 +219,7 @@ public class AdminShipment extends BaseController {
 		}
 		model.addAttribute("loginUser", getPrincipal());
 
-		return "redirect: " + rtn;
+		return "redirect:" + rtn;
 	}
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/items"})
@@ -354,7 +354,7 @@ public class AdminShipment extends BaseController {
 		
 		model.addAttribute("loginUser", getPrincipal());
 
-		return "redirect: " + rtn;
+		return "redirect:" + rtn;
 	}
 
 
@@ -400,7 +400,7 @@ public class AdminShipment extends BaseController {
 		throws Exception {
 		
 		logger.info("!!!!! doInventory is called");
-		String rtn = "redirect: item/" ;
+		String rtn = "redirect:item/" ;
 		
 		User receivedby = this.getPrincipal();
 		
