@@ -37,16 +37,18 @@
                                 <div class="col-lg-2">
                                     <div id='external-events'>
 	                                    <h4>Draggable Events</h4>
-	                                    <div class='external-event'>My Event 1</div>
-	                                    <div class='external-event'>My Event 2</div>
-	                                    <div class='external-event'>My Event 3</div>
-	                                    <div class='external-event'>My Event 4</div>
-	                                    <div class='external-event'>My Event 5</div>
-	                                    <div class='external-event'>My Event 6</div>
-	                                    <div class='external-event'>My Event 7</div>
-	                                    <div class='external-event'>My Event 8</div>
-	                                    <div class='external-event'>My Event 9</div>
-	                                    <div class='external-event'>My Event 10</div>
+	                                    <div class='external-event'>Event 10-11AM</div>
+	                                    <div class='external-event'>Event 11-12AM</div>
+	                                    <div class='external-event'>Event 1-2PM</div>
+	                                    <div class='external-event'>Event 2-3PM</div>
+	                                    <div class='external-event'>Event 3-4PM</div>
+	                                    <div class='external-event'>Event 4-5PM</div>
+	                                    <div class='external-event'>Event 5-6PM</div>
+	                                    <div class='external-event'>Event 6-7PM</div>
+	                                    <div class='external-event'>Event 7-8PM</div>
+	                                    <div class='external-event'>Event 8-9PM</div>
+	                                    <div class='external-event'>Event 9-10PM</div>
+	                                    <div class='external-event'>Event 10-11PM</div>
 	                                    <p>
 	                                    	<input type='checkbox' id='drop-remove' /> <label for='drop-remove'>remove after drop</label>
 	                                    </p>
@@ -61,7 +63,21 @@
                         <!-- /block -->
                     </div>
                 </div>
-		        
+    <div id="fullCalModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span> <span class="sr-only">close</span></button>
+                    <h4 id="eventTitle" class="modal-title"></h4>
+                </div>
+                <div id="eventInfo" class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <a class="btn btn-primary" id="eventlink" target="_blank">Event Page</a>
+                </div>
+            </div>
+        </div>
+    </div>
 		        <style>
 			        #external-events {
 			            float: left;
@@ -114,8 +130,14 @@
 		        <script th:src="@{/assets/fullcalendar/fullcalendar/gcal.js}"></script>
 		        <script th:src="@{/js/calendar-scripts.js}"></script>
 		        <script>
+				
 			        $(function() {
 			            // Easy pie charts
+						var date = new Date();
+						var d = date.getDate();
+						var m = date.getMonth();
+						var y = date.getFullYear();
+						
 			            var calendar = $('#calendar').fullCalendar({
 						header: {
 							left: 'prev,next',
@@ -126,6 +148,7 @@
 			            selectHelper: true,
 			            select: function(start, end, allDay) {
 			                var title = prompt('Event Title:');
+			                alert('start:'+start)
 			                if (title) {
 			                    calendar.fullCalendar('renderEvent',
 			                        {
@@ -139,6 +162,16 @@
 			                }
 			                calendar.fullCalendar('unselect');
 			            },
+						events: [
+							{
+								title: 'All Day Event',
+								start: new Date(y, m, 21)
+							},
+							{
+								title: 'Long Event',
+								start: new Date(y, m, d-5),
+								end: new Date(y, m, d-2)
+							}],
 			            droppable: true, // this allows things to be dropped onto the calendar !!!
 			            drop: function(date, allDay) { // this function is called when something is dropped
 			            
@@ -164,7 +197,23 @@
 			                
 			            },
 						editable: true,
-						// US Holidays
+					    /* eventClick: function(event, element) {
+					    	var title = prompt('Event Title:', event.title);
+					        event.title = title;
+
+					        $('#calendar').fullCalendar('updateEvent', event);
+
+					    }, */
+					    eventClick:  function(event, jsEvent, view) {
+					        //set the values and open the modal
+					        $('#eventTitle').html(event.title);
+					        $("#eventInfo").html(event.description);
+					        $("#eventLink").attr('href', event.url);
+					        $('#fullCalModal').modal();
+					        return false;
+					        //$("#eventContent").dialog({ modal: true, title: event.title });
+					    },
+					    // US Holidays
 						events: 'http://www.google.com/calendar/feeds/usa__en%40holiday.calendar.google.com/public/basic'
 						
 						});
