@@ -13,9 +13,20 @@ public class CountryService {
 
 	@Autowired
 	private CountryRepository countryRepository;
-	
-	
+
+	public Country getById(long countryid) {
+		return countryRepository.findByCountryid(countryid);
+	}
+
 	public List<Country> getAll() {
 		return this.countryRepository.findAll();
+	}
+
+	public List<Country> getByName(String name) {
+		return this.countryRepository.findByNameIgnoreCaseLike(name);
+	}
+
+	public Country save(Country country) {
+		return countryRepository.save(country);
 	}
 }

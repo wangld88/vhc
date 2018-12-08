@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html layout:decorator="store/admin/layout/layout">
+
+	<div layout:fragment="content">
+
+	    <script>
+	    /*<![CDATA[*/
+	     	var acceptedfiletypes = ["pdf","PDF"];
+
+			function wordCount(elmt) {
+				size = elmt.maxLength;
+				len = size - utf8Length(elmt.value);
+				if(len > 0) {
+					msg = "  <Font color='green'>Character(s) Left: " + len + "</Font>";
+				}
+				else {
+					msg = "  You have reached the character limit."	;
+				}
+				name = elmt.name + 'counter';
+
+				document.getElementById(name).innerHTML=msg;
+			}
+
+			function utf8Length(unicodeString) {
+				var usl=0;
+				for(var i=0;unicodeString.length>i;++i) {
+					var codePoint=unicodeString.charCodeAt(i);
+					if(codePoint===10||codePoint===13){
+						usl+=2;
+					}else if(128>codePoint){
+						usl+=1;
+					}else if((codePoint>127)&&(2048>codePoint)){
+						usl+=2;
+					}else{
+						usl+=3;
+					}
+				}
+				return usl;
+			}
+
+			function addMessage(msgs) {
+				rmvMessage();
+				var main = document.getElementById("main1");
+				var errors = document.createElement("div");
+				var ul = document.createElement("ul");
+				var upload = document.getElementById("upload");
+
+				errors.setAttribute("id", "errors");
+				errors.setAttribute("class", "alert alert-danger");
+
+				for(i in msgs) {
+					ul.appendChild(createListNode(msgs[i]));
+				}
+
+				errors.appendChild(ul)
+				main.appendChild(errors);
+				main.focus();
+			}
+
+			function createListNode(item) {
+				var li = document.createElement("li");
+				var txt = document.createTextNode(item);
+
+				li.appendChild(txt);
+				return li;
+			}
+
+			function rmvMessage() {
+				var main = document.getElementById("main1");
+				var errors = document.getElementById("errors");
+
+				if(errors || errors != null) {
+					main.removeChild(errors);
+				}
+			}
+
+			function validateDoc(itemid) {
+				var elmt = document.getElementById("uploadBtn"+itemid);
+				var main = document.getElementById("main1");
+				var btn = document.getElementById("submitBtn"+itemid);
+				var errors = [];
+
+				if(!elmt  || (elmt.value).trim().length == 0) {
+					errors.push("Please choose your document to upload.");
+				} else {
+					doctype =  elmt.value.trim().split(".").pop();
+
+					if(acceptedfiletypes.indexOf(doctype) < 0) {
+						errors.push("This file type is not accepted by the Document Upload Page.  Please upload an acceptable file type.");
+					}
+
+					if(elmt.files[0].size > 52428800) {
+						errors.push("Files must be less than 50MB in size.");
+					}
+				}
+
+				if(errors.length > 0) {
+					addMessage(errors);
+					return false;
+				}
+
+				btn.disabled = true;
+
+				document.getElementById("uploadForm"+itemid).submit();
+
+			}
+
+			function callThis(itemid) {
+				var elmt = document.getElementById("uploadBtn"+itemid);
+				var filename = elmt.value.split('\\').pop().split('/').pop();
+				var text = document.getElementById("uploadFile"+itemid);
+				var submitBtn = document.getElementById("submitBtn"+itemid);
+
+				rmvMessage();
+				clearSelection(itemid);
+
+				document.getElementById("row"+itemid).style.backgroundColor="#ECE8E8";
+				text.style.backgroundColor="#ECE8E8";
+				text.innerHTML = filename + "&nbsp;&nbsp;&nbsp;&nbsp;";
+
+			    anchor = document.createElement("a");
+			    anchor.setAttribute("href", "javascript: clearSelection()");
+
+			    //image = document.createElement("img");
+			    //image.setAttribute("src", "/rodocs/gradupload/resources/assets/images/remove.png");
+			    //anchor.appendChild(image);
+
+			    span = document.createElement("span");
+			    span.setAttribute("class", "glyphicon glyphicon-trash alert-danger minus");
+			    anchor.appendChild(span);
+
+			    text.appendChild(anchor);
+
+			    submitBtn.style.display = "";
+			}
+
+			function clearSelection(itemid) {
+				var elmts = document.getElementsByName("uploadFile");
+
+				for(i = 0; i < elmts.length; i++) {
+					elmts[i].innerHTML = "";
+					elmts[i].style.backgroundColor="#ffffff";
+				}
+
+				var rows = document.getElementsByName("row");
+
+				for(i = 0; i < rows.length; i++) {
+					rows[i].style.backgroundColor="#ffffff";
+				}
+
+				var files = document.getElementsByName("uploadBtn");
+
+				for(i = 0; i < files.length; i++) {
+					if(files[i].id != "uploadBtn"+itemid) {
+						files[i].value = "";
+					}
+				}
+
+				var btns = document.getElementsByName("submitBtn");
+				for(i=0; i < btns.length; i++) {
+					btns[i].style.display = "none";
+				}
+			}
+
+
+			function removeImage() {
+				form = document.getElementById("category");
+
+				form.setAttribute("action", "removeImage");
+
+				form.submit();
+			}
+
+			/*]]>*/
+	    </script>
+		<style>
+			.myLabel {
+			    position: relative;
+			    display: inline-block;
+			    padding: 6px 12px;
+			    margin-bottom: 0;
+			    cursor: pointer;
+				background-color: #3c8dbc;
+				color: #ffffff;
+				font-size: 14px;
+				font-weight:bold;
+				border-radius: 3px;
+				border: 1px solid #367fa9;
+			    display: inline-block;
+			    cursor: pointer;
+			    vertical-align: middle;
+				font-weight: normal;
+				line-height: 1.428571429;
+				text-align: center;
+				vertical-align: middle;
+				white-space: nowrap;
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				-o-user-select: none;
+				user-select: none;
+				font-weight: 300;
+				-webkit-transition: all 0.15s;
+				-moz-transition: all 0.15s;
+				transition: all 0.15s;
+				width: 62%;
+			}
+
+			.myLabel input {
+			    position: absolute;
+			    z-index: 12;
+			    opacity: 0;
+			    width: 100%;
+			    height: 100%;
+			    cursor: pointer;
+			}
+
+			.myLabel:hover {
+				background-color: #367fa9;
+			}
+
+			.myLabel span {
+				/* padding-left: 10%; */
+				display: table-cell;
+				vertical-align: middle;
+				padding-top: 2px;
+				width: 100%;
+				text-align: center;
+				font-size: 14px;
+				font-weight: 400;
+				cursor: pointer;
+			}
+
+			#uploadFile {
+				padding-top: 6px;
+				margin-top: 6px;
+				font-size: 0.9em;
+				font-weight: bold;
+				font-style: italic;
+				color: #1f3b08;
+				vertical-align: middle;
+				height: 100%;
+			}
+
+			.submitBtn {
+				width: 160px;
+				background-color: #bce0ee;
+				color: #3d3c3c;
+				border-color: #3d3c3c;
+				font-weight: bold;
+			}
+
+			.submitBtn:hover {
+				width: 160px;
+				background-color: #3cb0fd;
+				color: #ffffff;
+				border-color: #575657
+			}
+
+			.header {
+				background-color:#bce0ee;
+				color:#3d3c3c !important;
+				font-family: UniversCondensed, Arial, sans-serif !important;
+			}
+		</style>
+
+		<section class="content-header">
+			<h1>
+				Product Management
+				<small>List Categories</small>
+			</h1>
+			<ol class="breadcrumb">
+				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
+				<li><a th:href="@{/store/admin/brands}"><i class="fa fa-cubes"></i>Categories</a></li>
+				<li><i class="fa fa-file-text-o"></i><span th:text="${category==null?'New Category':'Modify Category'}"></span></li>
+			</ol>
+		</section>
+
+		<section class="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="box">
+						<div class="box-header">
+							<h3 class="box-title" th:text="${category==null?'New Category':'Modify Category'}"></h3>
+						</div>
+
+						<div class="box-body">
+							<div class="form">
+								<form class="form-validate form-horizontal" id="category" name="category" method="post" th:action="@{/store/admin/category}" enctype="multipart/form-data">
+									<div class="form-group">
+									    <label for="name" class="control-label col-lg-2">Category Name <span class="required">*</span></label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="name" name="name" th:value="${category==null?'':category.name}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="title" class="control-label col-lg-2">Web Path <span class="required">*</span></label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="title" name="title" th:value="${category==null?'':category.title}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group">
+										<label for="image" class="control-label col-lg-2">Category Image <span class="required">*</span></label>
+										<div th:if="${category==null or category.imageData == null}" class="col-lg-4">
+											<div class="myLabel">
+												<input type="file" id="uploadBtn" name="picture">
+												<span class="col-lg-4 col-md-4">+ Add Image</span>
+											</div>
+										</div>
+										<div th:if="${category!=null and category.imageData != null}" class="col-lg-4">
+											<img th:src="'data:image/jpg;base64,'+${category.imageData}"
+													class="media-object img-thumbnail"
+													style="height: 120px; width: 120px; display: block;" />
+											<input type="file" name="picture" style="display:none;">
+											<!-- <a onlick="javascript:removeImage()" class="btn btn-primary">Remove</a> -->
+										</div>
+										<div class="col-lg-4" style="height: 36px;vertical-align: middle;">
+											<span id="uploadFile"></span>
+										</div>
+										<div id="remove" th:if="${category!=null and category.imageData!=null}" class="col-lg-2" style="margin-top: 20px;">
+											<a value="Remove" class="btn btn-primary btn-label-left" onclick="removeImage()"><span class="col-lg-2 col-md-2">Remove</span></a>
+										</div>
+										<p class="help-block"><!-- Example block-level help text here. --></p>
+									</div>
+									<div class="form-group">
+									    <div class="col-lg-offset-2 col-lg-10">
+											<button class="btn btn-primary" type="submit"> Save </button>
+									        <a th:href="@{/store/admin/categories}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+									        <input type="hidden" id="categoryid" name="categoryid" th:value="${category==null?'':category.categoryid}" />
+									    </div>
+									</div>
+								</form>
+							</div>
+							<div th:if="${category!=null}" class="form" style="margin-bottom: 20px;">
+								<form role="form" name="categoryproduct" class="form-horizontal" th:action="@{/store/admin/category/product}" method="post">
+									<div class="row">
+										<div class="col-lg-2">
+											<font size="4">Add Product</font>
+										</div>
+										<div class="col-lg-10">
+											<input type="submit" class="btn btn-primary" value="  +  Save Selected Product  " />
+									        <input type="hidden" id="categoryid" name="categoryid" th:value="${category==null?'':category.categoryid}" />
+										</div>
+									</div>
+									<div style="margin-left: 150px; margin-top: 0px; margin-right: 100px;">
+									<table id="mainTable" class="table table-striped table-bordered">
+										<thead>
+											<tr>
+												<th><i class="icon_documents"></i> Product</th>
+												<th><i class="icon_cogs"></i> Action</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="product: ${products}">
+												<td>
+													<input type="checkbox" name="productid" id="productid" th:value="${product.productid}" th:checked="${#lists.contains(cateproductids,product.productid)}" />
+												</td>
+												<td th:text="${product.name}"></td>
+											</tr>
+										</tbody>
+									</table>
+									</div>
+									<!-- <div class="form-group">
+									    <label for="productid" class="control-label col-lg-2">Product </label>
+									    <div class="col-lg-8">
+											<input class="form-control" id="productname" name="productname" th:value="${product!=null?product.name:''}" />
+									    </div>
+										<div class="col-lg-2" style="float: left; margin-bottom: 4px;">
+											<input type="submit" class="btn btn-primary" value="+ Add" />
+									        <input type="hidden" id="categoryid" name="categoryid" th:value="${category==null?'':category.categoryid}" />
+										</div>
+									</div> -->
+									<!-- <div class="container" style="margin-left: 150px; margin-top: 0px; margin-right: 100px;">
+										<div class="row">
+											<div class="col-lg-2">
+												<font size="4">Add Product</font>
+											</div>
+											<div class="col-lg-10">
+												<input type="submit" class="btn btn-primary" value="+ Add" />
+										        <input type="hidden" id="categoryid" name="categoryid" th:value="${category==null?'':category.categoryid}" />
+											</div>
+										</div>
+										<div th:each="product: ${products}" class="row">
+											<div class="col-lg-2"><input type="checkbox" name="productid" id="productid" th:value="${product.productid}" th:checked="${#lists.contains(cateproductids,product.productid)}"></div>
+											<div class="col-lg-10"><span th:text="${product.name}"></span></div>
+										</div>
+									</div> -->
+								</form>
+							</div>
+							<!-- <div th:if="${products!=null and products.size()>0}"  class="form" style="margin-left: 150px; margin-top: 40px; margin-right: 100px;">
+								<table id="mainTable" class="table table-striped table-bordered">
+									<thead>
+										<tr>
+											<th><i class="icon_documents"></i> Product</th>
+											<th><i class="icon_cogs"></i> Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="product: ${products}">
+											<td th:text="${product.name}"></td>
+											<td>
+												<form id="categoryproduct" name="categoryproduct" th:action="@{/store/admin/category/product/}+${product.productid}" method="delete">
+													<div class="btn-group">
+														<a type="submit" title="Remove Product"><i class="fa fa-trash"></i></a>
+														<input type="hidden" id="categoryid" name="categoryid" th:value="${category==null?'':category.categoryid}" />
+													</div>
+												</form>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div> -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+      <!--main content end-->
+		<script th:src="@{/js/jquery-1.10.2.min.js}"></script>
+		<script th:src="@{/js/jquery-ui-1.12.1.js}"></script>
+		<script th:src="@{/js/jquery.autocomplete.min.js}"></script>
+		<script>
+			$(document).ready(function() {
+			    var token = $("meta[name='_csrf']").attr("content");
+			    var header = $("meta[name='_csrf_header']").attr("content");
+			    var dialog, form;
+
+				$( "#productname" ).autocomplete({
+					source: function (request, response) {
+	                    $.ajax({
+	                        url: 'products?name='+document.getElementById("productname").value,
+	                        dataType: "json",
+	                        type: "POST",
+	                        contentType: "application/json; charset=utf-8",
+	                        beforeSend: function(xhr){
+	                            xhr.setRequestHeader(header, token);
+	                        },
+	                        success: function (data) {
+	                            response($.map(data, function (item) {
+            		                return { value: item.name, data: item.productid };
+	                            }))
+	                        },
+	                        error: function (response) {
+	                        	console.log(response);
+	                            //alert(response.responseText);
+	                        },
+	                        failure: function (response) {
+	                        	console.log(response);
+	                            //alert(response.responseText);
+	                        }
+	                    });
+	                }
+				});
+
+				// Variable to store your files
+				var files;
+
+				// Add events
+				//$('input[type=file]').on('change', prepareUpload);
+
+				// Grab the files and set them to our variable
+				function prepareUpload(event) {
+					alert("xxxdf")
+					files = event.target.files;
+				}
+
+				//$('form').on('submit', uploadFiles);
+
+				// Catch the form submit and upload the files
+				function uploadFiles(event) {
+					alert("cccc")
+					event.stopPropagation(); // Stop stuff happening
+					event.preventDefault(); // Totally stop stuff happening
+
+				    // START A LOADING SPINNER HERE
+				    // Create a formdata object and add the files
+				    var data = new FormData();
+				    $.each(files, function(key, value) {
+				        data.append(key, value);
+				    });
+
+				    $.ajax({
+				        url: 'categoryImage?files',
+				        type: 'POST',
+				        data: data,
+				        cache: false,
+				        dataType: 'json',
+				        processData: false, // Don't process the files
+				        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+				        success: function(data, textStatus, jqXHR) {
+				            if(typeof data.error === 'undefined') {
+				                // Success so call function to process the form
+				                submitForm(event, data);
+				            }
+				            else {
+				                // Handle errors here
+				                console.log('ERRORS: ' + data.error);
+				            }
+				        },
+				        error: function(jqXHR, textStatus, errorThrown) {
+				            // Handle errors here
+				            console.log('ERRORS: ' + textStatus);
+				            // STOP LOADING SPINNER
+				        }
+				    });
+				}
+
+				document.getElementById("uploadBtn").onchange = function () {
+					var filename = this.value.split('\\').pop().split('/').pop();
+					rmvMessage();
+				    namefield = document.getElementById("uploadFile");
+				    namefield.innerHTML = filename + "&nbsp;&nbsp;&nbsp;&nbsp;";
+				    anchor = document.createElement("a");
+				    anchor.setAttribute("href", "javascript: clearSelection()");
+				    span = document.createElement("i");
+				    span.setAttribute("class", "icon_trash");
+				    anchor.appendChild(span);
+				    namefield.appendChild(anchor);
+				};
+
+			});
+		</script>
+	</div>
+</html>

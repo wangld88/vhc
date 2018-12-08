@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html layout:decorator="store/admin/layout/layout">
+	<div layout:fragment="content">
+
+		<section class="content-header">
+			<h1>
+				Inventory Management
+				<small>List Purchase Orders</small>
+			</h1>
+			<ol class="breadcrumb">
+				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
+				<li><a th:href="@{/store/admin/pos}"><i class="fa fa-cubes"></i> Inventories</a></li>
+				<li class="active"><i class="fa fa-file-text-o"></i>List Purchase Orders</li>
+			</ol>
+		</section>
+
+		<section class="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="box">
+						<div class="box-header">
+							<h3 class="box-title">All Purchase Orders</h3> <span style="width: 240px;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <a th:href="@{/store/admin/purchorder}" title="Add New Purchase Order"><i class="fa fa-plus-square"></i></a>
+						</div>
+						<div class="box-body">
+
+							<table id="mainTable" class="table table-striped" th:if="${orders != null}">
+								<thead>
+									<tr>
+										<th><i class="icon_documents"></i> P.O. Number</th>
+										<th><i class="icon_calendar"></i> Supplier</th>
+										<th><i class="icon_pin_alt"></i> Sent By</th>
+										<th><i class="icon_contacts_alt"></i> Sent Date</th>
+										<th><i class="icon_pin_alt"></i> Recorded By</th>
+										<th><i class="icon_contacts_alt"></i> Record Date</th>
+										<th><i class="icon_mail_alt"></i> Comments</th>
+										<th><i class="icon_cogs"></i> Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="order:${orders}">
+										<td th:text="${order.code}"></td>
+										<td th:text="${order.supplier.name}"></td>
+										<td th:text="${order.sentby.firstname}"></td>
+										<td th:text="${#calendars.format(order.sentdate,'dd MMMM yyyy')}"></td>
+										<td th:text="${order.recordedby.firstname}"></td>
+										<td th:text="${#calendars.format(order.recorddate,'dd MMMM yyyy')}"></td>
+										<td th:text="${order.comments}"></td>
+										<td>
+											<div class="btn-group">
+												<!-- <a class="btn btn-primary" th:href="@{/admin/shipment}" title="Add New Shipment"><i class="icon_plus_alt2"></i></a> -->
+												<a th:href="@{/store/admin/purchorder/}+${order.orderid}" title="Edit Purchase Order"><i class="fa fa-edit"></i></a>
+												<!-- <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a> -->
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+ 			</div>
+		</section>
+	</div>
+</html>

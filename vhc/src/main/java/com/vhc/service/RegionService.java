@@ -13,18 +13,18 @@ public class RegionService {
 
 	@Autowired
 	RegionRepository regionRepository;
-	
-	
+
+
 	public List<Region> getAll() {
 		return regionRepository.findAll();
 	}
-	
+
 	public Region getById(long regionid) {
 		return regionRepository.findByRegionid(regionid);
 	}
-	
+
 	public Region save(Region region) {
 		return this.regionRepository.save(region);
 	}
-	
+
 }

@@ -16,7 +16,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 /**
- * 
+ *
  * @author Jerry
  *
  */
@@ -28,32 +28,32 @@ public class Country implements Serializable {
 
 	private static final long serialVersionUID = -5818451727489525929L;
 
-	
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "countryid", updatable = false, nullable = false)
 	private long countryid;
-	         
+
 	@Column(nullable=false, unique=true, length=100)
 	@Size(max=100)
 	@ApiObjectField(description="Unique Name", format="Not Null, maxlength = 100", required=true)
 	private String name;
 
-/*	@Column(nullable=true, unique=true, length=3)
+	@Column(nullable=true, unique=true, length=3)
 	@Size(max=3)
 	@ApiObjectField(description="Unique Name", format="Not Null, maxlength = 3", required=false)
 	private String code;
-*/
-	
+
+
 	public Country() {
-		
+
 	}
-	
+
 	public Country(String name) { //, String code) {
 		this.name = name;
 		//this.code = code;
 	}
-	
+
 	public long getCountryid() {
 		return countryid;
 	}
@@ -70,12 +70,12 @@ public class Country implements Serializable {
 		this.name = name;
 	}
 
-	/*public String getCode() {
+	public String getCode() {
 		return code;
 	}
 
 	public void setCode(String code) {
 		this.code = code;
-	}*/
+	}
 
 }

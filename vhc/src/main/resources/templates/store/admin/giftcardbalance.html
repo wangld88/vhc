@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html layout:decorator="store/admin/layout/layout">
+	<div layout:fragment="content">
+
+		<section class="content-header">
+			<h1>
+				Sales Management
+				<small>Sales</small>
+			</h1>
+			<ol class="breadcrumb">
+				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
+				<li><a th:href="@{/store/admin/brands}"><i class="fa fa-cubes"></i>Sales</a></li>
+				<li><i class="fa fa-file-text-o"></i><span th:text="${'Gift Card'}"></span></li>
+			</ol>
+		</section>
+
+		<section class="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="box">
+						<div class="box-header">
+							<h3 class="box-title" th:text="${'Gift Card'}"></h3>
+						</div>
+
+						<div class="box-body">
+							<div class="form">
+								<form class="form-validate form-horizontal" id="giftcard" name="giftcard" method="post" th:action="@{/store/admin/giftcardbalance}">
+									<div class="form-group">
+									    <label for="cardnum" class="control-label col-lg-2">Gift Card Number <span class="required">*</span></label>
+									    <div class="col-lg-10">
+									        <input class="form-control" id="cardnum" name="cardnum" th:value="${giftcard==null?'':giftcard.code}" type="text" />
+									    </div>
+									</div>
+
+									<div class="form-group">
+									    <div class="col-lg-offset-2 col-lg-10">
+									        <button class="btn btn-primary" type="submit"> Check Balance </button>
+									    </div>
+									</div>
+								</form>
+							</div>
+						</div>
+
+						<div th:if="${giftcard!=null}" class="box-body">
+							<div class="col-lg-offset-1 col-lg-11">
+								<label>Card Balance: </label>
+								<span th:text="${'CA$'+giftcard.balance}"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+      <!--main content end-->
+	</div>
+</html>

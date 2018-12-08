@@ -1,7 +1,9 @@
 package com.vhc.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -29,7 +33,7 @@ public class Item implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "itemid", updatable = false, nullable = false)
 	private long itemid;
-	
+
 	@Column(nullable=true, length=20)
 	@Size(max=20)
 	@ApiObjectField(description="Unique sku", format="Not Null, maxlength = 20", required=false)
@@ -89,11 +93,22 @@ public class Item implements Serializable {
 	@ApiObjectField(description="Unique Shipment", required=true)
 	private Shipment shipment;
 
-	
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="poid")
+	@ApiObjectField(description="Unique Purchase Order", required=true)
+	private Purchaseorder purchaseorder;
+
+	@OneToMany(cascade={javax.persistence.CascadeType.ALL}, mappedBy="item", fetch=FetchType.LAZY)
+	private List<Inventory> inventories = new ArrayList<>();
+
+	/*@OneToOne(targetEntity = Orderitem.class, fetch=FetchType.EAGER)
+	@JoinColumn(nullable = false, name="orderitemid")
+	private Orderitem orderitem;*/
+
+
 	public Item() {
-		
 	}
-	
+
 	public long getItemid() {
 		return itemid;
 	}
@@ -190,7 +205,7 @@ public class Item implements Serializable {
 	public void setShipment(Shipment shipment) {
 		this.shipment = shipment;
 	}
-	
+
 	public com.vhc.model.Size getSize() {
 		return size;
 	}
@@ -198,5 +213,29 @@ public class Item implements Serializable {
 	public void setSize(com.vhc.model.Size size) {
 		this.size = size;
 	}
+
+	public Purchaseorder getPurchaseorder() {
+		return purchaseorder;
+	}
+
+	public void setPurchaseorder(Purchaseorder purchaseorder) {
+		this.purchaseorder = purchaseorder;
+	}
+
+	public List<Inventory> getInventories() {
+		return inventories;
+	}
+
+	public void setInventories(List<Inventory> inventories) {
+		this.inventories = inventories;
+	}
+
+	/*public Orderitem getOrderitem() {
+		return orderitem;
+	}
+
+	public void setOrder(Orderitem orderitem) {
+		this.orderitem = orderitem;
+	}*/
 
 }

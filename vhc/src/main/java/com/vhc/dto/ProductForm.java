@@ -2,40 +2,31 @@ package com.vhc.dto;
 
 import java.util.List;
 
-import com.vhc.model.Item;
+import com.vhc.model.Product;
+import com.vhc.model.Producttag;
 
 public class ProductForm {
 
-	private long inventoryid;
-
-	private long quantity;
-	
-	private Item item;
+	private Product product;
 
 	private List<ImageForm> images;
-	
-	public long getInventoryid() {
-		return inventoryid;
+
+	private List<Producttag> tags;
+
+
+	public ProductForm() {
 	}
 
-	public void setInventoryid(long inventoryid) {
-		this.inventoryid = inventoryid;
+	public ProductForm(Product product) {
+		this.product = product;
 	}
 
-	public long getQuantity() {
-		return quantity;
+	public Product getProduct() {
+		return product;
 	}
 
-	public void setQuantity(long quantity) {
-		this.quantity = quantity;
-	}
-
-	public Item getItem() {
-		return item;
-	}
-
-	public void setItem(Item item) {
-		this.item = item;
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
 	public List<ImageForm> getImages() {
@@ -45,6 +36,13 @@ public class ProductForm {
 	public void setImages(List<ImageForm> images) {
 		this.images = images;
 	}
-	
-	
+
+	public List<Producttag> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<Producttag> tags) {
+		this.tags = tags;
+	}
+
 }

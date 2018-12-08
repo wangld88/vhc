@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html layout:decorator="admin/layout/layout">
+	<div layout:fragment="content" class="container">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item">System Error</li>
+			<!-- <li class="breadcrumb-item"><a href="#">Forms</a></li> -->
+			<li class="breadcrumb-item active">Debug Information</li>
+		</ol>
+
+		<strong>Requested URL:</strong> <span th:text="${exception.path}"></span><br><br>
+		<strong>Title:</strong> <span th:text="${exception.error}"></span><br><br>
+		<!-- <strong>Exception:</strong> <span th:text="${exception==null?'N/A':exception.exception}"></span><br><br> -->
+
+		<strong>Exception Stack Trace</strong><br>
+		<div th:each="ste: ${exception}">
+			<span th:text="${ste}"></span>
+		</div>
+	</div>
+</html>

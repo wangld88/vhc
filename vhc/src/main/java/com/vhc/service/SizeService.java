@@ -13,22 +13,30 @@ public class SizeService {
 
 	@Autowired
 	SizeRepository sizeRepository;
-	
-	
+
+
 	public List<Size> getAll() {
-		return sizeRepository.findAll();
+		return sizeRepository.findAllByOrderByRegionAscTypeAscSizenumAsc();
 	}
-	
+
+	public List<Size> getBySizenum(String sizenum) {
+		return sizeRepository.findBySizenumIgnoreCaseLike(sizenum);
+	}
+
 	public List<Size> getByTypeAndRegion(long typeid, long regionid) {
 		return sizeRepository.findByType_typeidAndRegion_regionid(typeid, regionid);
 	}
-	
+
+	public List<Size> getByTypeAndSizenum(long typeid, String sizenum) {
+		return sizeRepository.findByType_typeidAndSizenumIgnoreCaseLike(typeid, sizenum);
+	}
+
 	public Size getById(long sizeid) {
 		return sizeRepository.findBySizeid(sizeid);
 	}
-	
+
 	public Size save(Size size) {
 		return this.sizeRepository.save(size);
 	}
-	
+
 }

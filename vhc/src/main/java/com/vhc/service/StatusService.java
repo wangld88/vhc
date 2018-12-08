@@ -14,19 +14,23 @@ public class StatusService {
 
 	@Autowired
 	private StatusRepository statusRepository;
-	
+
 	public Status getById(long statusid) {
 		return statusRepository.findByStatusid(statusid);
+	}
+
+	public Status getByName(String name) {
+		return statusRepository.findByName(name);
 	}
 
 	public List<Status> getAll() {
 		return statusRepository.findAll();
 	}
-	
+
 	public List<Status> getByReftbl(String reftbl) {
 		return statusRepository.findByReftbl(reftbl);
 	}
-	
+
 	public Status save(Status status) {
 		return statusRepository.save(status);
 	}

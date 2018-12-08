@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html layout:decorator="admin/layout/layout">
+	<div layout:fragment="content">
+
+		<section id="main-content">
+			<section class="wrapper">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Setting Management</h3>
+						<ol class="breadcrumb">
+							<li><i class="fa fa-home"></i><a th:href="@{/admin/home}">Home</a></li>
+							<li><i class="icon_document_alt"></i>Settings</li>
+							<li><i class="fa fa-file-text-o"></i><span th:text="${province==null?'New Province':'Modify Province'}"></span></li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+						<section class="panel">
+							<header class="panel-heading">
+								Province
+							</header>
+
+							<div class="panel-body">
+								<div class="form">
+									<form class="form-validate form-horizontal " id="province" name="province" method="post" th:action="@{/admin/province}">
+										<div class="form-group">
+										    <label for="name" class="control-label col-lg-2">Name <span class="required">*</span></label>
+										    <div class="col-lg-10">
+										        <input class=" form-control" id="name" name="name" th:value="${province==null?'':province.name}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="description" class="control-label col-lg-2">Code </label>
+										    <div class="col-lg-10">
+										        <input class=" form-control" id="code" name="code" th:value="${province==null?'':province.code}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="cityid" class="control-label col-lg-2">Country </label>
+										    <div class="col-lg-10">
+												<select class="form-control" id="countryid" name="countryid">
+													<option th:each="country: ${countries}" th:value="${country.countryid}" th:text="${country.name}" th:selected="${province!=null and province.country!=null and province.country.countryid==country.countryid}"></option>
+												</select>
+										    </div>
+										</div>
+										<div class="form-group">
+										    <div class="col-lg-offset-2 col-lg-10">
+										        <button class="btn btn-primary" type="submit"> Save </button>
+										        <a th:href="@{/admin/provinces}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+										        <input type="hidden" id="provinceid" name="provinceid" th:value="${province==null?'':province.provinceid}" />
+										    </div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</section>
+					</div>
+				</div>
+			</section>
+		</section>
+      <!--main content end-->
+	</div>
+</html>

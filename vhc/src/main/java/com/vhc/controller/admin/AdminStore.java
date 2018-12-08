@@ -1,5 +1,7 @@
 package com.vhc.controller.admin;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +9,7 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.vhc.controller.BaseController;
 import com.vhc.model.Address;
 import com.vhc.model.City;
+import com.vhc.model.Staff;
 import com.vhc.model.Store;
 import com.vhc.model.User;
 import com.vhc.security.LoginUser;
@@ -28,56 +32,83 @@ import com.vhc.security.LoginUser;
 public class AdminStore extends BaseController {
 
 	private final Logger logger = LoggerFactory.getLogger(AdminStore.class);
-	
+
 	@RequestMapping(method={RequestMethod.GET}, value={"/stores"})
 	public String dspStores(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/stores";
-		
+
+		User loginUser = getPrincipal();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
 		List<Store> mfs = storeService.getAll();
 		model.addAttribute("stores", mfs);
-		model.addAttribute("loginUser", getPrincipal());
-		
-		return rtn;
-	}
-	
-	
-	@RequestMapping(method={RequestMethod.GET}, value={"/store"})
-	public String dspStore(ModelMap model, HttpSession httpSession) {
-		String rtn = "admin/store";
-		
-		List<City> cities = cityService.getAll();
-		
-		model.addAttribute("cities", cities);
-		model.addAttribute("loginUser", getPrincipal());
-		
-		return rtn;
-	}
-	
-	
-	@RequestMapping(method={RequestMethod.GET}, value={"/store/{storeid}"})
-	public String updateStore(ModelMap model, @PathVariable("storeid") Long storeid, HttpSession httpSession) {
-		String rtn = "admin/store";
-		
-		long mfid = storeid.longValue();
-		Store store = storeService.getById(mfid);
-		
-		List<City> cities = cityService.getAll();
-		model.addAttribute("store", store);
-		model.addAttribute("cities", cities);
-		model.addAttribute("loginUser", getPrincipal());
-		
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Business");
+
 		return rtn;
 	}
 
-	
+
+	@RequestMapping(method={RequestMethod.GET}, value={"/store"})
+	public String dspStore(ModelMap model, HttpSession httpSession) {
+		String rtn = "admin/store";
+
+		User loginUser = getPrincipal();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		List<City> cities = cityService.getAll();
+
+		model.addAttribute("cities", cities);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Business");
+
+		return rtn;
+	}
+
+
+	@RequestMapping(method={RequestMethod.GET}, value={"/store/{storeid}"})
+	public String updateStore(ModelMap model, @PathVariable("storeid") Long storeid, HttpSession httpSession) {
+		String rtn = "admin/store";
+
+		User loginUser = getPrincipal();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		long mfid = storeid.longValue();
+		Store store = storeService.getById(mfid);
+
+		List<City> cities = cityService.getAll();
+		model.addAttribute("store", store);
+		model.addAttribute("cities", cities);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Business");
+
+		return rtn;
+	}
+
+
 	@RequestMapping(method={RequestMethod.POST}, value={"/store"})
 	public String doStore(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		String rtn = "stores";
-		
+
 		logger.info("doStore is call!!!!!");
-		
+
+		User loginUser = getPrincipal();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
 		Address ads = new Address();
-		
+
 		String mfid = requestParams.get("storeid");
 		String street = requestParams.get("street");
 		String cityid = requestParams.get("cityid");
@@ -93,15 +124,15 @@ public class AdminStore extends BaseController {
 		String google = requestParams.get("google");
 		String twitter = requestParams.get("twitter");
 		String comments = requestParams.get("comments");
-		
+
 		logger.info("cityid: " + cityid);
 		City city = cityService.getById(Long.parseLong(cityid));
 		ads.setCity(city);
 		ads.setStreet(street);
 		ads.setPostalcode(postalcode);
-		
+
 		addressService.save(ads);
-		
+
 		Store store = new Store();
 		if(mfid != null && !mfid.isEmpty()) {
 			store.setStoreid(Long.parseLong(mfid));
@@ -119,22 +150,138 @@ public class AdminStore extends BaseController {
 		store.setTwitter(twitter);
 		store.setComments(comments);
 		storeService.save(store);
-		model.addAttribute("loginUser", getPrincipal());
-		
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Business");
+
+		return "redirect:" + rtn;
+	}
+
+	@RequestMapping(method={RequestMethod.GET}, value={"/staffs"})
+	public String dspStaffs(ModelMap model, HttpSession httpSession) {
+		String rtn = "admin/staffs";
+
+		User loginUser = getPrincipal();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		List<Staff> staffs = staffService.getAll();
+		model.addAttribute("staffs", staffs);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Business");
+
+		return rtn;
+	}
+
+
+	@RequestMapping(method={RequestMethod.GET}, value={"/staff"})
+	public String dspStaff(ModelMap model, HttpSession httpSession) {
+		String rtn = "admin/staff";
+
+		User loginUser = getPrincipal();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		List<String> roles = new ArrayList<String>();
+		roles.add("ADMIN");
+		roles.add("STAFF");
+
+		List<Store> stores = storeService.getAll();
+		List<User> users = userService.getByRolenames(roles);
+
+		model.addAttribute("users", users);
+		model.addAttribute("stores", stores);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Business");
+
+		return rtn;
+	}
+
+
+	@RequestMapping(method={RequestMethod.GET}, value={"/staff/{staffid}"})
+	public String updateStaff(ModelMap model, @PathVariable("staffid") Long staffid, HttpSession httpSession) {
+		String rtn = "admin/staff";
+
+		User loginUser = getPrincipal();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		long mfid = staffid.longValue();
+		Staff staff = staffService.getById(mfid);
+		List<User> users = new ArrayList<User>();
+		users.add(staff.getUser());
+
+		List<Store> stores = storeService.getAll();
+		model.addAttribute("staff", staff);
+		model.addAttribute("users", users);
+		model.addAttribute("stores", stores);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Business");
+
+		return rtn;
+	}
+
+
+	@RequestMapping(method={RequestMethod.POST}, value={"/staff"})
+	public String doStaff(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
+		String rtn = "staffs";
+
+		logger.info("doStaff is call!!!!!");
+
+		User loginUser = getPrincipal();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		Staff staff = new Staff();
+
+		String staffid = requestParams.get("staffid");
+		String storeid = requestParams.get("storeid");
+		String userid = requestParams.get("userid");
+
+		Store store = storeService.getById(Long.parseLong(storeid));
+		User user = userService.getById(Long.parseLong(userid));
+
+		if(staffid != null && !staffid.isEmpty()) {
+			staff.setStaffid(Long.parseLong(staffid));
+		}
+		staff.setStore(store);
+		staff.setUser(user);
+
+		staffService.save(staff);
+
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Business");
+
 		return "redirect:" + rtn;
 	}
 
 	private User getPrincipal(){
     	User user = null;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        //System.out.println("Role is : "+((LoginStudent)principal).toString());
+
+        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        boolean isSuper = false;
+        for (GrantedAuthority grantedAuthority : authorities) {
+        	isSuper = grantedAuthority.getAuthority().equals("SUPERADMIN");
+        }
+
         if (principal instanceof LoginUser) {
-            user = ((LoginUser)principal).getUser();
+        	LoginUser auth = (LoginUser)principal;
+        	if(isSuper) {
+        		user = auth.getUser();
+        	}
         } else {
             user = userService.findByUsername("");
         }
         return user;
     }
-	
-	
+
+
 }

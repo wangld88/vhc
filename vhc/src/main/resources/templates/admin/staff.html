@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html layout:decorator="admin/layout">
+<html layout:decorator="admin/layout/layout">
 	<div layout:fragment="content">
 
 		<section id="main-content">
 			<section class="wrapper">
 				<div class="row">
 					<div class="col-lg-12">
-						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Product Management</h3>
+						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Business Management</h3>
 						<ol class="breadcrumb">
 							<li><i class="fa fa-home"></i><a th:href="@{/admin/home}">Home</a></li>
-							<li><i class="icon_document_alt"></i>Products</li>
-							<li><i class="fa fa-file-text-o"></i><span th:text="${mf==null?'New Manufacture':'Modify Manufacture'}"></span></li>
+							<li><i class="icon_document_alt"></i>Business</li>
+							<li><i class="fa fa-file-text-o"></i><span th:text="${staff==null?'New Staff':'Modify Staff'}"></span></li>
 						</ol>
 					</div>
 				</div>
@@ -19,72 +19,38 @@
 					<div class="col-lg-12">
 						<section class="panel">
 							<header class="panel-heading">
-								Manufacture
+								Staff
 							</header>
 							<div class="panel-body">
 								<div class="form">
-									<form class="form-validate form-horizontal " id="manufacture" name="manufacture" method="post" th:action="@{/admin/manufacture}">
+									<form class="form-validate form-horizontal " id="staff" name="staff" method="post" th:action="@{/admin/staff}">
 										<div class="form-group">
-										    <label for="fullname" class="control-label col-lg-2">Full Name <span class="required">*</span></label>
+										    <label for="userid" class="control-label col-lg-2">Staff <span class="required">*</span></label>
 										    <div class="col-lg-10">
-										        <input class=" form-control" id="name" name="name" th:value="${mf==null?'':mf.name}" type="text" />
-										    </div>
-										</div>
-										<div class="form-group">
-										    <label for="stree" class="control-label col-lg-2">Address </label>
-										    <div class="col-lg-10">
-										        <input class=" form-control" id="street" name="street" th:value="${mf==null?'':mf.address.street}" type="text" />
-										    </div>
-										</div>
-										<div class="form-group">
-										    <label for="cityid" class="control-label col-lg-2">City </label>
-										    <div class="col-lg-10">
-												<select class="form-control m-bot15" id="cityid" name="cityid">
-													<option th:each="city: ${cities}" th:value="${city.cityid}" th:text="${city.name}" th:selected="${mf==null?'':(mf.address.city.cityid.equals(city.cityid)?'Selected':'')}"></option>
+												<select class="form-control" id="userid" name="userid">
+													<option th:each="user: ${users}" th:value="${user.userid}" th:text="${user==null?'':user.firstname+' '+user.lastname}"></option>
 												</select>
 										    </div>
 										</div>
-										<div class="form-group ">
-										    <label for="postalcode" class="control-label col-lg-2">Postal Code </label>
+										<div class="form-group">
+										    <label for="store" class="control-label col-lg-2">Store </label>
 										    <div class="col-lg-10">
-										        <input class="form-control " id="postalcode" name="postalcode" th:value="${mf==null?'':mf.address.postalcode}" type="text" />
+												<select class="form-control" id="storeid" name="storeid">
+													<option th:each="store: ${stores}" th:value="${store.storeid}" th:text="${store.name}"></option>
+												</select>
 										    </div>
 										</div>
-										<div class="form-group ">
-										    <label for="contact" class="control-label col-lg-2">Contact </label>
-										    <div class="col-lg-10">
-										        <input class="form-control " id="contact" name="contact" th:value="${mf==null?'':mf.contact}" type="text" />
-										    </div>
-										</div>
-										<div class="form-group ">
+										<!-- <div class="form-group ">
 										    <label for="phone" class="control-label col-lg-2">Phone </label>
 										    <div class="col-lg-10">
-										        <input type="text" class="form-control" id="phone" name="phone" th:value="${mf==null?'':mf.phone}" />
+										        <input type="text" class="form-control" id="phone" name="phone" th:value="${staff==null?'':staff.phone}" />
 										    </div>
-										</div>
-										<div class="form-group ">
-										    <label for="email" class="control-label col-lg-2">Email </label>
-										    <div class="col-lg-10">
-										        <input class="form-control " id="email" name="email" type="email" th:value="${mf==null?'':mf.email}" />
-										    </div>
-										</div>
-										<div class="form-group ">
-										    <label for="website" class="control-label col-lg-2">Web Site </label>
-										    <div class="col-lg-10">
-										        <input class="form-control " id="website" name="website" type="url" th:value="${mf==null?'':mf.website}" />
-										    </div>
-										</div>
-										<div class="form-group ">
-										    <label for="comments" class="control-label col-lg-2">Comments </label>
-										    <div class="col-lg-10">
-										        <textarea class="form-control " id="comments" name="comments" th:value="${mf==null?'':mf.comments}" ></textarea>
-										    </div>
-										</div>
+										</div> -->
 										<div class="form-group">
 										    <div class="col-lg-offset-2 col-lg-10">
 										        <button class="btn btn-primary" type="submit"> Save </button>
 										        <button class="btn btn-default" type="button">Cancel</button>
-										        <input type="hidden" id="manufactureid" name="manufactureid" th:value="${mf==null?'':mf.manufactureid}" />
+										        <input type="hidden" id="staffid" name="staffid" th:value="${staff==null?'':staff.staffid}" />
 										    </div>
 										</div>
 									</form>

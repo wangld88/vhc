@@ -13,18 +13,26 @@ public class TypeService {
 
 	@Autowired
 	TypeRepository typeRepository;
-	
-	
+
+
 	public List<Type> getAll() {
 		return typeRepository.findAll();
 	}
-	
+
+	public List<Type> getByName(String name) {
+		return typeRepository.findByNameIgnoreCaseLike(name);
+	}
+
 	public Type getById(long typeid) {
 		return typeRepository.findByTypeid(typeid);
 	}
-	
+
+	public Type getByNameReftbl(String name, String reftbl) {
+		return typeRepository.findByNameIgnoreCaseAndReftblIgnoreCase(name, reftbl);
+	}
+
 	public Type save(Type type) {
 		return this.typeRepository.save(type);
 	}
-	
+
 }

@@ -15,36 +15,44 @@ import com.vhc.controller.BaseController;
 @Controller
 @RequestMapping({"/admin"})
 public class AdminLogin extends BaseController {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(AdminLogin.class);
-  
+
 	@RequestMapping(method={RequestMethod.GET}, value={"/login"})
 	public String dspLogin(ModelMap model) {
-		return "admin/login/login";
+
+		String loginUser = getPrincipal();
+
+		if(loginUser != null && loginUser != "anonymousUser") {
+			return "redirect:home";
+		} else {
+			return "admin/login/login";
+		}
 	}
-  
+
 	@RequestMapping(value={"/Access_Denied"}, method={RequestMethod.GET})
 	public String accessDeniedPage(ModelMap model) {
 		model.addAttribute("user", getPrincipal());
 		return "/error/accessDenied";
 	}
 
-	
-	@RequestMapping(method={RequestMethod.GET}, value={"/"})
+
+	@RequestMapping(method={RequestMethod.GET}, value={""})
 	public String dspHome(ModelMap model) {
 		model.addAttribute("loginUser", getPrincipal());
 		return "index";
 	}
-	
-	
+
+
 	private String getPrincipal()	{
 		String userName = null;
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    
-		logger.info("Get Logged in User : " + ((UserDetails)principal).toString());
+
 		if ((principal instanceof UserDetails)) {
+			logger.info("Get Logged in User : " + ((UserDetails)principal).toString());
 			userName = ((UserDetails)principal).getUsername();
 		} else {
+			logger.info("Get Logged in User : " + principal.toString());
 			userName = principal.toString();
 		}
 		return userName;

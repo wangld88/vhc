@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html layout:decorator="admin/layout">
+<html layout:decorator="admin/layout/layout">
 	<div layout:fragment="content">
-    
+
         <!-- Bootstrap -->
         <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap.min.css}" />
         <link rel="stylesheet" media="screen" th:href="@{/css/calendar-styles.css}" />
  		<link rel="stylesheet" media="screen" th:href="@{/assets/fullcalendar/fullcalendar/fullcalendar.css}" />
+ 		<!-- <script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css"> -->
+		<link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css">
+
+      <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -63,21 +68,39 @@
                         <!-- /block -->
                     </div>
                 </div>
-    <div id="fullCalModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span> <span class="sr-only">close</span></button>
-                    <h4 id="eventTitle" class="modal-title"></h4>
-                </div>
-                <div id="eventInfo" class="modal-body"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <a class="btn btn-primary" id="eventlink" target="_blank">Event Page</a>
-                </div>
-            </div>
-        </div>
-    </div>
+
+			    <div id="fullCalModal" class="modal fade">
+			        <div class="modal-dialog">
+			            <div class="modal-content">
+			                <div class="modal-header">
+			                    <button type="button" class="close icon_close" data-dismiss="modal">
+			                    	<!-- <span aria-hidden="true">×</span> -->
+			                    	<span class="sr-only">close</span>
+			                    </button>
+			                    <h4 id="eventTitle" class="modal-title edit"></h4>
+			                </div>
+			                <div style="padding-left: 20px; padding-top: 8px;">
+				                <div class="row">
+				                	<label class="col-xs-1">Start: </label>
+				                	<input type="text" id="datestart24" data-format="DD-MM-YYYY HH:mm" data-template="DD / MM / YYYY  HH : mm" name="datestart" value="">
+				                </div>
+				                <div class="row">
+				                	<label class="col-xs-1">End: </label>
+				                	<input type="text" id="dateend24" data-format="DD-MM-YYYY HH:mm" data-template="DD / MM / YYYY  HH : mm" name="dateend" value="">
+				                </div>
+			                </div>
+			                <div id="eventInfo" class="modal-body">
+			                	<label >Detail: </label>
+			                	<textarea cols="60" rows="4"></textarea>
+			                </div>
+			                <div class="modal-footer">
+			                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			                    <!-- <a class="btn btn-primary" id="eventlink" target="_blank">Event Page</a> -->
+			                </div>
+			            </div>
+			        </div>
+			    </div>
+
 		        <style>
 			        #external-events {
 			            float: left;
@@ -87,7 +110,7 @@
 			            background: #eee;
 			            text-align: left;
 		            }
-		            
+
 			        #external-events h4 {
 						color:#4a4a4a;
 						font-weight: bold;
@@ -96,7 +119,7 @@
 						margin-bottom: 10px;
 			            padding-top: 1em;
 		            }
-		            
+
 					#external-events label {
 						color:#4a4a4a;
 					}
@@ -110,34 +133,35 @@
 			            cursor: pointer;
 			            z-index: 1;
 		            }
-		            
+
 			        #external-events p {
 			            margin: 1.5em 0;
 			            font-size: 11px;
 			            color: #666;
 		            }
-		            
+
 			        #external-events p input {
 			            margin: 0;
 			            vertical-align: middle;
 		            }
-		
+
 		        </style>
 		        <!--/.fluid-container-->
 		        <!-- <script th:src="@{/js/jquery-1.9.1.min.js}"></script>
 		        <script th:src="@{/js/jquery-ui-1.10.3.js}"></script> -->
 		        <script th:src="@{/assets/fullcalendar/fullcalendar/fullcalendar.js}"></script>
 		        <script th:src="@{/assets/fullcalendar/fullcalendar/gcal.js}"></script>
+		        <script th:src="@{/js/combodate.js}"></script>
+		        <script th:src="@{/js/moment.js}"></script>
 		        <script th:src="@{/js/calendar-scripts.js}"></script>
 		        <script>
-				
 			        $(function() {
 			            // Easy pie charts
 						var date = new Date();
 						var d = date.getDate();
 						var m = date.getMonth();
 						var y = date.getFullYear();
-						
+
 			            var calendar = $('#calendar').fullCalendar({
 						header: {
 							left: 'prev,next',
@@ -148,7 +172,7 @@
 			            selectHelper: true,
 			            select: function(start, end, allDay) {
 			                var title = prompt('Event Title:');
-			                alert('start:'+start)
+
 			                if (title) {
 			                    calendar.fullCalendar('renderEvent',
 			                        {
@@ -174,27 +198,27 @@
 							}],
 			            droppable: true, // this allows things to be dropped onto the calendar !!!
 			            drop: function(date, allDay) { // this function is called when something is dropped
-			            
+
 			                // retrieve the dropped element's stored Event Object
 			                var originalEventObject = $(this).data('eventObject');
-			                
+
 			                // we need to copy it, so that multiple events don't have a reference to the same object
 			                var copiedEventObject = $.extend({}, originalEventObject);
-			                
+
 			                // assign it the date that was reported
 			                copiedEventObject.start = date;
 			                copiedEventObject.allDay = allDay;
-			                
+
 			                // render the event on the calendar
 			                // the last `true` argument determines if the event "sticks" (http://arshaw.com/fullcalendar/docs/event_rendering/renderEvent/)
 			                $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
-			                
+
 			                // is the "remove after drop" checkbox checked?
 			                if ($('#drop-remove').is(':checked')) {
 			                    // if so, remove the element from the "Draggable Events" list
 			                    $(this).remove();
 			                }
-			                
+
 			            },
 						editable: true,
 					    /* eventClick: function(event, element) {
@@ -215,29 +239,51 @@
 					    },
 					    // US Holidays
 						events: 'http://www.google.com/calendar/feeds/usa__en%40holiday.calendar.google.com/public/basic'
-						
+
 						});
 			        });
-			
+
 			        $('#external-events div.external-event').each(function() {
-			        
+
 			            // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
 			            // it doesn't need to have a start or end
 			            var eventObject = {
 			                title: $.trim($(this).text()) // use the element's text as the event title
 			            };
-			            
+
 			            // store the Event Object in the DOM element so we can get to it later
 			            $(this).data('eventObject', eventObject);
-			            
+
 			            // make the event draggable using jQuery UI
 			            $(this).draggable({
 			                zIndex: 999999999,
 			                revert: true,      // will cause the event to go back to its
 			                revertDuration: 0  //  original position after the drag
 			            });
-			            
+
 			        });
+			        $(function(){
+			        	var d = new Date(); //21-12-2012 20:30
+			        	smin = ":00";
+			        	emin = ":30";
+			        	if(d.getMinutes() > 30) {
+				        	smin = ":30";
+				        	emin = ":59";
+			        	}
+			        	start = d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear() + " " + d.getHours() + smin;
+			        	end = d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear() + " " + d.getHours() + emin;
+			        	document.getElementById("datestart24").value = start;
+			        	document.getElementById("dateend24").value = end;
+			        	//$('#datestart24').value = start;
+			        	//$('#dateend24').value = end;
+			            $('#datestart24').combodate();
+			            $('#dateend24').combodate();
+			        });
+			        $.fn.editable.defaults.mode = 'inline';
+			        $.fn.editable.defaults.showbuttons = false;
+			        $.fn.editable.defaults.url = '/post';
+			        $.fn.editable.defaults.type = 'text';
+			        $('#eventTitle').editable();
 		        </script>
 
 			</section>

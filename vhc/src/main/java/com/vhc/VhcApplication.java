@@ -2,6 +2,7 @@ package com.vhc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class VhcApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(VhcApplication.class, args);
+		ApplicationContext ctx = SpringApplication.run(VhcApplication.class, args);
+
 	}
 }

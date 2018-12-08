@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html layout:decorator="store/admin/layout/layout">
+	<div layout:fragment="content">
+
+		<section class="content-header">
+			<h1>
+				Product Management
+				<small>List Suppliers</small>
+			</h1>
+			<ol class="breadcrumb">
+				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
+				<li><a th:href="@{/store/admin/brands}"><i class="fa fa-cubes"></i>Products</a></li>
+				<li><i class="fa fa-file-text-o"></i><span th:text="${mf==null?'New Supplier':'Modify Supplier'}"></span></li>
+			</ol>
+		</section>
+
+		<section class="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="box">
+						<div class="box-header">
+							<h3 class="box-title" th:text="${mf==null?'New Supplier':'Modify Supplier'}"></h3>
+						</div>
+
+						<div class="box-body">
+							<div class="form">
+								<form class="form-validate form-horizontal " id="supplier" name="supplier" method="post" th:action="@{/store/admin/supplier}">
+									<div class="form-group">
+									    <label for="fullname" class="control-label col-lg-2">Full Name <span class="required">*</span></label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="name" name="name" th:value="${mf==null?'':mf.name}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="stree" class="control-label col-lg-2">Address </label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="street" name="street" th:value="${mf==null?'':mf.address.street}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="cityid" class="control-label col-lg-2">City </label>
+									    <div class="col-lg-10">
+											<select class="form-control" id="cityid" name="cityid">
+												<option th:each="city: ${cities}" th:value="${city.cityid}" th:text="${city.name}" th:selected="${mf!=null and mf.address!=null and mf.address.city.cityid==city.cityid}"></option>
+											</select>
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="postalcode" class="control-label col-lg-2">Postal Code </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="postalcode" name="postalcode" th:value="${mf==null?'':mf.address.postalcode}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="contact" class="control-label col-lg-2">Contact </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="contact" name="contact" th:value="${mf==null?'':mf.contact}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="phone" class="control-label col-lg-2">Phone </label>
+									    <div class="col-lg-10">
+									        <input type="text" class="form-control" id="phone" name="phone" th:value="${mf==null?'':mf.phone}" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="email" class="control-label col-lg-2">Email </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="email" name="email" type="email" th:value="${mf==null?'':mf.email}" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="website" class="control-label col-lg-2">Web Site </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="website" name="website" type="url" th:value="${mf==null?'':mf.website}" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="comments" class="control-label col-lg-2">Comments </label>
+									    <div class="col-lg-10">
+									        <textarea class="form-control " id="comments" name="comments" th:value="${mf==null?'':mf.comments}" ></textarea>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <div class="col-lg-offset-2 col-lg-10">
+									        <button class="btn btn-primary" type="submit"> Save </button>
+									        <a th:href="@{/store/admin/suppliers}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+									        <input type="hidden" id="supplierid" name="supplierid" th:value="${mf==null?'':mf.supplierid}" />
+									    </div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+      <!--main content end-->
+	</div>
+</html>

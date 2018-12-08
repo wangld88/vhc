@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html layout:decorator="store/admin/layout/layout">
+	    <script>
+	    /*<![CDATA[*/
+	     	var acceptedfiletypes = ["pdf","PDF"];
+
+			function wordCount(elmt) {
+				size = elmt.maxLength;
+				len = size - utf8Length(elmt.value);
+				if(len > 0) {
+					msg = "  <Font color='green'>Character(s) Left: " + len + "</Font>";
+				}
+				else {
+					msg = "  You have reached the character limit."	;
+				}
+				name = elmt.name + 'counter';
+
+				document.getElementById(name).innerHTML=msg;
+			}
+
+			function utf8Length(unicodeString) {
+				var usl=0;
+				for(var i=0;unicodeString.length>i;++i) {
+					var codePoint=unicodeString.charCodeAt(i);
+					if(codePoint===10||codePoint===13){
+						usl+=2;
+					}else if(128>codePoint){
+						usl+=1;
+					}else if((codePoint>127)&&(2048>codePoint)){
+						usl+=2;
+					}else{
+						usl+=3;
+					}
+				}
+				return usl;
+			}
+
+			function addMessage(msgs) {
+				rmvMessage();
+				var main = document.getElementById("main1");
+				var errors = document.createElement("div");
+				var ul = document.createElement("ul");
+				var upload = document.getElementById("upload");
+
+				errors.setAttribute("id", "errors");
+				errors.setAttribute("class", "alert alert-danger");
+
+				for(i in msgs) {
+					ul.appendChild(createListNode(msgs[i]));
+				}
+
+				errors.appendChild(ul)
+				main.appendChild(errors);
+				main.focus();
+			}
+
+			function createListNode(item) {
+				var li = document.createElement("li");
+				var txt = document.createTextNode(item);
+
+				li.appendChild(txt);
+				return li;
+			}
+
+			function rmvMessage() {
+				var main = document.getElementById("main1");
+				var errors = document.getElementById("errors");
+
+				if(errors || errors != null) {
+					main.removeChild(errors);
+				}
+			}
+
+			function validateDoc(itemid) {
+				var elmt = document.getElementById("uploadBtn"+itemid);
+				var main = document.getElementById("main1");
+				var btn = document.getElementById("submitBtn"+itemid);
+				var errors = [];
+
+				if(!elmt  || (elmt.value).trim().length == 0) {
+					errors.push("Please choose your document to upload.");
+				} else {
+					doctype =  elmt.value.trim().split(".").pop();
+
+					if(acceptedfiletypes.indexOf(doctype) < 0) {
+						errors.push("This file type is not accepted by the Document Upload Page.  Please upload an acceptable file type.");
+					}
+
+					if(elmt.files[0].size > 52428800) {
+						errors.push("Files must be less than 50MB in size.");
+					}
+				}
+
+				if(errors.length > 0) {
+					addMessage(errors);
+					return false;
+				}
+
+				btn.disabled = true;
+
+				document.getElementById("uploadForm"+itemid).submit();
+
+			}
+
+			function callThis(itemid) {
+				var elmt = document.getElementById("uploadBtn"+itemid);
+				var filename = elmt.value.split('\\').pop().split('/').pop();
+				var text = document.getElementById("uploadFile"+itemid);
+				var submitBtn = document.getElementById("submitBtn"+itemid);
+
+				rmvMessage();
+				clearSelection(itemid);
+
+				document.getElementById("row"+itemid).style.backgroundColor="#ECE8E8";
+				text.style.backgroundColor="#ECE8E8";
+				text.innerHTML = filename + "&nbsp;&nbsp;&nbsp;&nbsp;";
+
+			    anchor = document.createElement("a");
+			    anchor.setAttribute("href", "javascript: clearSelection()");
+
+			    //image = document.createElement("img");
+			    //image.setAttribute("src", "/rodocs/gradupload/resources/assets/images/remove.png");
+			    //anchor.appendChild(image);
+
+			    span = document.createElement("span");
+			    span.setAttribute("class", "glyphicon glyphicon-trash alert-danger minus");
+			    anchor.appendChild(span);
+
+			    text.appendChild(anchor);
+
+			    submitBtn.style.display = "";
+			}
+
+			function clearSelection(itemid) {
+				var elmts = document.getElementsByName("uploadFile");
+
+				for(i = 0; i < elmts.length; i++) {
+					elmts[i].innerHTML = "";
+					elmts[i].style.backgroundColor="#ffffff";
+				}
+
+				var rows = document.getElementsByName("row");
+
+				for(i = 0; i < rows.length; i++) {
+					rows[i].style.backgroundColor="#ffffff";
+				}
+
+				var files = document.getElementsByName("uploadBtn");
+
+				for(i = 0; i < files.length; i++) {
+					if(files[i].id != "uploadBtn"+itemid) {
+						files[i].value = "";
+					}
+				}
+
+				var btns = document.getElementsByName("submitBtn");
+				for(i=0; i < btns.length; i++) {
+					btns[i].style.display = "none";
+				}
+			}
+			/*]]>*/
+	    </script>
+		<style>
+			.myLabel {
+			    position: relative;
+				/* padding-top: -10px; */
+			    display: inline-block;
+			    /* margin-left: 0px; */
+			    margin-top: 1px;
+			    cursor: pointer;
+			}
+
+			.myLabel input {
+			    position: absolute;
+			    z-index: 12;
+			    opacity: 0;
+			    width: 100%;
+			    height: 100%;
+			    cursor: pointer;
+			}
+
+			.myLabel {
+				background-color: #bce0ee;
+				padding-bottom: 10px;
+				color: #3d3c3c;
+				font-size:1.2em;
+				font-weight:bold;
+				border-radius: 3px;
+				border: 1px solid #3d3c3c;
+			    display: inline-block;
+			    cursor: pointer;
+			    width: 80%;
+			    height: 22px;
+			    vertical-align: middle;
+			}
+
+			.myLabel:hover {
+				background-color: #3cb0fd;
+				border: 1px solid #575657;
+				color: #ffffff;
+				border-radius: 3px;
+				cursor: pointer;
+			}
+
+			.myLabel span {
+				/* padding-left: 10%; */
+				display: table-cell;
+				vertical-align: middle;
+				padding-top: 2px;
+				width: 100%;
+				text-align: center;
+				font-size: 12px;
+				font-weight: bold;
+				cursor: pointer;
+			}
+
+			#uploadFile {
+				/* margin-left: 2%; */
+				font-size: 0.9em;
+				font-weight: bold;
+				color: #1f3b08;
+			}
+
+			.submitBtn {
+				width: 160px;
+				background-color: #bce0ee;
+				color: #3d3c3c;
+				border-color: #3d3c3c;
+				font-weight: bold;
+			}
+
+			.submitBtn:hover {
+				width: 160px;
+				background-color: #3cb0fd;
+				color: #ffffff;
+				border-color: #575657
+			}
+
+			.header {
+				background-color:#bce0ee;
+				color:#3d3c3c !important;
+				font-family: UniversCondensed, Arial, sans-serif !important;
+			}
+		</style>
+
+	<div layout:fragment="content">
+
+		<section class="content-header">
+			<h1>
+				Product Management
+				<small>List Products</small>
+			</h1>
+			<ol class="breadcrumb">
+				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
+				<li><a th:href="@{/store/admin/brands}"><i class="fa fa-cubes"></i>Products</a></li>
+				<li><i class="fa fa-file-text-o"></i><span th:text="${product==null?'New Product':'Modify Product'}"></span></li>
+			</ol>
+		</section>
+
+		<section class="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="box">
+						<div class="box-header">
+							<h3 class="box-title" th:text="${product==null?'New Product':'Modify Product'}"></h3>
+						</div>
+
+						<div class="box-body">
+							<div class="form">
+								<form class="form-validate form-horizontal" id="product" name="product" method="post" th:action="@{/store/admin/product}">
+									<div class="form-group">
+									    <label for="name" class="control-label col-lg-2">Product Name <span class="required">*</span></label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="name" name="name" th:value="${product==null?'':product.name}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="modelnum" class="control-label col-lg-2">Model Number </label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="modelnum" name="modelnum" th:value="${product==null?'':product.modelnum}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="upc" class="control-label col-lg-2">Barcode </label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="upc" name="upc" th:value="${product==null?'':product.upc}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="description" class="control-label col-lg-2">Description </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="description" name="description" th:value="${product==null?'':product.description}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="brandid" class="control-label col-lg-2">Brand </label>
+									    <div class="col-lg-10">
+											<select class="form-control" id="brandid" name="brandid">
+												<option th:each="brand: ${brands}" th:value="${brand.brandid}" th:text="${brand.name}" th:selected="${product!=null and product.brand.brandid==brand.brandid}"></option>
+											</select>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="typeid" class="control-label col-lg-2">Type </label>
+									    <div class="col-lg-10">
+											<select class="form-control" id="typeid" name="typeid">
+												<option th:each="type: ${types}" th:value="${type.typeid}" th:text="${type.name}" th:selected="${product!=null and product.type.typeid==type.typeid}"></option>
+											</select>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="colorid" class="control-label col-lg-2">Color </label>
+									    <div class="col-lg-10">
+											<select class="form-control" id="colorid" name="colorid">
+												<option th:each="color: ${colors}" th:value="${color.colorid}" th:text="${color.name}" th:selected="${product!=null and product.color.colorid==color.colorid}"></option>
+											</select>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="styleid" class="control-label col-lg-2">Style </label>
+									    <div class="col-lg-10">
+											<select class="form-control" id="styleid" name="styleid">
+												<option th:each="style: ${styles}" th:value="${style.styleid}" th:text="${style.name}" th:selected="${product!=null and product.style!=null and product.style.styleid==style.styleid}"></option>
+											</select>
+									        <!-- <input class=" form-control" id="style" name="style" th:value="${product==null?'':product.style}" type="text" /> -->
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="material" class="control-label col-lg-2">Material </label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="material" name="material" th:value="${product==null?'':product.material}" type="text" />
+									    </div>
+									</div>
+									<!-- <div class="form-group ">
+									    <label for="wholesale" class="control-label col-lg-2">Wholesale Price </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="wholesale" name="wholesale" type="text" th:value="${product==null or product.wholesale==null?'':#numbers.formatDecimal(product.wholesale, 0, 2)}" />
+									    </div>
+									</div> -->
+									<div class="form-group ">
+									    <label for="retail" class="control-label col-lg-2">Retail Price </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="retail" name="retail" type="text" th:value="${product==null or product.retail==null?'':#numbers.formatDecimal(product.retail, 0, 2)}" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="clinic" class="control-label col-lg-2">Clinic Price </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="clinic" name="clinic" type="text" th:value="${product==null or product.clinic==null?'':#numbers.formatDecimal(product.clinic, 0, 2)}" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="onsale" class="control-label col-lg-2">On Sale Price </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="onsale" name="onsale" type="text" th:value="${product==null or product.onsale==null?'':#numbers.formatDecimal(product.onsale, 0, 2)}" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="points" class="control-label col-lg-2">Bonus Points </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="points" name="points" type="text" th:value="${product==null?'':product.points}" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="comments" class="control-label col-lg-2">Comments </label>
+									    <div class="col-lg-10">
+									        <textarea class="form-control " id="comments" name="comments" th:value="${product==null?'':product.comments}" ></textarea>
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="storefront" class="control-label col-lg-2">Store Front </label>
+									    <div class="col-lg-10">
+									        <input type="checkbox" id="storefront" name="storefront" value="1" th:checked="${(product!=null and product.storefront=='1')}" /> Display the product at store front
+									    </div>
+									</div>
+									<div class="form-group">
+									    <div class="col-lg-offset-2 col-lg-10">
+									        <button class="btn btn-primary" type="submit"> Save </button>
+									        <a th:href="@{/store/admin/products}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+									        <input type="hidden" id="productid" name="productid" th:value="${product==null?'':product.productid}" />
+									    </div>
+									</div>
+								</form>
+							</div>
+							<div class="form" style="margin-bottom: 20px;">
+								<font size="4">Product Image Upload</font>
+								<form role="form" class="form-horizontal" th:action="@{/store/admin/uploadImage}" method="post" enctype="multipart/form-data">
+									<div class="form-group">
+										<!-- <label for="picture" class="control-label col-lg-offset-1 col-lg-2">Product Image Upload</label> -->
+										<div class="col-lg-offset-2 col-lg-10">
+											<label>Image Name:</label>
+											<input type="text" id="name" name="name" value="" class=" form-control" />
+										</div>
+										<div class="col-lg-offset-2 col-lg-10" style="overflow: hidden; margin-top: 18px;">
+											<div style="float: left;">
+												<input type="hidden" id="productid" name="productid" th:value="${product==null?'':product.productid}" />
+												<input type="file" id="picture" name="picture">
+											</div>
+											<div style="float: left; margin-bottom: 4px;">
+												<input type="submit" class="btn btn-primary" value="Upload" />
+											</div>
+											<p class="help-block"><!-- Example block-level help text here. --></p>
+										</div>
+											<!-- <div class="col-lg-6 col-md-6">
+												<div class="myLabel">
+													<input type="file" id="uploadBtn" name="uploadBtn" onchange="callThis()"/>
+													<span class="col-lg-4 col-md-4">Choose Upload Document</span>
+												</div>
+											</div>
+
+											<div class="col-lg-6 col-md-6" style="padding-left:10px" >
+												<input type="button" class="btn btn-xs btn-primary col-lg-12 col-md-12 submitBtn" value="Upload" id="submitBtn" name="submitBtn" onclick="validateDoc()" style="display: none" />
+											</div>
+											<div class="col-lg-12 col-md-12">
+												<I><span id="uploadFile" name="uploadFile" style="color: green; font-weight: bold; width: 50%"></span></I>
+											</div> -->
+
+									</div>
+								</form>
+							</div>
+							<div th:if="${images!=null}"  class="form" style="margin-left: 150px; margin-top: 40px;">
+								<div class="row" >
+									<div th:each="image: ${images}" class="col-lg-2 col-md-3" id="imagePanel">
+										<form th:action="@{/store/admin/removeImage}" method="post">
+											<img th:src="'data:image/jpg;base64,'+${image.imageData}"
+												class="media-object img-thumbnail"
+												style="height: 120px; width: 120px; display: block;" />
+											<div class="caption text-center" style="width: 120px;">
+												<span th:text="${image.name}"></span>
+												<input type="hidden" id="productid" name="productid" th:value="${product==null?'':product.productid}" />
+												<input type="hidden" id="imageid" name="imageid" th:value="${image.imageid}" />
+												<button type="submit" class="close" aria-label="Close">
+													<span aria-hidden="true">&times;</span>
+												</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+      <!--main content end-->
+	</div>
+</html>

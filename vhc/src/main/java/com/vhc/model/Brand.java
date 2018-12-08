@@ -1,6 +1,7 @@
 package com.vhc.model;
 
 import java.io.Serializable;
+import java.sql.Blob;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -24,37 +26,37 @@ public class Brand implements Serializable {
 
 	private static final long serialVersionUID = -596658205795166084L;
 
-	
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "brandid", updatable = false, nullable = false)
 	private long brandid;
-	
+
 	@Column(nullable=false, length=200)
 	@Size(max=200)
 	@ApiObjectField(description="Brand Name", format="Not Null, maxlength = 200", required=true)
 	private String name;
-	
+
 	@Column(nullable=true, unique=false, length=400)
 	@Size(max=400)
 	@ApiObjectField(description="Brand Description", format="Not Null, maxlength = 400", required=false)
 	private String description;
-	
+
 	@Column(nullable=true, length=50)
 	@Size(max=50)
 	@ApiObjectField(description="Manufacture's Contact Name", format="maxlength = 50", required=false)
 	private String contact;
-	
+
 	@Column(nullable=true, length=30)
 	@Size(max=30)
 	@ApiObjectField(description="Phone Number", format="maxlength = 30", required=false)
 	private String phone;
-	
+
 	@Column(nullable=true, length=50)
 	@Size(max=50)
 	@ApiObjectField(description="Email Address", format="maxlength = 50", required=false)
 	private String email;
-	
+
 	@Column(nullable=true, length=100)
 	@Size(max=100)
 	@ApiObjectField(description="Web Site", format="maxlength = 100", required=false)
@@ -62,7 +64,7 @@ public class Brand implements Serializable {
 
 	@Column(nullable=true, length=600)
 	@Size(max=600)
-	@ApiObjectField(description="Web Site", format="maxlength = 600", required=false)
+	@ApiObjectField(description="Comment notes", format="maxlength = 600", required=false)
 	private String comments;
 
 	@ManyToOne(fetch=FetchType.EAGER)
@@ -70,11 +72,15 @@ public class Brand implements Serializable {
 	@ApiObjectField(description="Unique Address", format="Not Null", required=false)
 	private Address address;
 
-	
+	@Column(nullable=true)
+	@Lob
+	private Blob image;
+
+
 	public Brand() {
-		
+
 	}
-	
+
 	public long getBrandid() {
 		return brandid;
 	}
@@ -146,5 +152,13 @@ public class Brand implements Serializable {
 	public void setAddress(Address address) {
 		this.address = address;
 	}
-	
+
+	public Blob getImage() {
+		return image;
+	}
+
+	public void setImage(Blob image) {
+		this.image = image;
+	}
+
 }

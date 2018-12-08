@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html layout:decorator="store/admin/layout/layout">
+	<div layout:fragment="content">
+
+		<section class="content-header">
+			<h1>
+				Inventory Management
+				<small>List Shipments</small>
+			</h1>
+			<ol class="breadcrumb">
+				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
+				<li><a th:href="@{/store/admin/pos}"><i class="fa fa-cubes"></i> Inventories</a></li>
+				<li class="active"><i class="fa fa-file-text-o"></i>List Shipments</li>
+			</ol>
+		</section>
+
+		<section class="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="box">
+						<div class="box-header">
+							<h3 class="box-title">All Shipments</h3> <span style="width: 240px;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <a th:href="@{/store/admin/shipment}" title="Add New Shipment"><i class="fa fa-plus-square"></i></a>
+						</div>
+						<div class="box-body">
+
+							<table id="mainTable" class="table table-striped" th:if="${shipments != null}">
+								<thead>
+									<tr>
+										<th><i class="icon_documents"></i> Shipment Code</th>
+										<th><i class="icon_calendar"></i> Supplier</th>
+										<th><i class="icon_pin_alt"></i> Received By</th>
+										<th><i class="icon_contacts_alt"></i> Receive Date</th>
+										<th><i class="icon_pin_alt"></i> Recorded By</th>
+										<th><i class="icon_contacts_alt"></i> Record Date</th>
+										<th><i class="icon_mail_alt"></i> Comments</th>
+										<th><i class="icon_cogs"></i> Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="shipment:${shipments}">
+										<td th:text="${shipment.code}"></td>
+										<td th:text="${shipment.supplier.name}"></td>
+										<td th:text="${shipment.receivedby.firstname}"></td>
+										<td th:text="${#calendars.format(shipment.receivedate,'dd MMMM yyyy')}"></td>
+										<td th:text="${shipment.recordedby.firstname}"></td>
+										<td th:text="${#calendars.format(shipment.recorddate,'dd MMMM yyyy')}"></td>
+										<td th:text="${shipment.comments}"></td>
+										<td>
+											<div class="btn-group">
+												<!-- <a class="btn btn-primary" th:href="@{/admin/shipment}" title="Add New Shipment"><i class="icon_plus_alt2"></i></a> -->
+												<a th:href="@{/store/admin/shipment/}+${shipment.shipmentid}" title="Edit Shipment"><i class="fa fa-edit"></i></a>
+												<!-- <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a> -->
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+ 			</div>
+		</section>
+	</div>
+</html>

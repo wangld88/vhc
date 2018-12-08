@@ -1,10 +1,106 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="ISO-8859-1" />
-		<title>Insert title here</title>
-	</head>
-	<body>
-		Super Admin Home
-	</body>
+<html layout:decorator="admin/layout/layout">
+	<div layout:fragment="content">
+
+		<section id="main-content">
+			<section class="wrapper">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Product Management</h3>
+						<ol class="breadcrumb">
+							<li><i class="fa fa-home"></i><a th:href="@{/admin/home}">Home</a></li>
+							<li><i class="icon_document_alt"></i>Products</li>
+							<li><i class="fa fa-file-text-o"></i><span th:text="${brand==null?'New Brand':'Modify Brand'}"></span></li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+						<section class="panel">
+							<header class="panel-heading">
+								Brand
+							</header>
+							<div class="panel-body">
+								<div class="form">
+									<form class="form-validate form-horizontal " id="brand" name="brand" method="post" th:action="@{/admin/brand}">
+										<div class="form-group">
+										    <label for="name" class="control-label col-lg-2">Name <span class="required">*</span></label>
+										    <div class="col-lg-10">
+										        <input class=" form-control" id="name" name="name" th:value="${brand==null?'':brand.name}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="description" class="control-label col-lg-2">Description </label>
+										    <div class="col-lg-10">
+										        <input class=" form-control" id="description" name="description" th:value="${brand==null?'':brand.description}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="street" class="control-label col-lg-2">Address </label>
+										    <div class="col-lg-10">
+										        <input class=" form-control" id="street" name="street" th:value="${mf==null?'':brand.address.street}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="cityid" class="control-label col-lg-2">City </label>
+										    <div class="col-lg-10">
+												<select class="form-control" id="cityid" name="cityid">
+													<option th:each="city: ${cities}" th:value="${city.cityid}" th:text="${city.name}" th:selected="${brand==null?'':(brand.address.city.cityid.equals(city.cityid)?'Selected':'')}"></option>
+												</select>
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="postalcode" class="control-label col-lg-2">Postal Code </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="postalcode" name="postalcode" th:value="${brand==null?'':brand.address.postalcode}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="contact" class="control-label col-lg-2">Contact </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="contact" name="contact" th:value="${brand==null?'':brand.contact}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="phone" class="control-label col-lg-2">Phone </label>
+										    <div class="col-lg-10">
+										        <input type="text" class="form-control" id="phone" name="phone" th:value="${brand==null?'':brand.phone}" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="email" class="control-label col-lg-2">Email </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="email" name="email" type="email" th:value="${brand==null?'':brand.email}" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="website" class="control-label col-lg-2">Web Site </label>
+										    <div class="col-lg-10">
+										        <input class="form-control " id="website" name="website" type="url" th:value="${brand==null?'':brand.website}" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="comments" class="control-label col-lg-2">Comments </label>
+										    <div class="col-lg-10">
+										        <textarea class="form-control " id="comments" name="comments" th:value="${brand==null?'':brand.comments}" ></textarea>
+										    </div>
+										</div>
+										<div class="form-group">
+										    <div class="col-lg-offset-2 col-lg-10">
+										        <button class="btn btn-primary" type="submit"> Save </button>
+										        <button class="btn btn-default" type="button">Cancel</button>
+										        <input type="hidden" id="brandid" name="brandid" th:value="${brand==null?'':brand.brandid}" />
+										    </div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</section>
+					</div>
+				</div>
+			</section>
+		</section>
+      <!--main content end-->
+	</div>
 </html>

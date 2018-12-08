@@ -9,17 +9,18 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 @ControllerAdvice
 public class AdminLoginControllerAdvice {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(AdminLoginControllerAdvice.class);
-  
+
 	@ModelAttribute("LoginUser")
 	public LoginUser getCurrentUser(Authentication authentication) {
-		logger.info(" authentication: " + authentication);
-		LoginUser user = authentication == null ? null : (LoginUser)authentication.getPrincipal();
+
+		logger.info("LoginUser authentication: " + authentication);
+		/*LoginUser user = authentication == null ? null : (LoginUser)authentication.getPrincipal();
 		String password = user == null ? null : user.getPassword();
-		logger.info("AdminLoginControllerAdvice is invoked: " + password);
-    
+		logger.info("AdminLoginControllerAdvice is invoked: " + password);*/
+
 		return authentication == null ? null : (LoginUser)authentication.getPrincipal();
 	}
-	
+
 }

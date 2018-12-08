@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html layout:decorator="store/admin/layout/layout">
+	<div layout:fragment="content">
+
+		<section class="content-header">
+			<h1>
+				Settings Management
+				<small>List Location</small>
+			</h1>
+			<ol class="breadcrumb">
+				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
+				<li><a th:href="@{/store/admin/styles}"><i class="fa fa-cubes"></i>Settings</a></li>
+				<li><i class="fa fa-file-text-o"></i><span th:text="${location==null?'New Location':'Modify Location'}"></span></li>
+			</ol>
+		</section>
+
+		<section class="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="box">
+						<div class="box-header">
+							<h3 class="box-title" th:text="${location==null?'New Location':'Modify Location'}"></h3>
+						</div>
+
+						<div class="box-body">
+							<div class="form">
+								<form class="form-validate form-horizontal " id="location" name="location" method="post" th:action="@{/store/admin/location}">
+									<div class="form-group">
+									    <label for="name" class="control-label col-lg-2">Name <span class="required">*</span></label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="name" name="name" th:value="${location==null?'':location.name}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="storeid" class="control-label col-lg-2">Store </label>
+									    <div class="col-lg-10">
+											<select class="form-control" id="storeid" name="storeid">
+												<option th:each="store: ${stores}" th:value="${store.storeid}" th:text="${store.name}" th:selected="${location!=null and location.store.storeid==store.storeid}"></option>
+											</select>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <div class="col-lg-offset-2 col-lg-10">
+									        <button class="btn btn-primary" type="submit"> Save </button>
+									        <a th:href="@{/admin/locations}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+									        <input type="hidden" id="locationid" name="locationid" th:value="${location==null?'':location.locationid}" />
+									    </div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+      <!--main content end-->
+	</div>
+</html>

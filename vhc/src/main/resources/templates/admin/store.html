@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html layout:decorator="admin/layout">
+<html layout:decorator="admin/layout/layout">
 	<div layout:fragment="content">
 
 		<section id="main-content">
@@ -45,7 +45,7 @@
 										<div class="form-group">
 										    <label for="cityid" class="control-label col-lg-2">City </label>
 										    <div class="col-lg-10">
-												<select class="form-control m-bot15" id="cityid" name="cityid">
+												<select class="form-control" id="cityid" name="cityid">
 													<option th:each="city: ${cities}" th:value="${city.cityid}" th:text="${city.name}" th:selected="${store==null?'':(store.address.city.cityid.equals(city.cityid)?'Selected':'')}"></option>
 												</select>
 										    </div>

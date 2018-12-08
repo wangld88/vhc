@@ -9,7 +9,9 @@ import com.vhc.model.Color;
 public interface ColorRepository extends CrudRepository<Color, Long> {
 
 	List<Color> findAll();
-	
+
+	List<Color> findByNameIgnoreCaseLike(String name);
+
 	Color findByColorid(long colorid);
-	
+
 }

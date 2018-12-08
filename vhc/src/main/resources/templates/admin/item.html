@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html layout:decorator="admin/layout">
+<html layout:decorator="admin/layout/layout">
 	<div layout:fragment="content">
 
 		<section id="main-content">
@@ -27,29 +27,35 @@
 										<div class="form-group">
 										    <label for="productid" class="control-label col-lg-2">Product </label>
 										    <div class="col-lg-10">
-												<select class="form-control m-bot15" id="productid" name="productid">
+												<!-- <select class="form-control" id="productid" name="productid">
 													<option th:each="product: ${products}" th:value="${product.productid}" th:text="${product.name}" th:selected="${item==null?'':(item.product.productid.equals(product.productid)?'Selected':'')}"></option>
-												</select>
+												</select> -->
+												<input class="form-control" id="name" name="name" th:value="${item!=null?item.product.name:''}" />
 										    </div>
 										</div>
 										<div class="form-group ">
-										    <label for="sku" class="control-label col-lg-2">SKU </label>
+										    <label for="sku" class="control-label col-lg-2">UPC </label>
 										    <div class="col-lg-10">
 										        <input class="form-control " id="sku" name="sku" th:value="${item==null?'':item.sku}" type="text" />
 										    </div>
 										</div>
 										<div class="form-group">
 										    <label for="size" class="control-label col-lg-2">Size </label>
-										    <div class="col-lg-5">
-												<select class="form-control m-bot15" id="regionid" name="regionid">
+										    <div class="col-lg-10">
+												<select class="form-control" id="sizeid" name="sizeid">
+													<option th:each="size: ${sizes}" th:value="${size.sizeid}" th:text="${size.region.name+' '+size.sizenum+' ('+size.type.name+')'}" th:selected="${product!=null and product.size!=null and product.size.sizeid==size.sizeid}"></option>
+												</select>
+										    </div>
+										    <!-- <div class="col-lg-5">
+												<select class="form-control" id="regionid" name="regionid">
 													<option th:each="region: ${regions}" th:value="${region.regionid}" th:text="${region.name}" th:selected="${product==null?'':(product.size.region.regionid.equals(region.regionid)?'Selected':'')}"></option>
 												</select>
 										    </div>
 										    <div class="col-lg-5">
-												<select class="form-control m-bot15" id="sizeid" name="sizeid">
+												<select class="form-control" id="sizeid" name="sizeid">
 													<option th:each="size: ${sizes}" th:value="${size.sizeid}" th:text="${size.sizenum}" th:selected="${product==null?'':(product.size.sizeid.equals(size.sizeid)?'Selected':'')}"></option>
 												</select>
-										    </div>
+										    </div> -->
 										</div>
 										<div class="form-group ">
 										    <label for="cost" class="control-label col-lg-2">Cost </label>
@@ -57,12 +63,12 @@
 										        <input class="form-control " id="cost" name="cost" type="text" th:value="${item==null?'':#numbers.formatDecimal(item.cost, 0, 'DEFAULT', 2, 'DEFAULT')}" />
 										    </div>
 										</div>
-										<div class="form-group ">
+										<!-- <div class="form-group ">
 										    <label for="price" class="control-label col-lg-2">Price </label>
 										    <div class="col-lg-10">
 										        <input class="form-control " id="price" name="price" type="text" th:value="${item==null?'':#numbers.formatDecimal(item.price, 0, 'DEFAULT', 2, 'DEFAULT')}" />
 										    </div>
-										</div>
+										</div> -->
 										<div class="form-group ">
 										    <label for="quantity" class="control-label col-lg-2">Quantity </label>
 										    <div class="col-lg-10">
@@ -70,9 +76,18 @@
 										    </div>
 										</div>
 										<div class="form-group">
+										    <label for="orderid" class="control-label col-lg-2">P.O. No. </label>
+										    <div class="col-lg-10">
+												<select class="form-control" id="orderid" name="orderid">
+													<option value=""></option>
+													<option th:each="order: ${orders}" th:value="${order.orderid}" th:text="${order.code}" th:selected="${item!=null and item.purchaseorder!=null and item.purchaseorder.orderid==order.orderid}"></option>
+												</select>
+										    </div>
+										</div>
+										<div class="form-group">
 										    <label for="shipmentid" class="control-label col-lg-2">Shipment </label>
 										    <div class="col-lg-10">
-												<select class="form-control m-bot15" id="shipmentid" name="shipmentid">
+												<select class="form-control" id="shipmentid" name="shipmentid">
 													<option th:each="shipment: ${shipments}" th:value="${shipment.shipmentid}" th:text="${shipment.code}" th:selected="${item==null?'':(item.shipment.shipmentid.equals(shipment.shipmentid)?'Selected':'')}"></option>
 												</select>
 										    </div>
@@ -86,7 +101,7 @@
 										<div class="form-group">
 										    <div class="col-lg-offset-2 col-lg-10">
 										        <button class="btn btn-primary" type="submit"> Save </button>
-										        <button class="btn btn-default" type="button">Cancel</button>
+										        <button class="btn btn-default" type="button"></button>
 										        <input type="hidden" id="itemid" name="itemid" th:value="${item==null?'':item.itemid}" />
 										        <input type="hidden" th:if="${shipments!=null} and ${shipments.size()}==1" id="rtn_shipmentid" name="rtn_shipmentid" th:value="${shipments.get(0).shipmentid}" />
 										    </div>
@@ -96,12 +111,12 @@
 							</div>
 							<div th:if="${item!=null}">
 								<font size="4">Add Inventory</font>
-								<div class="form">
+								<div class="form" th:if="${inventories==null or sum==null or item.quantity!=sum}">
 									<form class="form-validate form-horizontal " id="inventory" name="inventory" method="post" th:action="@{/admin/inventory}">
 										<div class="form-group">
 										    <label for="storeid" class="control-label col-lg-2">Shipment </label>
 										    <div class="col-lg-10">
-												<select class="form-control m-bot15" id="storeid" name="storeid">
+												<select class="form-control" id="storeid" name="storeid">
 													<option th:each="store: ${stores}" th:value="${store.storeid}" th:text="${store.name}"></option>
 												</select>
 										    </div>
@@ -124,32 +139,32 @@
 									</form>
 								</div>
 								<div th:if="${inventories!=null}">
-							<table class="table table-striped table-advance table-hover">
-								<tbody>
-									<tr>
-										<th><i class="icon_documents"></i> Item</th>
-										<th><i class="icon_mail_alt"></i> Store</th>
-										<th><i class="icon_mail_alt"></i> Status</th>
-										<th><i class="icon_mobile"></i> Quantity</th>
-										<th><i class="icon_mobile"></i> Received</th>
-										<th><i class="icon_cogs"></i> Action</th>
-									</tr>
-									<tr th:each="inv:${inventories}">
-										<td th:text="${inv.item.product.name}"></td>
-										<td th:text="${inv.store.name}"></td>
-										<td th:text="${inv.status.name}"></td>
-										<td th:text="${inv.quantity}"></td>
-										<td th:text="${inv.receivedby.firstname}"></td>
-										<td>
-											<div class="btn-group">
-												<a class="btn btn-success" th:href="@{/admin/inventory/}+${inv.inventoryid}" title="Edit Item"><i class="icon_pencil-edit_alt"></i></a>
-												<!-- <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a> -->
-											</div>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-									
+									<table class="table table-striped table-advance table-hover">
+										<tbody>
+											<tr>
+												<th><i class="icon_documents"></i> Item</th>
+												<th><i class="icon_mail_alt"></i> Store</th>
+												<th><i class="icon_mail_alt"></i> Status</th>
+												<th><i class="icon_mobile"></i> Quantity</th>
+												<th><i class="icon_mobile"></i> Received</th>
+												<th><i class="icon_cogs"></i> Action</th>
+											</tr>
+											<tr th:each="inv:${inventories}">
+												<td th:text="${inv.item.product.name}"></td>
+												<td th:text="${inv.store.name}"></td>
+												<td th:text="${inv.status.name}"></td>
+												<td th:text="${inv.quantity}"></td>
+												<td th:text="${inv.receivedby.firstname}"></td>
+												<td>
+													<div class="btn-group">
+														<a class="btn btn-success" th:href="@{/admin/inventory/}+${inv.inventoryid}" title="Delete Inventory"><i class="icon_trash_alt"></i></a>
+														<!-- <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a> -->
+													</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+
 								</div>
 							</div>
 						</section>
@@ -157,6 +172,70 @@
 				</div>
 			</section>
 		</section>
-      <!--main content end-->
+		<!--main content end-->
+		<script th:src="@{/js/jquery-1.10.2.min.js}"></script>
+		<script th:src="@{/js/jquery-ui-1.12.1.js}"></script>
+		<script th:src="@{/js/jquery.autocomplete.min.js}"></script>
+		<script>
+			$(document).ready(function() {
+			    var token = $("meta[name='_csrf']").attr("content");
+			    var header = $("meta[name='_csrf_header']").attr("content");
+
+				$( "#name" ).autocomplete({
+					source: function (request, response) {
+	                    $.ajax({
+	                        url: 'products?name='+document.getElementById("name").value,
+	                        //data: "{ 'prefix': '" + request.term + "'}",
+	                        dataType: "json",
+	                        type: "POST",
+	                        contentType: "application/json; charset=utf-8",
+	                        beforeSend: function(xhr){
+	                            xhr.setRequestHeader(header, token);
+	                        },
+	                        success: function (data) {
+	                            response($.map(data, function (item) {
+            		                return { value: item.name, data: item.productid };
+	                            }))
+	                        },
+	                        error: function (response) {
+	                        	console.log(response);
+	                            //alert(response.responseText);
+	                        },
+	                        failure: function (response) {
+	                        	console.log(response);
+	                            //alert(response.responseText);
+	                        }
+	                    });
+	                }
+				});
+
+				$( "#size" ).autocomplete({
+					source: function (request, response) {
+	                    $.ajax({
+	                        url: 'size?size='+$("#size")[0].value,
+	                        dataType: "json",
+	                        type: "POST",
+	                        contentType: "application/json; charset=utf-8",
+	                        beforeSend: function(xhr){
+	                            xhr.setRequestHeader(header, token);
+	                        },
+	                        success: function (data) {
+	                            response($.map(data, function (size) {
+	                            	$("#sizeid")[0].value = size.sizeid;
+            		                return { value: size.region.name+' '+size.sizenum+' ('+size.type.name+')' , data: size.sizeid };
+	                            }))
+	                        },
+	                        error: function (response) {
+	                        	console.log(response);
+	                            alert(response.responseText);
+	                        },
+	                        failure: function (response) {
+	                            alert(response.responseText);
+	                        }
+	                    });
+	                }
+				});
+			});
+		</script>
 	</div>
 </html>

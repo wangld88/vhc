@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html layout:decorator="store/admin/layout/layout">
+	<div layout:fragment="content">
+
+		<section class="content-header">
+			<h1>
+				Settings Management
+				<small>List Types</small>
+			</h1>
+			<ol class="breadcrumb">
+				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
+				<li><a th:href="@{/store/admin/colors}"><i class="fa fa-cubes"></i>Settings</a></li>
+				<li><i class="fa fa-file-text-o"></i><span th:text="${type==null?'New Type':'Modify Type'}"></span></li>
+			</ol>
+		</section>
+
+		<section class="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="box">
+						<div class="box-header">
+							<h3 class="box-title" th:text="${type==null?'New Type':'Modify Type'}"></h3>
+						</div>
+
+						<div class="box-body">
+							<div class="form">
+								<form class="form-validate form-horizontal " id="type" name="type" method="post" th:action="@{/store/admin/type}">
+									<div class="form-group">
+									    <label for="name" class="control-label col-lg-2">Name <span class="required">*</span></label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="name" name="name" th:value="${type==null?'':type.name}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <div class="col-lg-offset-2 col-lg-10">
+									        <button class="btn btn-primary" type="submit"> Save </button>
+									        <a th:href="@{/store/admin/colors}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+									        <input type="hidden" id="typeid" name="typeid" th:value="${type==null?'':type.typeid}" />
+									    </div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+      <!--main content end-->
+	</div>
+</html>

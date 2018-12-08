@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -29,12 +30,12 @@ public class Shipment implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "shipmentid", updatable = false, nullable = false)
 	private long shipmentid;
-	
+
 	@Column(nullable=false, unique=true, length=200)
 	@Size(max=200)
 	@ApiObjectField(description="Shipment's Name", format="Not Null, maxlength = 200", required=true)
 	private String code;
-	
+
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="receivedby")
 	@ApiObjectField(description="Receive User", required=true)
@@ -55,7 +56,7 @@ public class Shipment implements Serializable {
 
 	@Column(nullable=true, length=600)
 	@Size(max=600)
-	@ApiObjectField(description="Web Site", format="maxlength = 600", required=false)
+	@ApiObjectField(description="Shipment comments", format="maxlength = 600", required=false)
 	private String comments;
 
 	@ManyToOne(fetch=FetchType.EAGER)
@@ -63,11 +64,14 @@ public class Shipment implements Serializable {
 	@ApiObjectField(description="Unique Supplier", required=true)
 	private Supplier supplier;
 
-	
+    @OneToOne(targetEntity = Purchaseorder.class, fetch = FetchType.EAGER)
+    @JoinColumn(nullable = true, name = "poid")
+	private Purchaseorder purchaseorder;
+
+
 	public Shipment() {
-		
 	}
-	
+
 	public long getShipmentid() {
 		return shipmentid;
 	}
@@ -130,6 +134,14 @@ public class Shipment implements Serializable {
 
 	public void setRecorddate(Calendar recorddate) {
 		this.recorddate = recorddate;
+	}
+
+	public Purchaseorder getPurchaseorder() {
+		return purchaseorder;
+	}
+
+	public void setPurchaseorder(Purchaseorder purchaseorder) {
+		this.purchaseorder = purchaseorder;
 	}
 
 }

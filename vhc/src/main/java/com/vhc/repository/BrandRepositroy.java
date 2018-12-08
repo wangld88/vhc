@@ -9,7 +9,11 @@ import com.vhc.model.Brand;
 
 public interface BrandRepositroy extends CrudRepository<Brand, Long> {
 
-	public Brand findByBrandid(long brandid);
+	public Brand findByBrandidOrderByName(long brandid);
+
 	public List<Brand> findAll();
-	
+
+	public List<Brand> findAllByOrderByName();
+
+	public List<Brand> findByNameIgnoreCaseLikeOrderByName(String name);
 }

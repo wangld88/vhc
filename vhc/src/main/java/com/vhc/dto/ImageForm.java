@@ -9,24 +9,24 @@ import com.vhc.util.ImageProcessor;
 public class ImageForm {
 
 	private long imageid;
-	
-	private String name;
-	
-	private Blob image;
 
-	private Product product;
+	private String name;
+
+	//private Blob image;
+
+	//private Product product;
 
 	private String imageData;
-	
+
 	public ImageForm() {
-		
+
 	}
-	
+
 	public ImageForm(Image image) {
 		this.imageid = image.getImageid();
 		this.name = image.getName();
-		this.image = image.getImage();
-		this.product = image.getProduct();
+		//this.image = image.getImage();
+		//this.product = image.getProduct();
 		ImageProcessor processor = new ImageProcessor();
 		this.imageData = processor.getImageByteArray(image.getImage());
 	}
@@ -47,7 +47,7 @@ public class ImageForm {
 		this.name = name;
 	}
 
-	public Blob getImage() {
+	/*public Blob getImage() {
 		return image;
 	}
 
@@ -61,7 +61,7 @@ public class ImageForm {
 
 	public void setProduct(Product product) {
 		this.product = product;
-	}
+	}*/
 
 	public String getImageData() {
 		return imageData;

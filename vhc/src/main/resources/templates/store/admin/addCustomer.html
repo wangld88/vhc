@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+	<head>
+		<meta charset="ISO-8859-1">
+		<title>Insert title here</title>
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min3.css}" />
+	</head>
+	<body>
+		<div class="panel-body">
+			<div class="form">
+				<form class="form-validate form-horizontal" id="" name="" th:action="@{/store/admin/addCustomer}" method="post">
+				<div class="form-group">
+				    <label for="fullname" class="control-label col-lg-2">User Name <span class="required">*</span></label>
+				    <div class="col-lg-10">
+				        <input class=" form-control" id="username" name="username" th:value="${customer==null or customer.user==null?'':customer.user.username}" type="text" autocomplete="off" />
+				    </div>
+				</div>
+				<!-- <div class="form-group">
+				    <label for="password" class="control-label col-lg-2">Password <span class="required">*</span></label>
+				    <div class="col-lg-10">
+				        <input class=" form-control" id="password" name="password" value="" type="password" autocomplete="off" />
+				    </div>
+				</div> -->
+				<div class="form-group">
+				    <label for="firstname" class="control-label col-lg-2">First Name </label>
+				    <div class="col-lg-10">
+				        <input class=" form-control" id="firstname" name="firstname" th:value="${customer==null or customer.user==null?'':customer.user.firstname}" type="text" />
+				    </div>
+				</div>
+				<div class="form-group">
+				    <label for="lastname" class="control-label col-lg-2">Last Name </label>
+				    <div class="col-lg-10">
+				        <input class=" form-control" id="lastname" name="lastname" th:value="${customer==null or customer.user==null?'':customer.user.lastname}" type="text" />
+				    </div>
+				</div>
+				<div class="form-group ">
+				    <label for="gender" class="control-label col-lg-2">Gender </label>
+				    <div class="col-lg-10">
+						<select class="form-control" id="gender" name="gender">
+							<option th:each="gen: ${genders}" th:value="${gen}" th:text="${gen}" th:selected="${customer==null or customer.user==null?'':(gen.equals(customer.user.gender)?'Selected':'')}"></option>
+						</select>
+				    </div>
+				</div>
+				<div class="form-group">
+				    <label for="street" class="control-label col-lg-2">Address </label>
+				    <div class="col-lg-10">
+				        <input class=" form-control" id="street" name="street" th:value="${customer==null or customer==null?'':customer.address.street}" type="text" />
+				    </div>
+				</div>
+				<div class="form-group">
+				    <label for="cityid" class="control-label col-lg-2">City </label>
+				    <div class="col-lg-10">
+						<select class="form-control" id="cityid" name="cityid">
+							<option th:each="city: ${cities}" th:value="${city.cityid}" th:text="${city.name}" th:selected="${customer==null or customer==null?'':(customer.address.city.cityid.equals(city.cityid)?'Selected':'')}"></option>
+						</select>
+				    </div>
+				</div>
+				<div class="form-group ">
+				    <label for="postalcode" class="control-label col-lg-2">Postal Code </label>
+				    <div class="col-lg-10">
+				        <input class="form-control " id="postalcode" name="postalcode" th:value="${customer==null or customer==null?'':customer.address.postalcode}" type="text" />
+				    </div>
+				</div>
+				<div class="form-group ">
+				    <label for="email" class="control-label col-lg-2">Email </label>
+				    <div class="col-lg-10">
+				        <input class="form-control " id="email" name="email" type="email" th:value="${customer==null or customer.user==null?'':customer.user.email}" />
+				    </div>
+				</div>
+				<div class="form-group ">
+				    <label for="phone" class="control-label col-lg-2">Phone </label>
+				    <div class="col-lg-10">
+				        <input type="text" class="form-control" id="phone" name="phone" th:value="${customer==null or customer.user==null?'':customer.user.phone}" />
+				    </div>
+				</div>
+				<div class="form-group ">
+				    <label for="cell" class="control-label col-lg-2">Mobile </label>
+				    <div class="col-lg-10">
+				        <input class="form-control " id="cell" name="cell" type="text" th:value="${customer==null or customer.user==null?'':customer.user.cell}" />
+				    </div>
+				</div>
+				<div class="form-group ">
+				    <label for="role" class="control-label col-lg-2">Access </label>
+				    <div class="col-lg-10">
+						<select class="form-control" id="roleid" name="roleid">
+							<option th:each="role: ${roles}" th:value="${role.roleid}" th:text="${role.name}" th:selected="${(customer==null or customer.user==null or customer.user.userroles.isEmpty())?'':(customer.user.userroles.contains(role)?'Selected':'')}"></option>
+						</select>
+				    </div>
+				</div>
+				<div class="form-group ">
+				    <label for="comments" class="control-label col-lg-2">Comments </label>
+				    <div class="col-lg-10">
+				        <textarea class="form-control " id="comments" name="comments" th:value="${customer==null or customer.user==null?'':customer.user.comments}" ></textarea>
+				    </div>
+				</div>
+				<div class="form-group">
+				    <div class="col-lg-offset-2 col-lg-10">
+				        <button class="btn btn-primary" type="submit"> Save </button>
+				        <button class="btn btn-default" type="button">Cancel</button>
+				        <input type="hidden" id="userid" name="userid" th:value="${customer==null or customer.user==null?'':customer.user.userid}" />
+				    </div>
+				</div>
+			</form>
+		</div>
+	</body>
+</html>

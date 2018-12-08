@@ -28,17 +28,23 @@ public class Type implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "typeid", updatable = false, nullable = false)
 	private long typeid;
-	
-	@Column(nullable=false, unique=true, length=200)
-	@Size(max=200)
-	@ApiObjectField(description="Manufacture's Name", format="Not Null, maxlength = 200", required=true)
-	private String name;
-	
 
-	public Type () {
-		
+	@Column(nullable=false, unique=true, length=20)
+	@Size(max=20)
+	@ApiObjectField(description="Type's Name", format="Not Null, maxlength = 20", required=true)
+	private String name;
+
+	@Column(nullable=false, unique=true, length=30)
+	@Size(max=30)
+	@ApiObjectField(description="reference table's Name", format="Not Null, maxlength = 30", required=true)
+	private String reftbl;
+
+
+
+	public Type() {
+
 	}
-	
+
 	public long getTypeid() {
 		return typeid;
 	}
@@ -53,6 +59,14 @@ public class Type implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getReftbl() {
+		return reftbl;
+	}
+
+	public void setReftbl(String reftbl) {
+		this.reftbl = reftbl;
 	}
 
 }

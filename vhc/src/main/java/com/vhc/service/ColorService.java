@@ -13,18 +13,22 @@ public class ColorService {
 
 	@Autowired
 	ColorRepository colorRepository;
-	
-	
+
+
 	public List<Color> getAll() {
 		return colorRepository.findAll();
 	}
-	
+
+	public List<Color> getByName(String name) {
+		return colorRepository.findByNameIgnoreCaseLike(name);
+	}
+
 	public Color getById(long colorid) {
 		return colorRepository.findByColorid(colorid);
 	}
-	
+
 	public Color save(Color color) {
 		return this.colorRepository.save(color);
 	}
-	
+
 }

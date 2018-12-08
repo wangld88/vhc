@@ -9,9 +9,15 @@ import com.vhc.model.Size;
 public interface SizeRepository extends CrudRepository<Size, Long> {
 
 	List<Size> findAll();
-	
+
+	List<Size> findAllByOrderByRegionAscTypeAscSizenumAsc();
+
 	List<Size> findByType_typeidAndRegion_regionid(long typeid, long regionid);
-	
+
+	List<Size> findByType_typeidAndSizenumIgnoreCaseLike(long typeid, String sizenum);
+
+	List<Size> findBySizenumIgnoreCaseLike(String sizenum);
+
 	Size findBySizeid(long sizeid);
-	
+
 }

@@ -32,12 +32,12 @@ public class Image implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "imageid", updatable = false, nullable = false)
 	private long imageid;
-	
+
 	@Column(nullable=true, length=200)
 	@Size(max=200)
 	@ApiObjectField(description="Image Name", format="maxlength = 200", required=false)
 	private String name;
-	
+
 	@Column(nullable=true)
 	@Lob
 	private Blob image;
@@ -48,9 +48,9 @@ public class Image implements Serializable {
 	private Product product;
 
 	public Image() {
-		
+
 	}
-	
+
 	public long getImageid() {
 		return imageid;
 	}
@@ -83,5 +83,5 @@ public class Image implements Serializable {
 		this.product = product;
 	}
 
-	
+
 }

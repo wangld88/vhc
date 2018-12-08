@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	>
+
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+		<meta name="description" content="" />
+		<meta name="author" content="KJ" />
+		<title>Store Admin</title>
+		<!-- Bootstrap core CSS-->
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min4.css}" />
+		<!-- Custom fonts for this template-->
+		<link rel="stylesheet" th:href="@{/css/font-awesome.min.css}" type="text/css" />
+		<!-- Custom styles for this template-->
+		<link rel="stylesheet" th:href="@{/css/sb-admin.css}" />
+		<link rel="stylesheet" th:href="@{/css/_all-skins.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/AdminLTE.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/store-login.css}" />
+		<link href='https://fonts.googleapis.com/css?family=Work+Sans:400,300,700' rel='stylesheet' type='text/css'>
+	</head>
+
+	<body class="hold-transition skin-blue sidebar-mini bg-dark">
+		<header class="main-header">
+			<a href="#" class="logo">
+				<!-- mini logo for sidebar mini 50x50 pixels -->
+				<span class="logo-mini"><b>V</b>HC</span>
+				<!-- logo for regular state and mobile devices -->
+				<span class="logo-lg"><b>VHC</b></span>
+			</a>
+			<nav class="navbar navbar-static-top">
+				<span class="banner"><b>Store</b> Admin</span>
+			</nav>
+		</header>
+		<div class="container">
+			<div class="card card-login mx-auto mt-5 profile--open">
+				<div class="card-header">Login</div>
+				<div class="card-body profile__form">
+					<form th:action="@{/store/admin/login}" method="post">
+						<div class="profile__fields">
+							<div class="field">
+								<input type="text" class="input" id="username" name="username" required autocomplete="off" />
+								<label for="username" class="label">Username</label>
+							</div>
+							<div class="field">
+								<input type="password" class="input" id="password" name="password" required autocomplete="off" />
+								<label for="password" class="label">Password</label>
+							</div>
+							<div class="form-group">
+								<div class="form-check">
+									<label class="form-check-label">
+									<input class="form-check-input" type="checkbox"> Remember Password</label>
+								</div>
+							</div>
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+							<input type="submit" class="btn btn-primary btn-block" value="LOGIN"></input>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!-- Bootstrap core JavaScript-->
+		<script th:src="@{/js/jquery-3.2.1.min.js}"></script>
+		<script th:src="@{/js/bootstrap.min.js}"></script>
+		<!-- Core plugin JavaScript-->
+		<!-- <script th:src="@{/js/jquery.easing.min.js}"></script> -->
+	</body>
+
+</html>

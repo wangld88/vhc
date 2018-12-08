@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html layout:decorator="store/layout/layout">
+
+	<div layout:fragment="content" id="content-wrapper">
+
+		<div class="wsite-section-content">
+			<div class="container">
+				<div id='wsite-content' class='wsite-not-footer'>
+					<div id="wsite-com-store">
+						<div id="wsite-com-store-inner">
+							<div class="wsite-com-category-subcategory-group wsite-com-column-group">
+								<div th:each="brandForm : ${brandForms}" class="wsite-com-category-subcategory wsite-com-column" data-id="12">
+									<div class="wsite-com-category-subcategory-wrap">
+										<a th:href="@{/store/brand/}+${brandForm.brandid}" class="wsite-com-category-subcategory-link wsite-com-link">
+											<div class="wsite-com-category-subcategory-image-container wsite-imageaspectratio-image-container">
+												<div class="wsite-imageaspectratio-image-height"> <!-- wsite-com-category-subcategory-image-height  -->
+												</div>
+												<div class="wsite-com-category-subcategory-image-wrap wsite-imageaspectratio-image-wrap">
+													<img th:src="'data:image/jpg;base64,'+${brandForm.imageData}"
+													class="media-object img-thumbnail"
+													style="height: 290px; width: 290px; display: block;" />
+													<!-- <img class="wsite-com-category-subcategory-image wsite-imageaspectratio-image" th:src="'data:image/jpg;base64,'+${brandForm.imageData}" style="width:250.5%;top:0%;left:-75.25%;" /> -->
+												</div>
+											</div>
+											<div class="wsite-com-category-subcategory-name">
+												<div class="wsite-com-category-subcategory-name-bg"></div>
+												<div class="wsite-com-category-subcategory-name-text">
+													<span th:text="${brandForm.name}" style="text-transform: uppercase;"></span>
+												</div>
+											</div>
+										</a>
+									</div>
+								</div>
+							</div>
+
+							<div style="clear:both"></div>
+							<!-- <div id="wsite-com-product-list">
+								<h2 id="wsite-com-title">Brand</h2>
+
+
+								<div id="wsite-com-category-product-group" class="wsite-com-category-product-featured-group clearfix">
+									<div class="wsite-com-category-product-featured wsite-com-column" data-id="625">
+										<div class=" wsite-com-category-product-featured-wrap">
+											<a href="/store/p625/Ara_Women%27s_dress_shoes_Karla_41419.html" class="wsite-com-link  wsite-com-category-product-link-featured">
+												<div style="position:relative">
+													<div class="wsite-com-category-product-featured-image-container wsite-imageaspectratio-image-container">
+														<div class="wsite-com-category-product-featured-image-height wsite-imageaspectratio-image-height">
+														</div>
+														<div class="wsite-com-category-product-featured-image-wrap wsite-imageaspectratio-image-wrap">
+															<img class="wsite-com-category-product-featured-image wsite-imageaspectratio-image" src="/uploads/4/8/4/2/48428543/s369874531391617206_p625_i5_w480.jpeg" style="width:133%;top:0%;left:-16.5%">
+														</div>
+													</div>
+
+													<div class=" wsite-com-category-product-featured-cover">
+													</div>
+												</div>
+
+												<div class="wsite-com-category-product-name wsite-com-link-text">
+													Ara Women's dress shoes Karla 41419
+												</div>
+											</a>
+
+											<div class="wsite-com-product-price single-sale-price">
+												<div class="wsite-com-price  wsite-com-category-product-featured-price">
+													CA$185.00
+												</div>
+												<div class="wsite-com-sale-price  wsite-com-category-product-featured-price">
+													CA$169.99 - CA$185.00
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="wsite-com-category-product-featured wsite-com-column" data-id="627">
+
+										<div class=" wsite-com-category-product-featured-wrap">
+
+											<a href="/store/p627/Ara_Shoes_Prema_12-32837_Pumps.html"
+												class="wsite-com-link  wsite-com-category-product-link-featured">
+
+												<div style="position:relative">
+													<div class="wsite-com-category-product-featured-image-container wsite-imageaspectratio-image-container">
+														<div class="wsite-com-category-product-featured-image-height wsite-imageaspectratio-image-height">
+														</div>
+														<div class="wsite-com-category-product-featured-image-wrap wsite-imageaspectratio-image-wrap">
+															<img class="wsite-com-category-product-featured-image wsite-imageaspectratio-image" src="/uploads/4/8/4/2/48428543/s369874531391617206_p627_i1_w225.jpeg" style="width:100%;top:-0%;left:0%">
+														</div>
+													</div>
+
+													<div class=" wsite-com-category-product-featured-cover">
+													</div>
+												</div>
+
+												<div class="wsite-com-category-product-name wsite-com-link-text">
+													Ara Shoes Prema 12-32837 Pumps
+												</div>
+											</a>
+
+											<div class="wsite-com-product-price single-sale-price">
+												<div class="wsite-com-price  wsite-com-category-product-featured-price">
+													CA$185.00
+												</div>
+												<div class="wsite-com-sale-price  wsite-com-category-product-featured-price">
+													CA$150.00
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="wsite-com-category-product-featured wsite-com-column" data-id="629">
+										<div class=" wsite-com-category-product-featured-wrap">
+											<a href="/store/p629/Ara_Women%27s_Knokke_pump_41403_01G.html" class="wsite-com-link wsite-com-category-product-link-featured">
+												<div style="position:relative">
+													<div class="wsite-com-category-product-featured-image-container wsite-imageaspectratio-image-container">
+														<div class="wsite-com-category-product-featured-image-height wsite-imageaspectratio-image-height">
+														</div>
+														<div class="wsite-com-category-product-featured-image-wrap wsite-imageaspectratio-image-wrap">
+															<img class="wsite-com-category-product-featured-image wsite-imageaspectratio-image" src="/uploads/4/8/4/2/48428543/s369874531391617206_p629_i1_w306.jpeg" style="width:185%;top:0%;left:-42.5%">
+														</div>
+													</div>
+
+													<div class=" wsite-com-category-product-featured-cover">
+													</div>
+												</div>
+
+												<div class="wsite-com-category-product-name wsite-com-link-text">
+													Ara Women's Knokke pump 41403 01G
+												</div>
+											</a>
+
+											<div class="wsite-com-product-price single-sale-price">
+												<div class="wsite-com-price  wsite-com-category-product-featured-price">
+													CA$205.00
+												</div>
+												<div class="wsite-com-sale-price  wsite-com-category-product-featured-price">
+													CA$160.00
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="wsite-com-category-product-featured wsite-com-column" data-id="662">
+
+										<div class=" wsite-com-category-product-featured-wrap">
+
+											<a href="/store/p662/Ugg_Men%27s_Brock_1012614_dark_chestnet.html" class="wsite-com-link wsite-com-category-product-link-featured">
+
+												<div style="position:relative">
+													<div class="wsite-com-category-product-featured-image-container wsite-imageaspectratio-image-container">
+														<div class="wsite-com-category-product-featured-image-height wsite-imageaspectratio-image-height">
+														</div>
+														<div class="wsite-com-category-product-featured-image-wrap wsite-imageaspectratio-image-wrap">
+															<img class="wsite-com-category-product-featured-image wsite-imageaspectratio-image" src="/uploads/4/8/4/2/48428543/s369874531391617206_p662_i1_w556.jpeg" style="width:100%;top:-5.56%;left:0%">
+														</div>
+													</div>
+
+													<div class=" wsite-com-category-product-featured-cover">
+													</div>
+												</div>
+
+												<div class="wsite-com-category-product-name wsite-com-link-text">
+													Ugg Men's Brock 1012614 dark chestnet
+												</div>
+											</a>
+
+											<div class="wsite-com-product-price ">
+												<div class="wsite-com-price  wsite-com-category-product-featured-price">
+													CA$160.00
+												</div>
+												<div class="wsite-com-sale-price  wsite-com-category-product-featured-price">
+													CA$160.00
+												</div>
+											</div>
+										</div>		</div>
+									<div class="wsite-com-category-product-featured wsite-com-column" data-id="663">
+
+										<div class=" wsite-com-category-product-featured-wrap">
+
+											<a href="/store/p663/Ugg_Men%27s_FREAMON_Leather_expresso__1013234.html" class="wsite-com-link wsite-com-category-product-link-featured">
+
+												<div style="position:relative">
+													<div class="wsite-com-category-product-featured-image-container wsite-imageaspectratio-image-container">
+														<div class="wsite-com-category-product-featured-image-height wsite-imageaspectratio-image-height">
+														</div>
+														<div class="wsite-com-category-product-featured-image-wrap wsite-imageaspectratio-image-wrap">
+															<img class="wsite-com-category-product-featured-image wsite-imageaspectratio-image" src="/uploads/4/8/4/2/48428543/s369874531391617206_p663_i5_w556.jpeg" style="width:100%;top:-5.56%;left:0%">
+														</div>
+													</div>
+
+													<div class=" wsite-com-category-product-featured-cover">
+													</div>
+												</div>
+
+												<div class="wsite-com-category-product-name wsite-com-link-text">
+													Ugg Men's FREAMON Leather expresso  1013234
+												</div>
+											</a>
+
+											<div class="wsite-com-product-price ">
+												<div class="wsite-com-price  wsite-com-category-product-featured-price">
+													CA$175.00
+												</div>
+												<div class="wsite-com-sale-price  wsite-com-category-product-featured-price">
+													CA$175.00
+												</div>
+											</div>
+										</div>		</div>
+									<div class="wsite-com-category-product-featured wsite-com-column" data-id="977">
+
+										<div class=" wsite-com-category-product-featured-wrap">
+
+											<a href="/store/p977/Allrounder_by_Mephisto_Men%27s__Maniko_nubuk.html"
+												class="wsite-com-link  wsite-com-category-product-link-featured">
+
+												<div style="position:relative">
+													<div class="wsite-com-category-product-featured-image-container wsite-imageaspectratio-image-container">
+														<div class="wsite-com-category-product-featured-image-height wsite-imageaspectratio-image-height">
+														</div>
+														<div class="wsite-com-category-product-featured-image-wrap wsite-imageaspectratio-image-wrap">
+															<img class="wsite-com-category-product-featured-image wsite-imageaspectratio-image" src="/uploads/4/8/4/2/48428543/s369874531391617206_p977_i1_w259.jpeg" style="width:134%;top:0%;left:-17%">
+														</div>
+													</div>
+
+													<div class=" wsite-com-category-product-featured-cover">
+													</div>
+												</div>
+
+												<div class="wsite-com-category-product-name wsite-com-link-text">
+													Allrounder by Mephisto Men's  Maniko nubuk
+												</div>
+											</a>
+
+											<div class="wsite-com-product-price ">
+												<div class="wsite-com-price  wsite-com-category-product-featured-price">
+													CA$225.00
+												</div>
+												<div class="wsite-com-sale-price  wsite-com-category-product-featured-price">
+													CA$225.00
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</div> -->
+
+							<div id="wsite-com-product-list-paging" class="clearfix">
+							</div>
+						</div>
+					</div>
+					<div style="clear:both"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</html>

@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import org.jsondoc.core.annotation.ApiObjectField;
 
@@ -24,33 +25,38 @@ public class Inventory implements Serializable {
 
 	private static final long serialVersionUID = -748565879849839762L;
 
-	
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "inventoryid", updatable = false, nullable = false)
 	private long inventoryid;
-	
+
 	@Column(nullable=true)
 	@ApiObjectField(description="Quantity", required=false)
 	private long quantity;
 
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="receivedby")
-	@ApiObjectField(description="Receive User", required=true)
+	@ApiObjectField(description="Received by User", required=true)
 	private User receivedby;
 
-	@Column(nullable=true, length=10)
-	@ApiObjectField(description="receivedate", format="maxlength = 10", required=false)
+	@Column(nullable=true)
+	@ApiObjectField(description="Receiving date", required=false)
 	private Calendar receivedate;
 
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="sentby")
-	@ApiObjectField(description="Recording User", required=true)
+	@ApiObjectField(description="Sent by User", required=true)
 	private User sentby;
 
-	@Column(nullable=true, length=10)
-	@ApiObjectField(description="senddate", format="maxlength = 10", required=false)
+	@Column(nullable=true)
+	@ApiObjectField(description="Sending date", required=false)
 	private Calendar senddate;
+
+	@Column(nullable=true, length=600)
+	@Size(max=600)
+	@ApiObjectField(description="Comment notes", format="maxlength = 600", required=false)
+	private String comments;
 
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="storeid")
@@ -67,11 +73,16 @@ public class Inventory implements Serializable {
 	@ApiObjectField(description="Unique Status", required=true)
 	private Status status;
 
-	
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="locationid")
+	@ApiObjectField(description="Unique Location", required=true)
+	private Location location;
+
+
 	public Inventory() {
-		
+
 	}
-	
+
 	public long getInventoryid() {
 		return inventoryid;
 	}
@@ -142,6 +153,22 @@ public class Inventory implements Serializable {
 
 	public void setQuantity(long quantity) {
 		this.quantity = quantity;
+	}
+
+	public String getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
+
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 }

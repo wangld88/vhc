@@ -14,16 +14,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 
 /**
- * 
+ *
  * @author Jerry
  *
  */
 public class LoginUser extends User {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private com.vhc.model.User user;
-	
+
 	public LoginUser(com.vhc.model.User user) {
 		super(user.getUsername(), user.getPassword(), AuthorityUtils.createAuthorityList(user.getRoles()));
 		/*System.out.println("user.getUsername(): "+user.getUsername() + ", Password:" +user.getPassword()+", roles: "+user.getRoles());
@@ -40,7 +40,7 @@ public class LoginUser extends User {
 	    for(Userrole role : user.getUserroles()) {
 	        simpleGrantedAuthorityList.add(new SimpleGrantedAuthority(role.getRole().getName()));
 	    }
-	    
+
 	    return simpleGrantedAuthorityList;
 	}
 
@@ -59,7 +59,7 @@ public class LoginUser extends User {
 	public com.vhc.model.User getUser() {
 		return this.user;
 	}
-	
+
 /*	@Override
 	public boolean isAccountNonExpired() {
 		// TODO Auto-generated method stub
@@ -83,5 +83,5 @@ public class LoginUser extends User {
 		// TODO Auto-generated method stub
 		return false;
 	}
-*/	
+*/
 }

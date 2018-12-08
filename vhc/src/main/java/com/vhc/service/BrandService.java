@@ -13,18 +13,22 @@ public class BrandService {
 
 	@Autowired
 	BrandRepositroy brandRepository;
-	
-	
+
+
 	public Brand getById(long brandid) {
-		return brandRepository.findByBrandid(brandid);
+		return brandRepository.findByBrandidOrderByName(brandid);
 	}
-	
+
 	public List<Brand> getAll() {
-		return brandRepository.findAll();
+		return brandRepository.findAllByOrderByName();
 	}
-	
+
+	public List<Brand> getByName(String name) {
+		return brandRepository.findByNameIgnoreCaseLikeOrderByName(name);
+	}
+
 	public Brand save(Brand brand) {
 		return this.brandRepository.save(brand);
 	}
-	
+
 }

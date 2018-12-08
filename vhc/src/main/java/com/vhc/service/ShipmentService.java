@@ -14,8 +14,8 @@ public class ShipmentService {
 
 	@Autowired
 	private ShipmentRepository shipmentRepository;
-	
-	
+
+
 	public Shipment getById(long shipmentid) {
 		return shipmentRepository.findByShipmentid(shipmentid);
 	}
@@ -24,8 +24,12 @@ public class ShipmentService {
 		return shipmentRepository.findAll();
 	}
 
+	public List<Shipment> getByName(String name) {
+		return shipmentRepository.findByCodeIgnoreCaseLikeOrSupplier_nameIgnoreCaseLike(name, name);
+	}
+
 	public Shipment save(Shipment shipment) {
 		return shipmentRepository.save(shipment);
 	}
-	
+
 }

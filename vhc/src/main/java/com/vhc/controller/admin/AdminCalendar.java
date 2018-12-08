@@ -21,9 +21,10 @@ public class AdminCalendar extends BaseController {
 	public String dspCalendar(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/calendar";
 		model.addAttribute("loginUser", getPrincipal());
-		
+		model.addAttribute("adminmenu", "Schedules");
+
 		return rtn;
-	}	
+	}
 
 	private User getPrincipal(){
     	User user = null;
@@ -36,5 +37,5 @@ public class AdminCalendar extends BaseController {
         }
         return user;
     }
-	
+
 }

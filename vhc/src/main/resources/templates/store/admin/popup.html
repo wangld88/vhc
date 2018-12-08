@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+	<head>
+		<meta charset="ISO-8859-1">
+		<title>Insert title here</title>
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min3.css}" />
+		<script type="text/javascript">
+			function selectCustomer(id) {
+				//alert(id);
+				window.opener.selectCustomer(id);
+				self.close();
+			}
+		</script>
+	</head>
+	<body>
+		<div class="panel-body">
+			<div class="form" style="overflow:hidden;">
+				<form id="customer" name="customer" th:action="@{/store/admin/searchCustomer}" method="get">
+					<div style="float:left">
+						<label for="lastname">Last Name: </label>
+						<input type="text" name="lastname" id="lastname" value="" />
+					</div>
+					<div style="float:left">
+						<label for="phone">Phone No.: </label>
+						<input type="text" name="phone" id="phone" value="" />
+					</div>
+					<div style="float:left">
+						<button class="btn btn-sm btn-primary" type="submit">Search</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div th:if="${customers != null and customers.size() > 0}">
+			<table>
+				<thead>
+					<tr>
+						<th>Customer</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="customer:${customers}">
+						<td><span th:text="${customer.user.firstname+' '+customer.user.lastname}"></span></td>
+						<td><button class="btn btn-xs btn-primary" th:onclick="${'selectCustomer('+customer.customerid+')'}">Select</button></td>
+						<!-- <td><a th:href="@{/store/admin/searchCustomer/}+${customer.customerid}" title="Edit Product"><button class="btn btn-xs btn-primary">Select</button></a> -->
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html layout:decorator="store/admin/layout/layout">
+	<div layout:fragment="content" >
+		<section id="content">
+
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item">System Error</li>
+				<li class="breadcrumb-item active">Debug Information</li>
+			</ol>
+
+			<div style="padding-left:20px;">
+				<strong>Title:</strong> <span th:text="${exception==null?'N/A':exception.title}"></span><br><br>
+				<strong>Requested URL:</strong> <span th:text="${exception==null?'N/A':exception.requestURL}"></span><br><br>
+				<strong>Message:</strong> <span th:text="${exception==null?'N/A':exception.message}"></span><br><br>
+
+				<strong>Exception Stack Trace:</strong><br>
+				<div th:each="ste: ${exception.trace}" style="padding-left: 15px;">
+					<span th:text="${ste}"></span>
+				</div>
+			</div>
+
+		</section>
+	</div>
+</html>

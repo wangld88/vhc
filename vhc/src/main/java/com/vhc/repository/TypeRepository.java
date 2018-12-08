@@ -9,7 +9,10 @@ import com.vhc.model.Type;
 public interface TypeRepository extends CrudRepository<Type, Long> {
 
 	List<Type> findAll();
-	
+
 	Type findByTypeid(long typeid);
-	
+
+	Type findByNameIgnoreCaseAndReftblIgnoreCase(String name, String reftbl);
+
+	List<Type> findByNameIgnoreCaseLike(String name);
 }

@@ -9,5 +9,8 @@ import com.vhc.model.City;
 public interface CityRepository extends CrudRepository<City, Long> {
 
 	public City findByCityid(long cityid);
+
 	public List<City> findAll();
+
+	public List<City> findByNameIgnoreCaseLike(String name);
 }

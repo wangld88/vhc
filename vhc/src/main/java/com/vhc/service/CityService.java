@@ -14,13 +14,21 @@ public class CityService {
 
 	@Autowired
 	private CityRepository cityRepository;
-	
-	
+
+
 	public City getById(long cityid) {
 		return cityRepository.findByCityid(cityid);
 	}
-	
+
 	public List<City> getAll() {
 		return cityRepository.findAll();
+	}
+
+	public List<City> getByName(String name) {
+		return cityRepository.findByNameIgnoreCaseLike(name);
+	}
+
+	public City save(City city) {
+		return cityRepository.save(city);
 	}
 }

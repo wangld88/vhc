@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html layout:decorator="store/admin/layout/layout">
+	<div layout:fragment="content">
+
+		<style>
+			.myLabel {
+			    position: relative;
+			    display: inline-block;
+			    padding: 6px 12px;
+			    margin-bottom: 0;
+			    cursor: pointer;
+				background-color: #3c8dbc;
+				color: #ffffff;
+				font-size: 14px;
+				font-weight:bold;
+				border-radius: 3px;
+				border: 1px solid #367fa9;
+			    display: inline-block;
+			    cursor: pointer;
+			    vertical-align: middle;
+				font-weight: normal;
+				line-height: 1.428571429;
+				text-align: center;
+				vertical-align: middle;
+				white-space: nowrap;
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				-o-user-select: none;
+				user-select: none;
+				font-weight: 300;
+				-webkit-transition: all 0.15s;
+				-moz-transition: all 0.15s;
+				transition: all 0.15s;
+				width: 62%;
+			}
+
+			.myLabel input {
+			    position: absolute;
+			    z-index: 12;
+			    opacity: 0;
+			    width: 100%;
+			    height: 100%;
+			    cursor: pointer;
+			}
+
+			.myLabel:hover {
+				background-color: #367fa9;
+			}
+
+			.myLabel span {
+				/* padding-left: 10%; */
+				display: table-cell;
+				vertical-align: middle;
+				padding-top: 2px;
+				width: 100%;
+				text-align: center;
+				font-size: 14px;
+				font-weight: 400;
+				cursor: pointer;
+			}
+
+			#uploadFile {
+				padding-top: 6px;
+				margin-top: 6px;
+				font-size: 0.9em;
+				font-weight: bold;
+				font-style: italic;
+				color: #1f3b08;
+				vertical-align: middle;
+				height: 100%;
+			}
+
+			.submitBtn {
+				width: 160px;
+				background-color: #bce0ee;
+				color: #3d3c3c;
+				border-color: #3d3c3c;
+				font-weight: bold;
+			}
+
+			.submitBtn:hover {
+				width: 160px;
+				background-color: #3cb0fd;
+				color: #ffffff;
+				border-color: #575657
+			}
+
+			.header {
+				background-color:#bce0ee;
+				color:#3d3c3c !important;
+				font-family: UniversCondensed, Arial, sans-serif !important;
+			}
+		</style>
+
+		<section class="content-header">
+			<h1>
+				Product Management
+				<small>List Brands</small>
+			</h1>
+			<ol class="breadcrumb">
+				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
+				<li><a th:href="@{/store/admin/brands}"><i class="fa fa-cubes"></i>Products</a></li>
+				<li><i class="fa fa-file-text-o"></i><span th:text="${brand==null?'New Brand':'Modify Brand'}"></span></li>
+			</ol>
+		</section>
+
+		<section class="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="box">
+						<div class="box-header">
+							<h3 class="box-title" th:text="${brand==null?'New Brand':'Modify Brand'}"></h3>
+						</div>
+
+						<div class="box-body">
+							<div class="form">
+								<form class="form-validate form-horizontal" id="brand" name="brand" method="post" th:action="@{/store/admin/brand}" enctype="multipart/form-data">
+									<div class="form-group">
+									    <label for="name" class="control-label col-lg-2">Name <span class="required">*</span></label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="name" name="name" th:value="${brand==null?'':brand.name}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="description" class="control-label col-lg-2">Description </label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="description" name="description" th:value="${brand==null?'':brand.description}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="street" class="control-label col-lg-2">Address </label>
+									    <div class="col-lg-10">
+									        <input class=" form-control" id="street" name="street" th:value="${mf==null?'':brand.address.street}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="cityid" class="control-label col-lg-2">City </label>
+									    <div class="col-lg-10">
+											<select class="form-control" id="cityid" name="cityid">
+												<option th:each="city: ${cities}" th:value="${city.cityid}" th:text="${city.name}" th:selected="${brand==null?'':(brand.address.city.cityid.equals(city.cityid)?'Selected':'')}"></option>
+											</select>
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="postalcode" class="control-label col-lg-2">Postal Code </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="postalcode" name="postalcode" th:value="${brand==null?'':brand.address.postalcode}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="contact" class="control-label col-lg-2">Contact </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="contact" name="contact" th:value="${brand==null?'':brand.contact}" type="text" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="phone" class="control-label col-lg-2">Phone </label>
+									    <div class="col-lg-10">
+									        <input type="text" class="form-control" id="phone" name="phone" th:value="${brand==null?'':brand.phone}" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="email" class="control-label col-lg-2">Email </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="email" name="email" type="email" th:value="${brand==null?'':brand.email}" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="website" class="control-label col-lg-2">Web Site </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="website" name="website" type="url" th:value="${brand==null?'':brand.website}" />
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="comments" class="control-label col-lg-2">Comments </label>
+									    <div class="col-lg-10">
+									        <textarea class="form-control " id="comments" name="comments" th:value="${brand==null?'':brand.comments}" ></textarea>
+									    </div>
+									</div>
+									<div class="form-group">
+										<label for="image" class="control-label col-lg-2">Brand Image <span class="required">*</span></label>
+										<div th:if="${brand==null or brand.imageData == null}" class="col-lg-2">
+											<div class="myLabel">
+												<input type="file" id="uploadBtn" name="picture">
+												<span class="col-lg-4 col-md-4">+ Add Image</span>
+											</div>
+										</div>
+											<div th:if="${brand!=null and brand.imageData!=null}" class="col-lg-2">
+												<img th:src="'data:image/jpg;base64,'+${brand.imageData}"
+													class="media-object img-thumbnail"
+													style="height: 160px; width: 160px; display: block;" />
+											</div>
+										<div class="col-lg-8" style="height: 36px;vertical-align: middle;">
+											<span id="uploadFile"></span>
+										</div>
+
+										<div id="remove" th:if="${brand!=null and brand.image!=null}" class="col-lg-2">
+											<a value="Remove" class="btn btn-primary btn-label-left" onclick="removeImage()"><span class="col-lg-2 col-md-2">Remove</span></a>
+										</div>
+
+										<p class="help-block"><!-- Example block-level help text here. --></p>
+									</div>
+									<div class="form-group">
+									    <div class="col-lg-offset-2 col-lg-10">
+									        <button class="btn btn-primary" type="submit"> Save </button>
+									        <a th:href="@{/store/admin/brands}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+									        <input type="hidden" id="brandid" name="brandid" th:value="${brand==null?'':brand.brandid}" />
+									    </div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!--main content end-->
+		<script>
+			function removeImage() {
+				form = document.getElementById("brand");
+
+				form.setAttribute("action", "removeImage");
+
+				form.submit();
+			}
+		</script>
+	</div>
+</html>

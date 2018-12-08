@@ -45,7 +45,7 @@ public class ImageProcessor {
 
 	/**
 	 * Using the custom size on processing image
-	 * 
+	 *
 	 * @param width
 	 * @param height
 	 */
@@ -56,7 +56,7 @@ public class ImageProcessor {
 
 	/**
 	 * Set the new image size
-	 * 
+	 *
 	 * @param width
 	 * @param height
 	 */
@@ -67,7 +67,7 @@ public class ImageProcessor {
 
 	/**
 	 * Get the width of the image being resized to
-	 * 
+	 *
 	 * @return
 	 */
 	public int getImageWidth() {
@@ -76,7 +76,7 @@ public class ImageProcessor {
 
 	/**
 	 * Get the height of the image being resized to
-	 * 
+	 *
 	 * @return
 	 */
 	public int getImageHeight() {
@@ -85,7 +85,7 @@ public class ImageProcessor {
 
 	/**
 	 * Get the imge.
-	 * 
+	 *
 	 * @param filePath
 	 * @return
 	 */
@@ -105,7 +105,7 @@ public class ImageProcessor {
 
 	/**
 	 * Save an image to file system
-	 * 
+	 *
 	 * @param img
 	 * @param filePath
 	 * @param imgType
@@ -117,13 +117,14 @@ public class ImageProcessor {
 			ImageIO.write(img, imgType, new File(filePath));
 
 		} catch (Exception e) {
+			message = e.getMessage();
 			e.printStackTrace();
 		}
 
 	}
 
 	/**
-	 * 
+	 *
 	 * @param image
 	 * @param imgType
 	 * @return
@@ -141,6 +142,7 @@ public class ImageProcessor {
 			is = new ByteArrayInputStream(os.toByteArray());
 
 		} catch (Exception e) {
+			message = e.getMessage();
 			e.printStackTrace();
 		}
 		return is;
@@ -148,7 +150,7 @@ public class ImageProcessor {
 
 	/**
 	 * Resize an image
-	 * 
+	 *
 	 * @param originalImage
 	 * @return
 	 */
@@ -157,8 +159,7 @@ public class ImageProcessor {
 		int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB
 				: originalImage.getType();
 
-		BufferedImage resizedImage = new BufferedImage(w,
-				h, type);
+		BufferedImage resizedImage = new BufferedImage(w, h, type);
 
 		Graphics2D image = resizedImage.createGraphics();
 
@@ -170,7 +171,7 @@ public class ImageProcessor {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param originalImage
 	 * @return
 	 */
@@ -204,7 +205,7 @@ public class ImageProcessor {
 
 	/**
 	 * Process the Image, resize it to the required size
-	 * 
+	 *
 	 * @param file
 	 * @return InputStream
 	 */
@@ -224,13 +225,13 @@ public class ImageProcessor {
 
 					BufferedImage originalImage = ImageIO.read(inputStream);
 
-					BufferedImage resizedImage = this
-							.resizeImage(originalImage, image_width, image_height);
+					is = this.getImageStream(originalImage, imgType);
+					/*BufferedImage resizedImage = this.resizeImage(originalImage, image_width, image_height);
 
 					BufferedImage crop = resizedImage.getSubimage(x, y, w, h);
-					BufferedImage resizedCropImage = this
-							.resizeImage(crop, outputW, outputH);
-					is = this.getImageStream(resizedCropImage, imgType);
+					BufferedImage resizedCropImage = this.resizeImage(crop, outputW, outputH);
+
+					is = this.getImageStream(resizedCropImage, imgType);*/
 
 				}
 			}

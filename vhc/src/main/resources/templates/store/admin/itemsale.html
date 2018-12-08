@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html layout:decorator="store/admin/layout/layout">
+	<div layout:fragment="content">
+
+		<style>
+			ul {
+				list-style-type: none;
+				margin-left: 18px;
+				padding: 0;
+			}
+		</style>
+		<section class="content-header">
+			<h1>
+				Business Management
+				<small>Point of Sales</small>
+			</h1>
+			<ol class="breadcrumb">
+				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
+				<li><a th:href="@{/store/admin/sales}"><i class="fa fa-cubes"></i>Sales</a></li>
+				<li><i class="fa fa-file-text-o"></i><span th:text="${'New Sale'}"></span></li>
+			</ol>
+		</section>
+
+		<section class="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="box">
+						<div class="box-header">
+							<h3 class="box-title" th:text="${'Item Sale'}"></h3>
+						</div>
+						<div class="box-body">
+							<div class="from">
+								<div class="col-lg-12" style="margin-bottom: 10px;">
+									<form id="lookup" name="lookup" th:action="@{/store/admin/itemsale/add}" method="get">
+										<label class="control-label col-lg-2">Item's UPC:</label>
+										<input type="text" id="sku" name="sku" value="" class="col-lg-2" />
+										<div class="col-lg-8">
+										<button type="submit" class="btn btn-xs btn-primary"><i class="fa fa-plus"></i>  Add</button>
+										</div>
+										<!-- <select id="inventory" name="inventory" style="height: 25px;" onchange="selectItem()">
+											<option value=""></option>
+											<option th:each="inventory: ${avaialbe}" th:value="${inventory.inventoryid}" th:text="${inventory.item.product.name+'('+inventory.item.size.region.name+' '+inventory.item.size.sizenum+')'}" th:title="${inventory.item.sku+':'+inventory.item.product.retail}"></option>
+										</select>
+										Price:
+										<input type="text" id="price" name="price" value="" />
+										Quantity:
+										<input type="text" id="quantity" name="quantity" value="1" readOnly />
+										<button class="btn btn-xs btn-primary" onclick="addRow(1)">Add</button> -->
+									</form>
+								</div>
+								<div th:if="${message!=null}" class="col-lg-12">
+									<span class="control-label col-lg-1" th:text="${''}"></span>
+									<span th:class="${message.status} + 'col-lg-11'" th:text="${message.message}"></span>
+								</div>
+								<!-- <form id="sale" name="sale" th:action="@{/store/admin/itemsale}" method="post">
+									<div style="padding: 5px; height: 200px;">
+									<table id="mainTable" class="table table-striped">
+										<tr>
+											<th>Item</th>
+											<th>UPC</th>
+											<th>Price</th>
+											<th>Quantity</th>
+											<th>Action</th>
+										</tr>
+									</table>
+									<input type="hidden" name="theValue" id="theValue" value="1" />
+									<input type="hidden" name="theIndex" id="theIndex" value="1" />
+									</div>
+									<div style="position: absolute;right: 10px;bottom:0px;">
+										<button type="submit" class="btn btn-app btn-primary" ><i class="fa fa-credit-card"></i>Pay Request</button>
+									</div>
+								</form> -->
+								<form id="sale"  name="sale" th:action="@{/store/admin/itemsale}" method="post" th:if="${saleList!=null and saleList.size()>0}">
+									<div style="padding: 5px; min-height: 200px;">
+										<table id="mainTable" class="table table-striped">
+											<tr>
+												<th>Action</th>
+												<th>Item</th>
+												<th>UPC</th>
+												<th>Quantity</th>
+												<th>Price</th>
+											</tr>
+											<tr th:each="inventory: ${saleList}">
+												<td><a class="btn btn-danger" th:onclick="${'removeInv('+inventory.inventoryid+')'}"><i class="fa fa-trash-o"></i></a></td>
+												<td th:text="${inventory.item.product.name}"></td>
+												<td th:text="${inventory.item.sku}"></td>
+												<td th:text="${inventory.quantity}"></td>
+												<td th:text="${inventory.item.product.finalprice}"></td>
+											</tr>
+											<tr>
+												<td>Sub-Total: </td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td><span th:text="${subTotal}"></span></td>
+											</tr>
+											<tr>
+												<td>Tax: 13%</td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td><span th:text="${tax}"></span></td>
+											</tr>
+											<tr>
+												<td>Total: </td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td><span th:text="${total}"></span></td>
+											</tr>
+										</table>
+									</div>
+									<div style="float: right; padding-right: 10px;bottom:0px;">
+										<a id="payment" class="btn btn-app btn-primary" th:if="${saleList!=null and saleList.size()>0}"><i class="fa fa-credit-card"></i>Pay Request</a>
+										<!-- <a id="print" th:href="@{/store/admin/itemsale/invoice}" class="btn btn-app btn-primary" style="display: none"><i class="fa fa-file-text"></i>Print Invoice</a> -->
+										<a id="print" class="btn btn-app btn-primary" style="display: none"><i class="fa fa-file-text"></i>Print Invoice</a>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="pay" class="form" title="Payment" th:if="${methods!=null}">
+					<form id="paymethod" name="paymethod" method="post" th:action="@{/store/admin/itemsale}" style="padding-left: 20px; width: 99%; height: 99%;">
+						<div class="form-group row">
+							<label>Payment Amount: </label>
+							<span th:text="' $'+${total}">$ 222.00</span>
+							<input type="hidden" id="amount" th:value="${total}" />
+						</div>
+						<div class="form-group row">
+							<label>Promotion Code: </label>
+							<input type="text" id="promocode" name="promocode" value="" style="width: 30%;" />
+							<a id="checkpcode" class="btn btn-default btn-sm">Apply</a>
+							<input type="hidden" id="save" value="0" />
+							<span id="percentage"></span>
+						</div>
+						<div class="form-group row">
+							<label>Payment Method: </label>
+							<ul>
+								<li>
+									<div class="form-group row">
+										<div style="width: 26%; float:left;">
+											<input type="checkbox" id="Credit Card" name="methodid" value="1" />
+											<label>Credit Card</label>
+										</div>
+										<div id="method1" style="width: 70%; display: none; float:left;">
+											<input type="text" id="amount1" name="creditamount" value="" style="width: 24%;" placeholder="Credit Card Payment" />
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="form-group row">
+										<div style="width: 26%; float:left;">
+											<input type="checkbox" id="Debit" name="methodid" value="2" />
+											<label>Debit</label>
+										</div>
+										<div id="method2" style="width: 70%; display: none; float:left;">
+											<input type="text" id="amount2" name="debitamount" value="" style="width: 24%;" placeholder="Debit Payment" />
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="form-group row">
+										<div style="width: 26%; float:left;">
+											<input type="checkbox" id="Gift Card" name="methodid" value="3" />
+											<label>Gift Card</label>
+										</div>
+										<div id="method3" style="width: 70%; display: none; float:left;">
+											<input type="text" id="cardnum" name="cardnum" th:value="${giftcard==null?'':giftcard.code}" placeholder="Card Number" style="width: 26%" />
+											<input type="password" id="pin" name='pin' placeholder="Pin" style="width: 10%" />
+											<a id="chkbalance" class="btn btn-default btn-sm">Check</a><br />
+											<input type="text" id="amount3" name="giftamount" style="display: none;width: 12%;" placeholder="Gift Card Payment" /><span id="giftbalance"></span>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="form-group row">
+										<div style="width: 26%; float:left;">
+											<input type="checkbox" id="Cash" name="methodid" value="4" />
+											<label>Cash</label>
+										</div>
+										<div id="method4" style="width: 70%; display: none; float:left;">
+											<input type="text" id="amount4" name="cashamount" value="" style="width: 24%;" placeholder="Cash Payment" />
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+						<div class="form-group row">
+							<div>
+								<label style="width: 24%;">Balance: </label> <span id="total" th:text="'$'+${total}"></span>
+							</div>
+							<div id="changediv" style="display: none;">
+								<label style="width: 24%;">Change: </label> <span id="cashchange"></span>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</section>
+		<!-- <script th:src="@{/js/jquery-1.8.3.min.js}"></script> -->
+		<script th:src="@{/js/jquery-1.10.2.min.js}"></script>
+		<script th:src="@{/js/jquery-ui-1.12.1.js}"></script>
+		<script>
+		    var token = $("meta[name='_csrf']").attr("content");
+		    var header = $("meta[name='_csrf_header']").attr("content");
+
+			$(document).ready(function() {
+			    var dialog, form;
+				dialog = $( "#pay" ).dialog({
+					autoOpen: false,
+					resizable: false,
+					height: 480,
+					width: 400,
+					modal: true,
+					buttons: {
+						"Pay": function() {
+							form = dialog.find( "form" );
+							var postData = form.serializeArray();
+							var formURL = form.attr("action");
+
+							console.log("URL: " + formURL);
+							$.ajax({
+								url: formURL,
+								type: "POST",
+								data: postData,
+				                beforeSend:function(xhr) {
+				                	xhr.setRequestHeader(header, token);
+				                },
+								success: function(data, textStatus, jqXHR) {
+									//console.log("URL: "+data);
+									alert("Payment completed succssfully!")
+									//$('#pay #balance').html(data);
+									//return true;
+									$("#payment").hide();
+									$("#print").show();
+									dialog.dialog( "close" );
+								},
+								error: function(jqXHR, status, error) {
+									console.log(status + ": " + error);
+								}
+							});
+						},
+						Cancel: function() {
+							dialog.dialog( "close" );
+						}
+					},
+					close: function() {
+						//alert("close")
+						//document.getElementById("giftcard").reset();
+						//allFields.removeClass( "ui-state-error" );
+					},
+					open: function (event, ui) {
+					    $('#payment').css('overflow', 'hidden');
+					}
+				});
+
+				$('#payment').click(function(){
+				    dialog.dialog( "open" );
+				});
+
+				//form = dialog.find( "form" ).on( "submit", function( event ) {
+				$( "#chkbalance" ).click( function() {
+					if($("#pin").val().trim() == "") {
+						alert("Please enter your pin!");
+						return false;
+					} else {
+						form = dialog.find( "form" );
+						var postData = form.serializeArray();
+						event.preventDefault();
+						console.log("postData: " + postData);
+						$.ajax({
+							url: "/vhc/store/admin/giftcardbalance",
+							type: "POST",
+							data: postData,
+			                beforeSend:function(xhr) {
+			                	xhr.setRequestHeader(header, token);
+			                },
+							success: function(data, textStatus, jqXHR) {
+								console.log("URL: "+data);
+								if(data > 0) {
+									$('#amount3').show();
+									$("#giftbalance").html("Available for Payment");
+									$('#amount3').val(data);
+									$("#Gift Card").prop( "checked", true );
+								} else {
+									$("#giftbalance").html("Gift card has 0 balance or pin is not correct")
+								}
+								calTotal();
+								return false;
+							},
+							error: function(jqXHR, status, error) {
+								console.log(status + ": " + error);
+							}
+						});
+					}
+				});
+
+				//Payment Methods
+				$("input[type=checkbox]").on("click", function() {
+					//i = $("input[type=radio]:checked").val();
+
+					$("input[type=checkbox]").each(function() {
+
+						i = $(this).val();
+						if($(this).is(':checked')) {
+							$("#method"+i).show();
+						} else {
+							$("#method"+i).hide();
+						}
+					});
+				});
+
+
+				$("#checkpcode").click(function() {
+					if($("#promocode").val().trim() == "") {
+						alert("Please provide the Promotion Code");
+						return false;
+					} else {
+
+						form = dialog.find( "form" );
+						var postData = form.serializeArray();
+
+						$.ajax({
+							url: "/vhc/store/admin/promocode",
+							type: "POST",
+							data: postData,
+			                beforeSend:function(xhr) {
+			                	xhr.setRequestHeader(header, token);
+			                },
+							success: function(data, textStatus, jqXHR) {
+								console.log("URL: "+jqXHR);
+								total = ($("#amount").val() * (100 - data) / 100).toFixed(2);
+								save = ($("#amount").val() * data / 100).toFixed(2);
+								console.log("Total: "+total+ ", save: "+save);
+								$("#save").val(save);
+								$('#pay #percentage').html("<br> Promotion Discount: "+data+"%, Saved: "+save);
+								$("#total").html("$" + total);
+								return false;
+							},
+							error: function(jqXHR, status, error) {
+								console.log(status + ": " + error);
+							}
+						});
+					}
+				});
+
+				$("#amount1").keyup(function() {
+					calTotal();
+				})
+				$("#amount2").keyup(function() {
+					calTotal();
+				})
+				$("#amount3").keyup(function() {
+					calTotal();
+				})
+				$("#amount4").keyup(function() {
+					calTotal();
+				})
+
+				function calTotal() {
+					console.log("Original Balance: "+$("#amount").val()+", save: "+$("#save").val()+", 1: "+$("#amount1").val()+", 3: "+$("#amount3").val())
+					balance = ($("#amount").val() - $("#save").val() - $("#amount1").val() - $("#amount2").val() - $("#amount3").val() - $("#amount4").val()).toFixed(2);
+
+					if(balance < 0) {
+						change = 0 - balance;
+						balance = 0;
+						$("#changediv").show();
+						$("#cashchange").html("$"+change);
+					} else {
+						console.log("call:"+balance)
+						$("#changediv").hide();
+						$("#cashchange").html("");
+					}
+
+					$("#total").html("$"+balance);
+
+				}
+
+				$("#print").click(function() {
+					window.open("printinvoice");
+					return false;
+				});
+			});
+
+		</script>
+
+		<script type="text/javascript">
+			/*<![CDATA[*/
+			function selectItem() {
+				var elmt = document.getElementById("inventory");
+				if(elmt.selectedIndex != 0) {
+					var title = elmt.options[elmt.selectedIndex].title.split(':');
+					var price = '';
+					if(title[1] != 'null') {
+						price = title[1];
+					}
+					document.getElementById("price").value=price;
+				} else {
+					document.getElementById("price").value=''
+				}
+
+			}
+
+			function addRow(reload) {
+				//console.log("addRow is called")
+				var ni = document.getElementById('mainTable');
+
+				var rows = ni.getElementsByTagName('tr');  // there is a tr for header
+				var numi = document.getElementById('theValue');
+				var num = (document.getElementById('theValue').value - 1) + 2;
+				var elmt = document.getElementById("inventory");
+				if(elmt.selectedIndex == 0) {
+					alert("Please select the Sale Item!")
+					return false;
+				}
+				//alert("rows: " + rows.length + ", num: " + num)
+				numi.value = num;
+				current = "sub" + numi.value;
+				indexElmt = document.getElementById("theIndex");
+
+				//alert("Before add row, theValue: "+numi.value+", indexElmt: "+indexElmt.value)
+
+				if(!reload)
+					rowIndex = parseInt(indexElmt.value);
+				else
+					rowIndex = 0;
+				//alert("rowIndex :"+rowIndex)
+				if(rowIndex == 0) {
+					for(i = 0; i < rows.length; i++) {
+						columns = rows[i].getElementsByTagName("td");
+						rowIndex = i + 1;
+						/*for(j = 0; j < columns.length; j++) {
+							if(columns[j].firstChild != null && columns[j].firstChild.id == current) {
+								rowIndex = i + 1; //Extra TRs not in the same table should be removed
+							}
+						}*/
+					}
+				}
+
+				//alert("rowIndex :"+rowIndex+", row num:"+num)
+				rownum = num;
+				//alert("current :"+current+",rows.length :"+rows.length+", rowIndex :"+rowIndex)
+				var newRow = ni.insertRow(rowIndex);
+				newCell = newRow.insertCell(0);
+				var newinput = document.createElement("input");
+				newinput.setAttribute('type','hidden');
+				var idName = "inventory" + rownum;
+				newinput.setAttribute('id',idName);
+				newinput.setAttribute("name",idName);
+				newinput.setAttribute("style","width:100px");
+				newinput.setAttribute("value",elmt.options[elmt.selectedIndex].value)
+				newCell.appendChild(newinput);
+				var text = document.createTextNode(elmt.options[elmt.selectedIndex].text);
+				newCell.appendChild(text);
+
+				newCell = newRow.insertCell(1);
+				var newinput = document.createElement("input");
+				newinput.setAttribute('type','hidden');
+				var idName = "price" + rownum;
+				newinput.setAttribute('id',idName);
+				newinput.setAttribute("name",idName);
+				newinput.setAttribute("value",document.getElementById("price").value);
+				newCell.appendChild(newinput);
+				var text = document.createTextNode(document.getElementById("price").value);
+				newCell.appendChild(text);
+
+				newCell = newRow.insertCell(2);
+				var newinput = document.createElement("input");
+				newinput.setAttribute('type','hidden');
+				var idName = "price" + rownum;
+				newinput.setAttribute('id',idName);
+				newinput.setAttribute("name",idName);
+				newinput.setAttribute("value",document.getElementById("price").value);
+				newCell.appendChild(newinput);
+				var text = document.createTextNode(document.getElementById("price").value);
+				newCell.appendChild(text);
+
+				newCell = newRow.insertCell(3);
+				var newinput = document.createElement("input");
+				newinput.setAttribute('type','hidden');
+				var idName = "quantity" + rownum;
+				newinput.setAttribute('id',idName);
+				newinput.setAttribute("name",idName);
+				newinput.setAttribute("value",document.getElementById("quantity").value);
+				newCell.appendChild(newinput);
+				var text = document.createTextNode(document.getElementById("quantity").value);
+				newCell.appendChild(text);
+
+				newCell = newRow.insertCell(4);
+				//newCell.setAttribute("style", "padding-left:4px;");
+				var newinput = document.createElement("button");
+				var idName = "remove" + rownum;
+				newinput.setAttribute('id',idName);
+				newinput.setAttribute("name",idName);
+				newinput.setAttribute("type","button");
+				newinput.setAttribute("class","btn btn-danger");
+				newinput.setAttribute("value","Remove");
+				newinput.setAttribute("onclick","removeRow("+rownum+")");
+				newCell.appendChild(newinput);
+
+				rowIndex++;// - 2; //two extra TDs added;
+				indexElmt.value = rowIndex;
+
+				//alert("after add row, theValue: "+numi.value+", indexElmt: "+indexElmt.value)
+			}
+
+			/* function removeInv(i) {
+				alert("i: "+i)
+				var ni = document.getElementById('mainTable');
+				ni.deleteRow(i-1);
+				//reset the row nubmer
+				rows = ni.rows;
+
+				var numi = document.getElementById('theValue');
+				indexElmt = document.getElementById("theIndex");
+				//alert("Before remove rows: "+numi.value+", indexElmt: "+indexElmt.value)
+
+				for(j = 1; j <= rows.length; j++) {
+					if(j > i) {
+						//alert("i: "+i+", j: "+j)
+						elmt = document.getElementById("remove"+j);
+						num = j - 1;
+						elmt.removeAttribute("onclick");
+						elmt.setAttribute("onclick","removeRow("+num+")");
+					}
+				}
+
+				indexElmt.value = parseInt(indexElmt.value) - 1;
+				numi.value = parseInt(numi.value) - 1;
+
+				alert("indexElmt.value: "+indexElmt.value)
+			} */
+
+			function strTrim(x) {
+			    return x.replace(/^\s+|\s+$/gm,'');
+			}
+
+			function strFilter(x) {
+			    return x.replace(/[\*\_\,\&]/g,'');
+			}
+
+			function removeInv(inventoryid) {
+				form = document.getElementById("lookup");
+				form.action = "/vhc/store/admin/itemsale/remove/" + inventoryid;
+				form.submit();
+			}
+			/*]]>*/
+		</script>
+	</div>
+</html>

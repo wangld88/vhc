@@ -14,17 +14,21 @@ public class SupplierService {
 
 	@Autowired
 	private SupplierRepository supplierRepository;
-	
+
 	public Supplier getById(long supplierid) {
 		return supplierRepository.findBySupplierid(supplierid);
 	}
-	
+
 	public List<Supplier> getAll() {
-		return supplierRepository.findAll();
+		return supplierRepository.findAllByOrderByName();
 	}
-	
+
+	public List<Supplier> getByName(String name) {
+		return supplierRepository.findByNameIgnoreCaseLikeOrderByName(name);
+	}
+
 	public Supplier save(Supplier supplier) {
 		return supplierRepository.save(supplier);
 	}
-	
+
 }
