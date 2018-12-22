@@ -46,6 +46,10 @@ public class InventoryService {
 		return inventoryRepository.findByItem_skuAndStore_storeidAndStatus(upc, storeid, status);
 	}
 
+	public List<Inventory> getByProductidSizeidAvailable(long productid, long sizeid, long storeid, Status status) {
+		return inventoryRepository.findByItem_Product_productidAndItem_Size_sizeidAndStore_storeidAndStatusOrderByItem_Size(productid, sizeid, storeid, status);
+	}
+
 	public List<Inventory> getAll() {
 		return inventoryRepository.findAll();
 	}

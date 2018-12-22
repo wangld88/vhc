@@ -42,6 +42,10 @@ public class ProductService {
 		return productRepository.findByStorefront(storefront);
 	}
 
+	public List<Product> getByStroefrontAndPaging(String storefront, Pageable pageable) {
+		return productRepository.findByStorefront(storefront, pageable);
+	}
+
 	public List<Product> getByStroefrontAndName(String storefront, String name) {
 		return productRepository.findByStorefrontAndNameIgnoreCaseLike(storefront, name);
 	}

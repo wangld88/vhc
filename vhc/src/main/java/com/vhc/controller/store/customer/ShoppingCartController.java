@@ -5,12 +5,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.vhc.controller.store.StoreBase;
+import com.vhc.dto.ItemForm;
+import com.vhc.dto.ShopItem;
 import com.vhc.dto.ShoppingCart;
 import com.vhc.model.Customer;
 import com.vhc.model.Item;
@@ -36,29 +40,39 @@ public class ShoppingCartController extends StoreBase {
 
 
 	@RequestMapping(value={"/",""}, method = RequestMethod.GET)
-	public String dspCart() {
-		String rtn = "";
+	public String dspCart(ModelMap model, HttpServletRequest request, HttpSession session) {
+		String rtn = "/customer/shoppingcart";
 
-		logger.info("Display shopping cart");
+		logger.info("dspCart is called in ShoppingCartController");
+		Object principal = getPrincipal();
 
-		return rtn;
-	}
-
-
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public String listCart(HttpServletRequest request, ModelMap model, HttpSession session) {
-		String cartKey = getCartKey(request);
-
-		ShoppingCart cart = (ShoppingCart) session.getAttribute(cartKey);
-
-		if(cart != null) {
-			cart = new ShoppingCart();
-			session.setAttribute(cartKey, cart);
+		if(!isCustomer(principal)) {
+			return "redirect:/customer/login";
 		}
 
-		model.addAttribute("cart", cart);
+		User loginUser = getLoginUser(principal);
+		model.addAttribute("loginUser", loginUser);
 
-		return "";
+		Customer customer = customerService.getByUser(getLoginUser(getPrincipal()));
+		//User loginUser = getLoginUser(principal);
+		logger.info("Display shopping cart");
+
+		String cartKey = getCartKey(request);
+		ShoppingCart cart = new ShoppingCart();
+		List<ShopItem> items = new ArrayList<ShopItem>();
+		double total = 0;
+
+		if (session.getAttribute(cartKey) != null) {
+			cart = (ShoppingCart) session.getAttribute(cartKey);
+			items = cart.getItems();
+			total = items.stream().collect(Collectors.summarizingDouble(ShopItem::getPrice)).getSum();
+		}
+
+		model.addAttribute("total", total);
+		model.addAttribute("items", items);
+		model.addAttribute("customer", customer);
+
+		return rtn;
 	}
 
 
@@ -69,7 +83,7 @@ public class ShoppingCartController extends StoreBase {
 
 		Customer customer = customerService.getByUser(getLoginUser(getPrincipal()));
 		ShoppingCart cart = new ShoppingCart();
-		List<Item> items = new ArrayList<Item>();
+		List<ShopItem> items = new ArrayList<ShopItem>();
 		long storeid = 1;
 		//Store store = staffService.getByUser(loginUser).getStore();
 		Status received = statusService.getByName("Received");
@@ -79,7 +93,7 @@ public class ShoppingCartController extends StoreBase {
 			items = cart.getItems();
 		}
 
-		items.add(inventoryService.getByStoreAvaiableUPC(sku, storeid, received).get(0).getItem());
+		items.add(new ShopItem(inventoryService.getByStoreAvaiableUPC(sku, storeid, received).get(0).getItem()));
 		if(customer != null) {
 			cart.setCustomer(customer);
 		}
@@ -99,8 +113,8 @@ public class ShoppingCartController extends StoreBase {
 
 		ShoppingCart cart = cart = (ShoppingCart) session.getAttribute(cartKey);
 
-		List<Item> items = cart.getItems();
-		
+		List<ShopItem> items = cart.getItems();
+
 		items.removeIf(i -> i.getSku().equals(sku));
 		cart.setItems(items);
 
@@ -110,10 +124,62 @@ public class ShoppingCartController extends StoreBase {
 	}
 
 
-	@RequestMapping(value = "/checkout/address", method = RequestMethod.GET)
-	public String provideAddress() {
+	@RequestMapping(value = "/shipping", method = RequestMethod.POST)
+	public String provideAddress(ModelMap model, HttpServletRequest request, HttpSession session) {
 
-		String rtn = "";
+		String rtn = "/customer/shipping";
+		Object principal = getPrincipal();
+
+		if(!isCustomer(principal)) {
+			return "redirect:/customer/login";
+		}
+
+		User loginUser = getLoginUser(principal);
+		model.addAttribute("loginUser", loginUser);
+
+		Customer customer = customerService.getByUser(getLoginUser(getPrincipal()));
+
+		logger.info("Display provideAddress");
+
+		return rtn;
+	}
+
+
+	@RequestMapping(value = "/payment", method = RequestMethod.POST)
+	public String makePayment(ModelMap model, HttpServletRequest request, HttpSession session) {
+
+		String rtn = "/customer/payment";
+		Object principal = getPrincipal();
+
+		if(!isCustomer(principal)) {
+			return "redirect:/customer/login";
+		}
+
+		User loginUser = getLoginUser(principal);
+		model.addAttribute("loginUser", loginUser);
+
+		Customer customer = customerService.getByUser(getLoginUser(getPrincipal()));
+
+		logger.info("Display makePayment");
+
+		return rtn;
+	}
+
+
+	@RequestMapping(value = "/review", method = RequestMethod.POST)
+	public String reviewOrder(ModelMap model, HttpServletRequest request, HttpSession session) {
+
+		String rtn = "/customer/review";
+		Object principal = getPrincipal();
+
+		if(!isCustomer(principal)) {
+			return "redirect:/customer/login";
+		}
+
+		User loginUser = getLoginUser(principal);
+		model.addAttribute("loginUser", loginUser);
+
+		Customer customer = customerService.getByUser(getLoginUser(getPrincipal()));
 
 		logger.info("Display shopping cart");
 
@@ -121,12 +187,22 @@ public class ShoppingCartController extends StoreBase {
 	}
 
 
-	@RequestMapping(value = "/checkout/payment", method = RequestMethod.GET)
-	public String makePayment() {
+	@RequestMapping(value = "/invoice", method = RequestMethod.POST)
+	public String completeTxn(ModelMap model, HttpServletRequest request, HttpSession session) {
 
-		String rtn = "";
+		String rtn = "/customer/invoice";
+		Object principal = getPrincipal();
 
-		logger.info("Display shopping cart");
+		if(!isCustomer(principal)) {
+			return "redirect:/customer/login";
+		}
+
+		User loginUser = getLoginUser(principal);
+		model.addAttribute("loginUser", loginUser);
+
+		Customer customer = customerService.getByUser(getLoginUser(getPrincipal()));
+
+		logger.info("Display shopping cart invoice");
 
 		return rtn;
 	}
@@ -188,4 +264,12 @@ public class ShoppingCartController extends StoreBase {
         return user;
     }
 
+	private boolean isCustomer(Object principal) {
+
+		if(principal instanceof LoginUser) {
+			return ((LoginUser) principal).getAuthorities().contains(new SimpleGrantedAuthority("CUSTOMER"));
+		} else {
+			return false;
+		}
+	}
 }

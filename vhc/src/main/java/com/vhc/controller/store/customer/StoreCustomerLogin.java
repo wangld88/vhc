@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -56,7 +57,7 @@ public class StoreCustomerLogin extends BaseController {
 	}
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/","/login"})
-	public String dspLogin(ModelMap model) {
+	public String dspLogin(ModelMap model, HttpSession session) {
 		return "customer/login/login";
 	}
 

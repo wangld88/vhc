@@ -1,11 +1,63 @@
 <!DOCTYPE html>
-	<div layout:fragment="content" id="content-wrapper">
-		<div class="container-login100">
-			<div class="col-lg-12">
-				<H4>Shopping Cart</H4>
-				<div class="form">
+<html layout:decorator="customer/layout/layout">
+	<head>
+		<meta charset="ISO-8859-1" />
+		<title>My Profile</title>
+		<link rel="stylesheet" type="text/css" th:href="@{/css/customer-util.css}" />
+		<link rel="stylesheet" type="text/css" th:href="@{/css/customer-main.css}" />
+		<style type="text/css">
+		.cart-header {
+			border-top: 1px solid grey;
+			border-bottom: 1px solid grey;
+			font-size: 1.1em;
+			height: 1.8em;
+		}
+		.cart-footer {
+			border-top: 1px solid grey;
+			font-size: 1.3em;
+		}
+		</style>
+	</head>
+	<body>
+		<div layout:fragment="content" id="content-wrapper">
+			<div class="container-login100">
+				<div class="col-lg-2"></div>
+				<div class="col-lg-8">
+					<div class="form">
+						<div class="row">
+							<div class="col-lg-9"><H3>Shopping Cart</H3></div>
+							<div class="col-lg-3"><a th:href="@{/store/}">Continue Shopping</a></div>
+						</div>
+						<br />
+
+						<form id="customer" name="customer" th:action="@{/store/customer/cart/shipping}" method="post" class="form-validate form-horizontal">
+							<!-- <a th:href="@{/store/customer/cart/shipping}"></a> -->
+							<div class="form-group cart-header">
+								<div class="col-lg-3"><span>ITEM</span></div>
+								<div class="col-lg-3"><span>PRODUCT DETAILS</span></div>
+								<div class="col-lg-3"><span>QUANTITY</span></div>
+								<div class="col-lg-3"><span>PRICE</span></div>
+							</div>
+							<div th:each="item:${items}" class="form-group">
+								<div class="col-lg-3"><span th:text="${item.name}+' ('+${item.modelnum}+')'">ITEM</span></div>
+								<div class="col-lg-3"><span th:text="${item.description}">PRODUCT DETAILS</span></div>
+								<div class="col-lg-3"><span th:text="${item.quantity}">QUANTITY</span></div>
+								<div class="col-lg-3"><span th:text="${item.price}">PRICE</span></div>
+							</div>
+							<div class="form-group cart-footer">
+								<div class="col-lg-9"><span>Estimated Total:</span></div>
+								<div class="col-lg-3"><span th:text="${total}">TOTAL</span></div>
+							</div>
+							<div class="form-group">
+								<div class="col-lg-9"></div>
+								<div class="col-lg-3"><button type="submit" class="btn btn-primary btn-action">Continue</button></div>
+							</div>
+
+						</form>
+					</div>
 				</div>
+				<div class="col-lg-2"></div>
 			</div>
 		</div>
-	</div>
+	</body>
 </html>

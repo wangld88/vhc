@@ -214,7 +214,7 @@
 														<div class="wsite-com-category-product-cover ">
 														</div>
 													</div>
-													<div class="wsite-com-category-product-name wsite-com-link-text" th:text="${prodform.product.name}">
+													<div class="wsite-com-category-product-name wsite-com-link-text" th:text="${#strings.toUpperCase(#strings.abbreviate(prodform.product.name,22))}">
 														Allrounder by Mephisto Women's Darina 60/90
 													</div>
 												</a>
@@ -242,7 +242,12 @@
 												</div> -->
 											</div>
 										</div>
+										<div id="postList">
+										</div>
 									</div>
+								</div>
+								<div class="load-more" lastID="1" style="display: none;">
+								    <img th:src="@{/images/chat-avatar.jpg}" style="display: none;"/>
 								</div>
 							</div>
 						</div>

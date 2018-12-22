@@ -24,7 +24,9 @@ import javax.validation.constraints.Size;
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
 @Entity
@@ -117,6 +119,7 @@ public class Product implements Serializable {
 	private Style style;
 
 	@OneToMany(cascade={CascadeType.ALL}, mappedBy="product", fetch=FetchType.LAZY)
+	@JsonManagedReference
 	private List<Image> images = new ArrayList<>();
 
 	@JsonIgnore

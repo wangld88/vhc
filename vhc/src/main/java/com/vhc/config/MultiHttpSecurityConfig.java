@@ -81,9 +81,11 @@ public class MultiHttpSecurityConfig {
 				.antMatchers("/store/kids/*").permitAll()
 				.antMatchers("/store/womens/products").permitAll()
 				.antMatchers("/store/accessories/*").permitAll()
-				/*.antMatchers("/store/clearance/*").permitAll()*/
 				.antMatchers("/store/shopping/**").permitAll()
-	         	.antMatchers("/store/admin/login/**").permitAll()
+				.antMatchers("/store/products").permitAll()
+				.antMatchers("/store/cart/**").permitAll()
+				.antMatchers("/store/customer/cart/**").permitAll()
+	         	.antMatchers("/vhc/store/admin/login/**").permitAll()
 	        	.antMatchers("/store/admin/**").hasAuthority("ADMIN")
 	                .anyRequest().authenticated()
 	        .and()

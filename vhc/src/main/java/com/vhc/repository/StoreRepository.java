@@ -9,6 +9,9 @@ import com.vhc.model.Store;
 public interface StoreRepository extends CrudRepository<Store, Long> {
 
 	public Store findByStoreid(long storeid);
+
+	public Store findByName(String name);
+
 	public List<Store> findAll();
-	
+
 }

@@ -53,11 +53,16 @@ public class StoreWebHome extends StoreBase {
 	public String dspHome(ModelMap model, HttpSession httpSession) {
 		String rtn = "store/home";
 
+		Sort sort = new Sort(new Sort.Order(Direction.ASC, "Name"));
+		int pagenum = 0;
+		int limit = 20;
+		Pageable pageable = new PageRequest(pagenum, limit, sort);
+
 		List<Item> items = itemService.getAll();
 
 		List<ProductForm> prodForms = new ArrayList<>();
 
-		List<Product> products = productService.getByStroefront("1");
+		List<Product> products = productService.getByStroefrontAndPaging("1", pageable);
 
 		List<Category> categories = categoryService.getAll();
 
@@ -81,26 +86,6 @@ public class StoreWebHome extends StoreBase {
 
 			prodForms.add(prodForm);
 		}
-
-		//List<Inventory> inventories = inventoryService.getByStoreid(1);
-		//List<Inventory> inventories = inventoryService.getAll();
-		/*for(Inventory i: inventories) {
-			ProductForm prodForm = new ProductForm();
-
-			prodForm.setQuantity(i.getQuantity());
-			prodForm.setInventoryid(i.getInventoryid());
-			prodForm.setItem(i.getItem());
-
-			long productid = i.getItem().getProduct().getProductid();
-			List<Image> images = imageService.getByProduct(productid);
-			List<ImageForm> imageForms = new ArrayList<>();
-
-			images.forEach(image->imageForms.add(new ImageForm(image)));
-
-			prodForm.setImages(imageForms);
-
-			products.add(prodForm);
-		}*/
 
 		for(Category c: categories) {
 			CategoryForm cf = new CategoryForm(c);

@@ -1,5 +1,7 @@
 package com.vhc.controller.store.customer;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -7,6 +9,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.vhc.controller.BaseController;
+import com.vhc.dto.ShopItem;
+import com.vhc.dto.ShoppingCart;
 import com.vhc.model.Account;
 import com.vhc.model.Address;
 import com.vhc.model.City;
@@ -155,8 +160,9 @@ public class CustomerProfile extends BaseController {
 	}
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/home"})
-	public String dspHome(ModelMap model) {
+	public String dspHome(ModelMap model, HttpServletRequest request, HttpSession session) {
 
+		logger.info("dspHome is called in Profile");
 		Object principal = getPrincipal();
 
 		if(!isCustomer(principal)) {
@@ -167,6 +173,11 @@ public class CustomerProfile extends BaseController {
 
 		model.addAttribute("loginUser", loginUser);
 
+		String cartKey = getCartKey(request);
+
+		if (session.getAttribute(cartKey) != null) {
+			return "redirect:/store/customer/shoppingcart";
+		}
 		return "customer/home";
 	}
 
@@ -307,4 +318,40 @@ public class CustomerProfile extends BaseController {
 		}
 	}
 
+	private String getCartKey(HttpServletRequest request) {
+		String ip = getUserIP(request);
+		String cartKey = hash(ip + "-cartkey");
+
+		return cartKey;
+	}
+
+	private String getUserIP(HttpServletRequest request) {
+		String ip = "";
+
+		if(request != null) {
+			ip = request.getHeader("X-FORWARDED-FOR");
+			if(ip == null || ip.isEmpty()) {
+				ip = request.getRemoteAddr();
+			}
+		}
+
+		return ip;
+	}
+
+	private String hash(String source) {
+		StringBuilder sb = new StringBuilder();
+
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			byte[] hashInBytes = md.digest(source.getBytes(StandardCharsets.UTF_8));
+
+			for (byte b : hashInBytes) {
+	            sb.append(String.format("%02x", b));
+	        }
+		} catch(Exception e) {
+			logger.error("Exception is caught on generating shopping cart key: {}", e.getMessage());
+		}
+
+        return sb.toString();
+	}
 }

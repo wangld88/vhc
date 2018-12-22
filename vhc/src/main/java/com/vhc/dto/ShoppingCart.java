@@ -1,5 +1,6 @@
 package com.vhc.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.vhc.model.Address;
@@ -8,9 +9,11 @@ import com.vhc.model.Item;
 import com.vhc.model.Payment;
 
 
-public class ShoppingCart {
+public class ShoppingCart implements Serializable {
 
-	private List<Item> items;
+	private static final long serialVersionUID = 5624308165287664871L;
+
+	private List<ShopItem> items;
 
 	private long count;
 
@@ -20,11 +23,11 @@ public class ShoppingCart {
 
 	private Payment payment;
 
-	public List<Item> getItems() {
+	public List<ShopItem> getItems() {
 		return items;
 	}
 
-	public void setItems(List<Item> items) {
+	public void setItems(List<ShopItem> items) {
 		this.items = items;
 	}
 

@@ -225,6 +225,7 @@
 				position:relative;
 				/* font-family: 'Comfortaa', cursive; */
 				margin-left: 20px;
+				cursor: pointer;
 			}
 			.basketitems {
 				color:#fff;
@@ -239,6 +240,39 @@
 				padding:0 12%;
 				border-radius:1000px;
 			}
+			.modal-header {
+				background: #EAF7CE;
+				border-radius: 6px 6px 0px 0px;
+			}
+			.modal-body {
+				color: #011721;
+			}
+			.wsite-button-highlight, .btn-action {
+				background-color: #478a1b;
+			}
+			.btn-action {
+				width: 25%;
+			}
+			.wsite-button-highlight {
+				width: 45%;
+				text-align: center;
+				align: center;
+			}
+			.wsite-button-highlight:hover, .btn-action:hover {
+				background-color: #386e15; /* #84b167; #6AAF70 */
+				/* color: #9467b1; #23450d; */
+			}
+			.btn-action, .btn-cancel {
+				border-radius: 0px;
+				border: 1px solid #bfbfbf;
+			}
+			.btn-cancel {
+				background-color: #e5e5e5;
+				border: 1px solid #bfbfbf;
+			}
+			.btn-cancel:hover {
+				background-color: #cccccc;
+			}
 		</style>
 
 	</head>
@@ -248,7 +282,7 @@
 				<div style="float: left; width: 76%; padding-left: 580px;">
 					<div style="text-algin: center; color: #F5AA35; font-size: 20px;">
 					<!-- <span>Free shipping with $100 purchase !!!</span> -->
-					<span th:text="${page.title}">Free shipping with $100 purchase !!!</span>
+					<span th:text="${page!=null?page.title:''}">Free shipping with $100 purchase !!!</span>
 					</div>
 				</div>
 				<div style="float: left;">
@@ -257,7 +291,7 @@
 						<a th:href="@{/customer/login/signup}" style="padding-top: 40px; padding-left: 10px; color: #F9FCF7;">SIGN UP</a>
 					</span>
 				</div>
-				<div class="shoppingbasket" >
+				<div class="shoppingbasket">
 					<div style="padding-top: 10px;">
 						<span style="color: white; margin-left: 5px;" data-icon="&#xe015;" data-toggle="modal" data-target="#myShoppingCart"></span>
 					</div>
@@ -265,18 +299,17 @@
 				<div class="modal fade" id="myShoppingCart" tabindex="-1" role="dialog" aria-labelledby="cartLabel" aria-hidden="true">
 					<div class="modal-dialog" role="document">
 						<div class="modal-content">
-							<div class="modal-header" style="background: #EAF7CE">
-								<h5 class="modal-title" id="cartLabel">My Cart</h5>
+							<div class="modal-header" style="">
 								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
+								<h4 class="modal-title" id="cartLabel">My Cart</h5>
 							</div>
 							<div class="modal-body">
-							  ...
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-								<button type="button" class="btn btn-primary">Check Out</button>
+								<button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Close</button>
+								<a class="btn btn-primary btn-action" id="checkout" th:href="@{/store/customer/cart}">Check Out</a>
 							</div>
 						</div>
 					</div>
@@ -673,6 +706,7 @@
 		<script>
 		    var token = $("meta[name='_csrf']").attr("content");
 		    var header = $("meta[name='_csrf_header']").attr("content");
+
 			$(document).ready(function() {
 			    var dialog, form;
 				dialog = $( "#dialog-form" ).dialog({
@@ -689,7 +723,7 @@
 							var postData = form.serializeArray();
 							var formURL = form.attr("action");
 
-							//console.log("URL: " + formURL);
+							console.log("URL: " + formURL);
 							$.ajax({
 								url: formURL,
 								type: "POST",
@@ -698,7 +732,7 @@
 				                	xhr.setRequestHeader(header, token);
 				                },
 								success: function(data, textStatus, jqXHR) {
-									console.log("URL: ");
+									console.log("111URL: ");
 									$('#dialog-form #balance').html(data);
 									return false;
 								},
@@ -718,30 +752,6 @@
 					open: function (event, ui) {
 					    $('#dialog-form').css('overflow', 'hidden');
 					}
-				});
-
-				//form = dialog.find( "form" ).on( "submit", function( event ) {
-				$( "#Check Balance" ).click( function() {
-					var postData = $(this).serializeArray();
-					var formURL = $(this).attr("action");
-					event.preventDefault();
-					console.log("URL: " + formURL);
-					$.ajax({
-						url: formURL,
-						type: "POST",
-						data: postData,
-		                beforeSend:function(xhr) {
-		                	xhr.setRequestHeader(header, token);
-		                },
-						success: function(data, textStatus, jqXHR) {
-							console.log("URL: ");
-							$('#dialog-form #balance').html(data);
-							return false;
-						},
-						error: function(jqXHR, status, error) {
-							console.log(status + ": " + error);
-						}
-					});
 				});
 
 				$('#popup').click(function(){
@@ -794,7 +804,7 @@
 			                    	}
 			                    	html += "<div class='wsite-com-category-product-featured wsite-com-column'>";
 			                    	html += "<div class='wsite-com-category-product-featured-wrap'>";
-			                    	html += "<a href='/store/shopping/product/" +rtn[i].productid +"' class='wsite-com-link wsite-com-category-product-link-featured'>";
+			                    	html += "<a href='/vhc/store/shopping/product/" +rtn[i].productid +"' class='wsite-com-link wsite-com-category-product-link-featured'>";
 			                    	html += "<div style='position:relative'>";
 			                    	html += "<div class='wsite-com-category-product-featured-image-container wsite-imageaspectratio-image-container'>";
 			                    	html += "<div class='wsite-com-category-product-featured-image-height wsite-imageaspectratio-image-height'></div>";
@@ -841,7 +851,56 @@
 		</script>
 		<script>
 			var items = 0;
-			$(document).ready(function(){
+		    var token = $("meta[name='_csrf']").attr("content");
+		    var header = $("meta[name='_csrf_header']").attr("content");
+
+		    $(document).ready(function(){
+		    	//call shopping cart list
+				$.ajax ({
+					url: '/vhc/store/cart/list',
+					type: "GET",
+					dataType: "json",
+					contentType: "application/json",
+	                beforeSend:function(xhr) {
+	                	xhr.setRequestHeader(header, token);
+	                },
+					success: function(data) {
+						$(".modal-body").empty();
+						$(".shoppingbasket").append("<div class=\"basketitems\">" + data.length + "</div>");
+						total = 0;
+						html = '<div class="container-fluid">';
+
+						if(data.length > 0) {
+							for(i=0; i < data.length; i++) {
+								console.log(data[i].price.toFixed(2).replace(/\d(?=\.)/g, '$&'));
+								html += '<div class="row">';
+								html += '<div class="col-md-6"><span>' + data[i].name + ' (' + data[i].modelnum + ')' + '</span></div>';
+								html += '<div class="col-md-3"><span>' + data[i].region + data[i].sizenum + '</span></div>';
+								html += '<div class="col-md-3"><span>' + data[i].price.toFixed(2).replace(/\d(?=\.)/g, '$&') +  '</span></div>';
+								html += '</div>';
+								total += data[i].price;
+							}
+							html += '<hr />';
+							total = total.toFixed(2).replace(/\d(?=\.)/g, '$&');
+							html += '<div class="row"><div class="col-md-6"><span>Total: </span></div><div class="col-md-3"></div><div class="col-md-3"><span>' + total + '</span></div>'
+							$("#checkout").removeAttr("disabled");
+						} else {
+							$("#checkout").attr("disabled", "disabled");
+							html += '<div class="row">';
+							html += '<div class="col-md-1"></div><div class="col-md-11"><span>Your Shopping Cart is empty.</span></div>';
+							html += '</div>';
+						}
+						html += '</div>';
+
+						$(".modal-body").append(html);
+					},
+					error: function(jqXHR, status, error) {
+						console.log("Load status: " + status);
+						console.log("Load Error: " + error);
+					}
+				});
+
+
 				$("#wsite-com-product-add-to-cart").click(function() {
 
 					if($('#wsite-com-product-option-size :selected').val() == "") {
@@ -854,19 +913,59 @@
 						return false;
 					}
 
+					productid = document.getElementById("productid").value;
+					size = document.getElementById("sizeid");
+					sizeid = size.options[size.selectedIndex].value;
+					postData = '{"productid":"'+ productid +'","sizeid":"' + sizeid + '"}'
+
 					$.ajax ({
-						url: '/cart/add/'+ sku,
+						url: '/vhc/store/cart/add',
 						type: "POST",
 						dataType: "json",
 						contentType: "application/json",
-						data : '{"sku":"'+ sku +'"}"',
-						complete: function(responseData, status, xhttp){
-							//Update it directly at backend, should it being called again?
-							//updateCartItemCount();
-							items += 1;
-							if (items != 0) {
-								$(".shoppingbasket").append("<div class=\"basketitems\">" + items + "</div>")
+						data : postData,
+		                beforeSend:function(xhr) {
+		                	xhr.setRequestHeader(header, token);
+		                },
+						success: function(data) {
+							/* console.log("return: " + data.length);
+							out = "";
+							for(i in data) {
+								out += i + ":" + data[i] +"\n";
+								for(j in data[i]) {
+									out += "  " + j + ":" + data[i][j] +"\n";
+									for(k in data[i][j]) {
+										out += "    " + k + ":" + data[i][j][k] +"\n";
+									}
+								}
 							}
+							console.log(out); */
+							$("#checkout").removeAttr("disabled");
+
+							$(".shoppingbasket").append("<div class=\"basketitems\">" + data.length + "</div>");
+							$(".modal-body").empty();
+							html = '<div class="container-fluid">';
+
+							total = 0;
+
+							for(i=0; i < data.length; i++) {
+								console.log(data[i].price.toFixed(2).replace(/\d(?=\.)/g, '$&'));
+								html += '<div class="row">';
+								html += '<div class="col-md-6"><span>' + data[i].name + ' (' + data[i].modelnum + ')' + '</span></div>';
+								html += '<div class="col-md-3"><span>' + data[i].region + data[i].sizenum + '</span></div>';
+								html += '<div class="col-md-3"><span>' + data[i].price.toFixed(2).replace(/\d(?=\.)/g, '$&') +  '</span></div>';
+								html += '</div>';
+								total += data[i].price;
+							}
+							html += '<hr />';
+							total = total.toFixed(2).replace(/\d(?=\.)/g, '$&');
+							html += '<div class="row"><div class="col-md-6"><span>Total: </span></div><div class="col-md-3"></div><div class="col-md-3"><span>' + total + '</span></div>'
+							html += '</div>';
+							$(".modal-body").append(html);
+						},
+						error: function(jqXHR, status, error) {
+							console.log("Add status: " + status);
+							console.log("Add Error: " + error);
 						}
 					});
 				});

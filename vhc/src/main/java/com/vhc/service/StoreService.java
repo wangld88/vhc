@@ -12,12 +12,16 @@ import com.vhc.repository.StoreRepository;
 public class StoreService {
 
 	@Autowired StoreRepository storeRespository;
-	
-	
+
+
 	public Store getById(long storeid) {
 		return storeRespository.findByStoreid(storeid);
 	}
-	
+
+	public Store getByName(String name) {
+		return storeRespository.findByName(name);
+	}
+
 	public List<Store> getAll() {
 		return storeRespository.findAll();
 	}

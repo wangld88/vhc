@@ -21,7 +21,7 @@ public interface InventoryRepository extends CrudRepository<Inventory, Long> {
 	public List<Inventory> findByStore_storeidAndStatus(long storeid, Status status);
 	public List<Inventory> findByItem_ProductAndStore_storeidAndStatus(Product product, long storeid, Status status);
 	public List<Inventory> findByItem_skuAndStore_storeidAndStatus(String sku, long storeid, Status status);
-
+	public List<Inventory> findByItem_Product_productidAndItem_Size_sizeidAndStore_storeidAndStatusOrderByItem_Size(long productid, long sizeid, long storeid, Status status);
 	//@Query("select u from User u where u.emailAddress = ?1")
 	//public int findSumByItem(Item item);
 }

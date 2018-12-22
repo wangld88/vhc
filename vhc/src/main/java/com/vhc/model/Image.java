@@ -19,6 +19,9 @@ import javax.validation.constraints.Size;
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 @Entity
 @Table(name="IMAGES")
@@ -45,6 +48,7 @@ public class Image implements Serializable {
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="productid")
 	@ApiObjectField(description="Unique Product", required=true)
+	@JsonBackReference
 	private Product product;
 
 	public Image() {

@@ -106,6 +106,8 @@
 									<p><span th:text="${'Model: '+product.product.modelnum}"></span></p>
 									<div id="wsite-com-product-sku" class="wsite-com-product-sku-none"> <!--  -->
 										<b class="wsite-com-product-title">SKU:</b>
+										<input type="hidden" id="sku" name="sku" th:value="${product.product.upc}">
+										<input type="hidden" id="productid" name="productid" th:value="${product.product.productid}">
 										<span id="wsite-com-product-sku-value" itemprop="sku" th:text="${product.product.upc}"></span> <!--  -->
 									</div>
 									<div class="wsite-com-product-show-price-range-on-sale wsite-com-product-price single-sale-price" itemprop="offers" itemtype="http://schema.org/Offer"> <!--   -->
@@ -172,7 +174,7 @@
 												<label class="wsite-com-product-label " for="wsite-com-product-option-size">
 													<b class="wsite-com-product-title">Size</b>
 												</label>
-												<select id="wsite-com-product-option-size" class="wsite-field " name="size" >
+												<select id="wsite-com-product-option-size" class="wsite-field" id="sizeid" name="size" >
 													<option value="">--</option>
 													<option th:each="size:${sizes}" th:value="${size.sizeid}" th:text="${size.sizenum}"></option><!-- +' '+size.type.name -->
 												</select>
@@ -194,6 +196,7 @@
 													min="0"
 													value="0"
 													th:disabled="${inventories==null}"
+													style="width: 45%; text-align: left;"
 													/>
 
 										</div>
@@ -201,11 +204,11 @@
 										</div>
 									</div>
 
-									<div id="wsite-com-product-buy" data-payments="enabled" data-direct-to-paypal="">
-										<a id="wsite-com-product-add-to-cart" th:class="${inventories==null?'wsite-button wsite-button-large wsite-button-highlight wsite-buy-button wsite-com-product-disabled':'wsite-button wsite-button-large wsite-button-highlight wsite-buy-button'}" role="button" tabindex="-1">
-											<span class="wsite-button-inner">
-												<span id="wsite-com-product-buy-icon"></span>
+									<div id="wsite-com-product-buy" data-payments="enabled" data-direct-to-paypal="" >
+										<a id="wsite-com-product-add-to-cart" th:class="${inventories==null?'wsite-button wsite-button-large wsite-button-highlight wsite-buy-button wsite-com-product-disabled':'wsite-button wsite-button-large wsite-button-highlight wsite-buy-button'}" role="button" tabindex="-1" style="text-align: center;">
+											<span >
 													Add to Cart
+												<span class="wsite-com-product-buy-icon"></span>
 											</span>
 										</a>
 									</div>
