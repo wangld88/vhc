@@ -1,7 +1,6 @@
 package com.vhc.model;
 
 import java.io.Serializable;
-import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,8 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 
 import org.jsondoc.core.annotation.ApiObjectField;
@@ -32,6 +29,11 @@ public class Creditcard implements Serializable {
 	@Column(name = "creditcardid", updatable = false, nullable = false)
 	private long creditcardid;
 
+	@Column(nullable=false, length=60)
+	@Size(max=60)
+	@ApiObjectField(description="Card's name", format="maxlength = 60", required=true)
+	private String printname;
+
 	@Column(nullable=false, length=20)
 	@Size(max=20)
 	@ApiObjectField(description="Card's number", format="maxlength = 20", required=true)
@@ -42,10 +44,15 @@ public class Creditcard implements Serializable {
 	@ApiObjectField(description="Card's cvv", format="maxlength = 5", required=false)
 	private String cvv;
 
-	@Temporal(TemporalType.DATE)
 	@Column(nullable=false)
-	@ApiObjectField(description="Card's load date", format="Not Null", required=true)
-	private Calendar expiredate;
+	@Size(max=2)
+	@ApiObjectField(description="Card's expire month", format="Not Null", required=true)
+	private String expiremonth;
+
+	@Column(nullable=false)
+	@Size(max=4)
+	@ApiObjectField(description="Card's expire year", format="Not Null", required=true)
+	private String expireyear;
 
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="customerid")
@@ -64,9 +71,6 @@ public class Creditcard implements Serializable {
 	public Creditcard(String cardnum, Customer customer) {
 		this.cardnum = cardnum;
 		this.customer = customer;
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MONDAY, 2);
-		this.expiredate = cal;
 	}
 
 	public long getCreditcardid() {
@@ -77,12 +81,28 @@ public class Creditcard implements Serializable {
 		this.creditcardid = creditcardid;
 	}
 
-	public Calendar getExpiredate() {
-		return expiredate;
+	public String getPrintname() {
+		return printname;
 	}
 
-	public void setExpiredate(Calendar expiredate) {
-		this.expiredate = expiredate;
+	public void setPrintname(String printname) {
+		this.printname = printname;
+	}
+
+	public String getExpiremonth() {
+		return expiremonth;
+	}
+
+	public void setExpiremonth(String expiremonth) {
+		this.expiremonth = expiremonth;
+	}
+
+	public String getExpireyear() {
+		return expireyear;
+	}
+
+	public void setExpireyear(String expireyear) {
+		this.expireyear = expireyear;
 	}
 
 	public Customer getCustomer() {

@@ -22,37 +22,37 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 @Configuration
 public class ApplicationWebConfigurer extends WebMvcConfigurerAdapter {
-	
+
 	private static final String[] MESSAGESOURCE_BASENAME = { "classpath:/i18n/messages", "classpath:/i18n/validationmessages" };
-  
+
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler(new String[] { "/static/**" }).addResourceLocations(new String[] { "classpath:/static/" });
 	}
-  
+
   @Bean
   public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
     PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
-    
+
     Resource[] resources = { new ClassPathResource("application.properties") };
-    
+
     pspc.setLocations(resources);
     pspc.setIgnoreResourceNotFound(true);
     pspc.setIgnoreUnresolvablePlaceholders(true);
     pspc.setLocalOverride(true);
     return pspc;
   }
-  
+
   @Bean(name={"messageSource"})
   public MessageSource getMessageSource() {
     ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-    
+
     messageSource.setBasenames(MESSAGESOURCE_BASENAME);
-    
+
     messageSource.setUseCodeAsDefaultMessage(true);
-    
+
     return messageSource;
   }
-  
+
   @Bean
   public LocaleResolver localeResolver() {
     CookieLocaleResolver resolver = new CookieLocaleResolver();
@@ -61,7 +61,7 @@ public class ApplicationWebConfigurer extends WebMvcConfigurerAdapter {
     resolver.setCookieMaxAge(Integer.valueOf(4800));
     return resolver;
   }
-  
+
   public void addInterceptors(InterceptorRegistry registry)  {
     LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
     interceptor.setParamName("lang");
@@ -72,14 +72,14 @@ public class ApplicationWebConfigurer extends WebMvcConfigurerAdapter {
   public HibernateJpaSessionFactoryBean sessionFactory() {
       return new HibernateJpaSessionFactoryBean();
   }
-  
+
   /*@Bean(name={"validator"})
   public LocalValidatorFactoryBean validator() {
     LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
     bean.setValidationMessageSource(getMessageSource());
     return bean;
   }
-  
+
   @Override
   public Validator getValidator() {
     return validator();

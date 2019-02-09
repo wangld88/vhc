@@ -23,6 +23,10 @@ public class StatusService {
 		return statusRepository.findByName(name);
 	}
 
+	public Status getByNameAndReftbl(String name, String reftbl) {
+		return statusRepository.findByNameAndReftbl(name, reftbl);
+	}
+
 	public List<Status> getAll() {
 		return statusRepository.findAll();
 	}

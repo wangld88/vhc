@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -38,6 +37,7 @@ import com.vhc.service.LocationService;
 import com.vhc.service.OrderService;
 import com.vhc.service.OrderitemService;
 import com.vhc.service.PageService;
+import com.vhc.service.PageimageService;
 import com.vhc.service.PaymentService;
 import com.vhc.service.PaymentmethodService;
 import com.vhc.service.TypeService;
@@ -194,6 +194,9 @@ public class BaseController {
 
 	@Autowired
 	protected DebitcardService debitcardService;
+
+	@Autowired
+	protected PageimageService pageimageService;
 
 
 	protected static final String DATE_FORMAT = "MM/dd/yyyy";

@@ -82,6 +82,58 @@
 										</div>
 									</form>
 								</div>
+
+								<div class="form" style="margin-bottom: 20px;">
+									<font size="4">Page Image Upload</font>
+									<form role="form" class="form-horizontal" th:action="@{/admin/page/uploadImage}" method="post" enctype="multipart/form-data">
+										<div class="form-group">
+											<!-- <label for="picture" class="control-label col-lg-offset-1 col-lg-2">Page Image Upload</label> -->
+											<div class="col-lg-offset-2 col-lg-10">
+												<label>Image Name:</label>
+												<input type="text" id="name" name="name" value="" class=" form-control" />
+											</div>
+											<div class="col-lg-offset-2 col-lg-10">
+												<label>Image Description:</label>
+												<input type="text" id="description" name="description" value="" class=" form-control" />
+											</div>
+											<div class="col-lg-offset-2 col-lg-10">
+												<label>Sequence No.:</label>
+												<select id="seqnum" name="seqnum" class="form-control">
+													<option th:each="n : ${#numbers.sequence(1,10)}" th:text="${n}" th:selected="${n==page.pageimages.size()+1}"></option>
+												</select>
+											</div>
+											<div class="col-lg-offset-2 col-lg-10" style="overflow: hidden; margin-top: 18px;">
+												<div style="float: left;">
+													<input type="hidden" id="pageid" name="pageid" th:value="${page==null?'':page.pageid}" />
+													<input type="file" id="picture" name="picture">
+												</div>
+												<div style="float: left; margin-bottom: 4px;">
+													<input type="submit" class="btn btn-primary" value="Upload" />
+												</div>
+												<p class="help-block"><!-- Example block-level help text here. --></p>
+											</div>
+										</div>
+									</form>
+								</div>
+								<div th:if="${page.pageimages!=null}"  class="form" style="margin-left: 150px; margin-top: 40px;">
+									<div class="row" >
+										<div th:each="image: ${page.pageimages}" class="col-lg-2 col-md-3" id="imagePanel">
+											<form th:action="@{/admin/page/removeImage}" method="post">
+												<img th:src="'data:image/jpg;base64,'+${image.imagedata}"
+													class="media-object img-thumbnail"
+													style="height: 48px; width: 240px; display: block;" />
+												<div class="caption text-center" style="width: 200px;">
+													<span th:text="${image.seqnum} + ' - ' + ${image.name}"></span>
+													<input type="hidden" id="pageid" name="pageid" th:value="${page==null?'':page.pageid}" />
+													<input type="hidden" id="pageimageid" name="pageimageid" th:value="${image.pageimageid}" />
+													<button type="submit" class="close" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
 							</div>
 						</section>
 					</div>

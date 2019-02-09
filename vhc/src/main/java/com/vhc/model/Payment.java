@@ -3,6 +3,7 @@ package com.vhc.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -20,6 +22,10 @@ import javax.validation.constraints.Size;
 
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
+
+import com.vhc.model.Account;
+import com.vhc.model.Paymentdetail;
+import com.vhc.model.User;
 
 
 @Entity
@@ -35,6 +41,11 @@ public class Payment implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "paymentid", updatable = false, nullable = false)
 	private long paymentid;
+
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="accountid")
+	@ApiObjectField(description="Transaction account", required=true)
+	private Account account;
 
 	@Column(name="amount", precision=13, scale=2)
 	@ApiObjectField(description="Payment amount", format="Not Null", required=true)
@@ -55,7 +66,10 @@ public class Payment implements Serializable {
 	@ApiObjectField(description="Comment notes", format="maxlength = 600", required=false)
 	private String comments;
 
-	@Column(name="creditamount", precision=13, scale=2)
+	@OneToMany(cascade={javax.persistence.CascadeType.ALL}, mappedBy="payment", fetch=FetchType.LAZY)
+	private List<Paymentdetail> paymentdetails;
+
+	/*@Column(name="creditamount", precision=13, scale=2)
 	@ApiObjectField(description="Payment through credit card", required=false)
 	private BigDecimal creditamount;
 
@@ -70,6 +84,16 @@ public class Payment implements Serializable {
 	@Column(name="cashamount", precision=13, scale=2)
 	@ApiObjectField(description="Payment through gift card", required=false)
 	private BigDecimal cashamount;
+
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="creditcardid")
+	@ApiObjectField(description="Paid by Creditcard", format="Not Null", required=false)
+	private Creditcard creditcard;
+
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="methodid")
+	@ApiObjectField(description="Payment method", format="Not Null", required=false)
+	private Paymentmethod paymentmethod;*/
 
 
 	public Payment() {
@@ -127,7 +151,27 @@ public class Payment implements Serializable {
 	}
 
 
-	public BigDecimal getCreditamount() {
+	public Account getAccount() {
+		return account;
+	}
+
+
+	public void setAccount(Account account) {
+		this.account = account;
+	}
+
+
+	public List<Paymentdetail> getPaymentdetails() {
+		return paymentdetails;
+	}
+
+
+	public void setPaymentdetails(List<Paymentdetail> paymentdetails) {
+		this.paymentdetails = paymentdetails;
+	}
+
+
+/*	public BigDecimal getCreditamount() {
 		return creditamount;
 	}
 
@@ -166,5 +210,24 @@ public class Payment implements Serializable {
 		this.cashamount = cashamount;
 	}
 
+
+	public Creditcard getCreditcard() {
+		return creditcard;
+	}
+
+
+	public void setCreditcard(Creditcard creditcard) {
+		this.creditcard = creditcard;
+	}
+
+
+	public Paymentmethod getPaymentmethod() {
+		return paymentmethod;
+	}
+
+
+	public void setPaymentmethod(Paymentmethod paymentmethod) {
+		this.paymentmethod = paymentmethod;
+	}*/
 
 }

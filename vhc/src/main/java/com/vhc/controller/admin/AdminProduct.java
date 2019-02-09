@@ -425,7 +425,7 @@ public class AdminProduct extends BaseController {
 
 
 	@RequestMapping(value = "/removeImage", method = RequestMethod.POST)
-	public String uploadImage(@RequestParam("imageid") Long imageid,
+	public String removeImage(@RequestParam("imageid") Long imageid,
 			@RequestParam("productid") Long productid,
 			ModelMap model, HttpSession httpSession) {
 

@@ -34,6 +34,7 @@ import com.vhc.model.Item;
 import com.vhc.model.Order;
 import com.vhc.model.Orderitem;
 import com.vhc.model.Payment;
+import com.vhc.model.Paymentdetail;
 import com.vhc.model.Paymentmethod;
 import com.vhc.model.Product;
 import com.vhc.model.Promocode;
@@ -374,23 +375,45 @@ public class StoreAdminSale extends StoreBase {
 					BigDecimal sum = BigDecimal.ZERO;
 					sum.setScale(2, BigDecimal.ROUND_HALF_UP);
 
+					List<Paymentdetail> details = new ArrayList<>();
+					Status status = statusService.getByNameAndReftbl("payments","Completed");
+
 					//multiple payment methods
 					if(methodid.contains("1")) {
 						BigDecimal credit = convertAmount(requestParams.get("creditamount"));
 						sum = sum.add(credit);
-						payment.setCreditamount(credit);
-						/*Creditcard credit = new Creditcard(cardnum, customer);
-						creditcardService.save(credit);
-						payment.setCreditcard(credit);*/
+
+						Creditcard creditcard = new Creditcard(cardnum, customer);
+						creditcard = creditcardService.save(creditcard);
+						Paymentdetail detail = new Paymentdetail();
+						Paymentmethod method = paymentmethodService.getById(Long.parseLong(methodid));
+						detail.setAmount(credit);
+						detail.setPaymentmethod(method);
+						detail.setRefnum("" + creditcard.getCreditcardid());
+						detail.setPaydate(Calendar.getInstance());
+						detail.setReceived(credit);
+						detail.setStatus(status);
+						details.add(detail);
 					}
+
 					if(methodid.contains("2")) {
 						BigDecimal debit = convertAmount(requestParams.get("debitamount"));
 						sum = sum.add(debit);
-						payment.setDebitamount(debit);
-						/*Debitcard debit = new Debitcard(cardnum, customer);
-						debitcardService.save(debit);
-						payment.setDebitcard(debit);*/
+
+						Debitcard debitcard = new Debitcard(cardnum, customer);
+						debitcard = debitcardService.save(debitcard);
+						Paymentdetail detail = new Paymentdetail();
+						Paymentmethod method = paymentmethodService.getById(Long.parseLong(methodid));
+						detail.setAmount(debit);
+						detail.setPaymentmethod(method);
+						detail.setRefnum("" + debitcard.getDebitcardid());
+						detail.setPaydate(Calendar.getInstance());
+						detail.setReceived(debit);
+						detail.setStatus(status);
+
+						details.add(detail);
 					}
+
 					if(methodid.contains("3")) {
 						BigDecimal gift = convertAmount(requestParams.get("debitamount"));
 						sum = sum.add(gift);
@@ -398,14 +421,18 @@ public class StoreAdminSale extends StoreBase {
 						if(balance.compareTo(BigDecimal.ZERO) < 0) {
 							balance = BigDecimal.ZERO;
 						}
+						Paymentdetail detail = new Paymentdetail();
 						giftcard.setBalance(balance);
 						giftcardService.save(giftcard);
-						payment.setGiftamount(convertAmount(requestParams.get("giftamount")));
+						detail.setAmount(gift);
+						details.add(detail);
 					}
 					if (methodid.contains("4")) {
 						BigDecimal cash = convertAmount(requestParams.get("cashamount"));
 						sum = sum.add(cash);
-						payment.setCashamount(cash);
+						Paymentdetail detail = new Paymentdetail();
+						detail.setAmount(cash);
+						details.add(detail);
 					}
 
 					if(amount.compareTo(sum) != 0) {

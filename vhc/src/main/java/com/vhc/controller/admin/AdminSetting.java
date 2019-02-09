@@ -1,11 +1,15 @@
 package com.vhc.controller.admin;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.hibernate.engine.jdbc.LobCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,12 +20,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.vhc.model.City;
 import com.vhc.model.Color;
 import com.vhc.model.Country;
+import com.vhc.model.Image;
 import com.vhc.model.Location;
 import com.vhc.model.Page;
+import com.vhc.model.Pageimage;
+import com.vhc.model.Product;
 import com.vhc.model.Province;
 import com.vhc.model.Size;
 import com.vhc.model.Store;
@@ -29,6 +37,7 @@ import com.vhc.model.Style;
 import com.vhc.model.Type;
 import com.vhc.model.User;
 import com.vhc.security.LoginUser;
+import com.vhc.util.ImageProcessor;
 
 
 @Controller
@@ -103,6 +112,92 @@ public class AdminSetting extends AdminBase {
 
 		return rtn;
 	}
+
+	@RequestMapping(value = "/page/uploadImage", method = RequestMethod.POST)
+	public String uploadImage(@RequestParam("picture") MultipartFile picture,
+			@RequestParam("pageid") Long pageid,
+			@RequestParam("name") String name,
+			@RequestParam("description") String description,
+			@RequestParam("seqnum") Long seqnum,
+			ModelMap model, HttpSession httpSession)
+			throws IllegalStateException, IOException {
+
+		logger.debug("Entering SettingController uploadImage");
+
+		Pageimage image = new Pageimage();
+
+		String rtn = "/admin/page"; // /" + pageid;
+
+		// Image processing
+		Blob blob = null;
+
+		Page page = pageService.getById(pageid);
+
+
+		if (!picture.isEmpty()) {
+			int x1 = (int) Double.parseDouble("0"); //loginUser.getX()
+			int y1 = (int) Double.parseDouble("0"); //loginUser.getY()
+			int w1 = (int) Double.parseDouble("240"); //loginUser.getW()
+			int h1 = (int) Double.parseDouble("240"); //loginUser.getH()
+			int width = (int) Double.parseDouble("240");  //loginUser.getImgWidth()
+			int height = (int) Double.parseDouble("240");  //loginUser.getImgHeight()
+
+			ImageProcessor processor = new ImageProcessor();
+			processor.setSize(width, height);
+			InputStream in = processor.process(picture, x1, y1, w1, h1,	(int) page.getImgwidth(), (int) page.getImgheight());
+			LobCreator lc = imageService.getLobCreator();
+			blob = lc.createBlob(in, picture.getSize());
+		}
+		// End of Image processing
+
+		if(name != null && !name.trim().isEmpty()) {
+			image.setName(name);
+		}
+		if(description != null && !description.trim().isEmpty()) {
+			image.setDescription(description);
+		}
+		if(seqnum == null || seqnum == 0) {
+			seqnum = Long.sum(page.getPageimages().size(), 1);
+		}
+		image.setSeqnum(seqnum);
+		image.setPage(page);
+		image.setImage(blob);
+		pageimageService.save(image);
+
+		logger.debug("Exiting SettingController.uploadImage");
+
+		return "redirect:" + rtn;
+	}
+
+
+	@RequestMapping(value = "/page/removeImage", method = RequestMethod.POST)
+	public String removeImage(@RequestParam("pageimageid") Long pageimageid,
+			@RequestParam("pageid") Long pageid,
+			ModelMap model, HttpSession httpSession) {
+
+		String rtn = "/admin/page"; // /" + pageid;
+		Object principal = getPrincipal();
+
+		if(!isSuperAdmin(principal)) {
+			return "redirect:/admin/logout";
+		}
+
+		User loginUser = getLoginUser(principal);
+
+		Pageimage image = new Pageimage();
+		image.setPageimageid(pageimageid);
+		pageimageService.delete(image);
+
+		Page page = pageService.getById(pageid);
+
+		model.addAttribute("page", page);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Settings");
+		model.addAttribute("submenu", "pages");
+
+		return "redirect:" + rtn;
+	}
+
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/types"})
 	public String dspTypes(ModelMap model, HttpSession httpSession) {
