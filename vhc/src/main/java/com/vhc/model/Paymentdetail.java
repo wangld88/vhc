@@ -14,6 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 
 import org.jsondoc.core.annotation.ApiObject;
@@ -70,6 +72,9 @@ public class Paymentdetail implements Serializable {
 	@ApiObjectField(description="Payment transaction result/no.", format="maxlength = 100", required=false)
 	private String trxnum;
 
+	@Temporal(TemporalType.DATE)
+	@Column(nullable=false)
+	@ApiObjectField(description="Payment date", format="Not Null", required=true)
 	private Calendar paydate;
 
 

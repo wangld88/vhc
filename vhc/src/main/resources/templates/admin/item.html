@@ -30,7 +30,8 @@
 												<!-- <select class="form-control" id="productid" name="productid">
 													<option th:each="product: ${products}" th:value="${product.productid}" th:text="${product.name}" th:selected="${item==null?'':(item.product.productid.equals(product.productid)?'Selected':'')}"></option>
 												</select> -->
-												<input class="form-control" id="name" name="name" th:value="${item!=null?item.product.name:''}" />
+												<input class="form-control" id="prodname" name="prodname" th:value="${item!=null?item.product.name:''}" />
+												<input type="hidden" id="typeid" name="typeid" th:value="${item!=null?item.product.type.typeid:0}" />
 										    </div>
 										</div>
 										<div class="form-group ">
@@ -42,9 +43,11 @@
 										<div class="form-group">
 										    <label for="size" class="control-label col-lg-2">Size </label>
 										    <div class="col-lg-10">
-												<select class="form-control" id="sizeid" name="sizeid">
+												<!-- <select class="form-control" id="sizeid" name="sizeid">
 													<option th:each="size: ${sizes}" th:value="${size.sizeid}" th:text="${size.region.name+' '+size.sizenum+' ('+size.type.name+')'}" th:selected="${product!=null and product.size!=null and product.size.sizeid==size.sizeid}"></option>
-												</select>
+												</select> -->
+												<input class="form-control" id="size" name="size" th:value="${item!=null?item.size.region.name+' '+item.size.sizenum+' ('+item.size.type.name+')':''}"  />
+												<input type="hidden" id="sizeid" name="sizeid" th:value="${item!=null?item.size.sizeid:0}" />
 										    </div>
 										    <!-- <div class="col-lg-5">
 												<select class="form-control" id="regionid" name="regionid">
@@ -177,15 +180,17 @@
 		<script th:src="@{/js/jquery-ui-1.12.1.js}"></script>
 		<script th:src="@{/js/jquery.autocomplete.min.js}"></script>
 		<script>
+			//jQuery.noConflict();
+
 			$(document).ready(function() {
 			    var token = $("meta[name='_csrf']").attr("content");
 			    var header = $("meta[name='_csrf_header']").attr("content");
+			    var dialog, form;
 
-				$( "#name" ).autocomplete({
+				$( "#prodname" ).autocomplete({
 					source: function (request, response) {
 	                    $.ajax({
-	                        url: 'products?name='+document.getElementById("name").value,
-	                        //data: "{ 'prefix': '" + request.term + "'}",
+	                        url: 'products?name='+document.getElementById("prodname").value,
 	                        dataType: "json",
 	                        type: "POST",
 	                        contentType: "application/json; charset=utf-8",
@@ -194,7 +199,7 @@
 	                        },
 	                        success: function (data) {
 	                            response($.map(data, function (item) {
-            		                return { value: item.name, data: item.productid };
+            		                return { value: item.name, data: item.productid, type: item.type.typeid};
 	                            }))
 	                        },
 	                        error: function (response) {
@@ -206,13 +211,21 @@
 	                            //alert(response.responseText);
 	                        }
 	                    });
+	                },
+	                select: function(v,u) {
+	                	/* out = "";
+	                	for(i in u.item) {
+	                		out += i + ":" +u.item[i]+"\n"
+	                	}
+	                	console.log(out); */
+	                	$("#typeid")[0].value = u.item.type;
 	                }
 				});
 
 				$( "#size" ).autocomplete({
 					source: function (request, response) {
 	                    $.ajax({
-	                        url: 'size?size='+$("#size")[0].value,
+	                        url: 'size?typeid='+$("#typeid")[0].value+'&size='+$("#size")[0].value,
 	                        dataType: "json",
 	                        type: "POST",
 	                        contentType: "application/json; charset=utf-8",
@@ -221,7 +234,7 @@
 	                        },
 	                        success: function (data) {
 	                            response($.map(data, function (size) {
-	                            	$("#sizeid")[0].value = size.sizeid;
+	                            	//$("#sizeid")[0].value = size.sizeid;
             		                return { value: size.region.name+' '+size.sizenum+' ('+size.type.name+')' , data: size.sizeid };
 	                            }))
 	                        },
@@ -233,9 +246,80 @@
 	                            alert(response.responseText);
 	                        }
 	                    });
+	                },
+	                select: function(v,u) {
+	                	/* out = "";
+	                	for(i in u.item) {
+	                		out += i + ":" +u.item[i]+"\n"
+	                	}
+	                	console.log(out); */
+	                	$("#sizeid")[0].value = u.item.data;
 	                }
 				});
+				dialog = $( "#dialog-form" ).dialog({
+					dialogClass: 'dialogStyle',
+					autoOpen: false,
+					resizable: false,
+					height: 400,
+					width: 350,
+					modal: true,
+					buttons: {
+						"Save": function() {
+							document.getElementById("inventory1").submit();},
+						Cancel: function() {
+							dialog.dialog( "close" );
+						}
+					},
+					close: function() {
+						form[ 0 ].reset();
+						//allFields.removeClass( "ui-state-error" );
+					},
+					open: function (event, ui) {
+					    $('#dialog-form').css('overflow', 'hidden');
+					}
+				});
+
+				form = dialog.find( "form" ).on( "submit", function( event ) {
+					event.preventDefault();
+					//addUser();
+				});
+
+				$('.header').click(function(){
+
+				    dialog.dialog( "open" );
+					console.log("inventoryid: "+$("#locationid"+this.id)[0].value);
+				    $("#ulocationid")[0].value = $("#locationid"+this.id)[0].value;
+				    $("#uquantity")[0].value = $("#quantity"+this.id)[0].value;
+				    $("#uinventoryid")[0].value = $("#inventoryid"+this.id)[0].value;
+				    $("#ustoreid")[0].value = $("#storeid"+this.id)[0].value;
+				    //$("#detail")[0].value = $("#detail"+this.id)[0].value;
+				});
+
+				$('#addInventory').click(function() {
+					if($("#addInventory")[0].checked) {
+						//alert("XXX");
+						document.getElementById("alocationid").style.display = "";
+					} else {
+						//alert("YYY");
+						document.getElementById("alocationid").style.display = "none";
+					}
+
+					//$('#alocationid')[0].attr("style").display = "";
+				});
 			});
+			function selectSize(elmt) {
+				out = "";
+				for(i in elmt) {
+					out += i + ": " + elmt[i] +"\n";
+				}
+				console.log("out>>"+out);
+			}
+
+			function next() {
+				tempForm = document.getElementById("item");
+				document.getElementById("return").value="item";
+				tempForm.submit();
+			}
 		</script>
 	</div>
 </html>

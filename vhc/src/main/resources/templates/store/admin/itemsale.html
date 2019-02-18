@@ -8,6 +8,21 @@
 				margin-left: 18px;
 				padding: 0;
 			}
+			.form-control1 {
+			    border-radius: 0;
+			    box-shadow: none;
+			    border-color: #d2d6de;
+			    display: block;
+			    height: 26px;
+			    padding: 5px 12px;
+			    font-size: 14px;
+			    line-height: 1.42857143;
+			    color: #555;
+			    background-color: #fff;
+			    background-image: none;
+			    border: 1px solid #ccc;
+			    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+			}
 		</style>
 		<section class="content-header">
 			<h1>
@@ -33,9 +48,9 @@
 								<div class="col-lg-12" style="margin-bottom: 10px;">
 									<form id="lookup" name="lookup" th:action="@{/store/admin/itemsale/add}" method="get">
 										<label class="control-label col-lg-2">Item's UPC:</label>
-										<input type="text" id="sku" name="sku" value="" class="col-lg-2" />
+										<input type="text" id="sku" name="sku" value="" class="col-lg-2" placeholder="Scan or type UPC" />
 										<div class="col-lg-8">
-										<button type="submit" class="btn btn-xs btn-primary"><i class="fa fa-plus"></i>  Add</button>
+											<button type="submit" class="btn btn-xs btn-primary"><i class="fa fa-plus"></i>  Add</button>
 										</div>
 										<!-- <select id="inventory" name="inventory" style="height: 25px;" onchange="selectItem()">
 											<option value=""></option>
@@ -49,8 +64,8 @@
 									</form>
 								</div>
 								<div th:if="${message!=null}" class="col-lg-12">
-									<span class="control-label col-lg-1" th:text="${''}"></span>
-									<span th:class="${message.status} + 'col-lg-11'" th:text="${message.message}"></span>
+									<span class="control-label col-lg-2" th:text="${''}"></span>
+									<span th:class="${message.status} + ' col-lg-5'" th:text="${message.message}"></span>
 								</div>
 								<!-- <form id="sale" name="sale" th:action="@{/store/admin/itemsale}" method="post">
 									<div style="padding: 5px; height: 200px;">
@@ -110,8 +125,8 @@
 											</tr>
 										</table>
 									</div>
-									<div style="float: right; padding-right: 10px;bottom:0px;">
-										<a id="payment" class="btn btn-app btn-primary" th:if="${saleList!=null and saleList.size()>0}"><i class="fa fa-credit-card"></i>Pay Request</a>
+									<div style="float: right; padding-right: 70px; bottom:0px;">
+										<a id="payment" class="btn btn-app btn-success" th:if="${saleList!=null and saleList.size()>0}"><i class="fa fa-credit-card"></i>Pay Request</a>
 										<!-- <a id="print" th:href="@{/store/admin/itemsale/invoice}" class="btn btn-app btn-primary" style="display: none"><i class="fa fa-file-text"></i>Print Invoice</a> -->
 										<a id="print" class="btn btn-app btn-primary" style="display: none"><i class="fa fa-file-text"></i>Print Invoice</a>
 									</div>
@@ -121,18 +136,22 @@
 					</div>
 				</div>
 				<div id="pay" class="form" title="Payment" th:if="${methods!=null}">
-					<form id="paymethod" name="paymethod" method="post" th:action="@{/store/admin/itemsale}" style="padding-left: 20px; width: 99%; height: 99%;">
+					<form id="paymethod" name="paymethod" method="post" th:action="@{/store/admin/itemsale}" style="padding-left: 20px; width: 99%; height: 99%;overflow-x: hidden;">
 						<div class="form-group row">
 							<label>Payment Amount: </label>
 							<span th:text="' $'+${total}">$ 222.00</span>
 							<input type="hidden" id="amount" th:value="${total}" />
 						</div>
 						<div class="form-group row">
-							<label>Promotion Code: </label>
-							<input type="text" id="promocode" name="promocode" value="" style="width: 30%;" />
-							<a id="checkpcode" class="btn btn-default btn-sm">Apply</a>
-							<input type="hidden" id="save" value="0" />
-							<span id="percentage"></span>
+							<div class="col-lg-4">
+								<label>Promotion Code: </label>
+							</div>
+							<div class="col-lg-6">
+								<input type="text" id="promocode" name="promocode" value="" style="width: 50%; padding-left: 12px;" placeholder="Promotion Code" />
+								<a id="checkpcode" class="btn btn-default btn-sm">Apply</a>
+								<input type="hidden" id="save" value="0" />
+								<span id="percentage"></span>
+							</div>
 						</div>
 						<div class="form-group row">
 							<label>Payment Method: </label>
@@ -144,7 +163,31 @@
 											<label>Credit Card</label>
 										</div>
 										<div id="method1" style="width: 70%; display: none; float:left;">
-											<input type="text" id="amount1" name="creditamount" value="" style="width: 24%;" placeholder="Credit Card Payment" />
+											<div class="form-group row">
+												<input type="text" id="amount1" name="creditamount" value="" class="form-control1 col-lg-5" placeholder="Credit Payment Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+											</div>
+											<div id="creditcard-button-container">
+												<div class="form-group row">
+													<!-- <label>Name as shown on card</label><br> -->
+													<input type="text" id="printname" name="printname" class="form-control1 col-lg-5" placeholder="Name on Card" />
+													<span class="col-lg-1"></span>
+													<!-- <label for="cardnum">Credit Card Number</label><br> -->
+													<input type="text" id="cardnum" name="cardnum" class="form-control1 col-lg-5" placeholder="Card Number" oninput="this.value = this.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');" maxlength="19" />
+												</div>
+												<div class="form-group row">
+														<select id="expmonth" name="expmonth" class="form-control1 col-lg-3">
+															<option>Month</option>
+															<option th:each="n : ${#numbers.sequence(1,12)}" th:text="${n}"></option>
+														</select>
+														<span class="col-lg-1">/</span>
+														<select id="expyear" name="expyear" class="form-control1 col-lg-3">
+															<option>Year</option>
+															<option th:each="n : ${#numbers.sequence(2019,2025)}" th:text="${n}"></option>
+														</select>
+														<span class="col-lg-1"></span>
+														<input type="text" id="cvv" name="cvv" size="3" class="form-control1 col-lg-3" value="" placeholder="cvv" />
+												</div>
+											</div>
 										</div>
 									</div>
 								</li>
@@ -155,7 +198,9 @@
 											<label>Debit</label>
 										</div>
 										<div id="method2" style="width: 70%; display: none; float:left;">
-											<input type="text" id="amount2" name="debitamount" value="" style="width: 24%;" placeholder="Debit Payment" />
+											<div class="form-group row">
+												<input type="text" id="amount2" name="debitamount" value="" class="form-control1 col-lg-5" placeholder="Debit Payment Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+											</div>
 										</div>
 									</div>
 								</li>
@@ -166,10 +211,14 @@
 											<label>Gift Card</label>
 										</div>
 										<div id="method3" style="width: 70%; display: none; float:left;">
-											<input type="text" id="cardnum" name="cardnum" th:value="${giftcard==null?'':giftcard.code}" placeholder="Card Number" style="width: 26%" />
-											<input type="password" id="pin" name='pin' placeholder="Pin" style="width: 10%" />
-											<a id="chkbalance" class="btn btn-default btn-sm">Check</a><br />
-											<input type="text" id="amount3" name="giftamount" style="display: none;width: 12%;" placeholder="Gift Card Payment" /><span id="giftbalance"></span>
+											<div class="form-group row">
+												<input type="text" id="cardcode" name="cardcode" th:value="${giftcard==null?'':giftcard.code}" class="form-control1 col-lg-5" placeholder="Card Number" />
+												<span class="col-lg-1"></span>
+												<input type="password" id="pin" name='pin' placeholder="Pin" class="form-control1 col-lg-2" />
+												<span class="col-lg-1"></span>
+												<a id="chkbalance" class="btn btn-default btn-sm">Check</a><br />
+												<input type="text" id="amount3" name="giftamount" style="display: none; width: 12%; padding-left: 12px;" placeholder="Gift Card Payment" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" /><span id="giftbalance" style="padding-left: 5px;"></span>
+											</div>
 										</div>
 									</div>
 								</li>
@@ -180,7 +229,9 @@
 											<label>Cash</label>
 										</div>
 										<div id="method4" style="width: 70%; display: none; float:left;">
-											<input type="text" id="amount4" name="cashamount" value="" style="width: 24%;" placeholder="Cash Payment" />
+											<div class="form-group row">
+												<input type="text" id="amount4" name="cashamount" value="" class="form-control1 col-lg-5" placeholder="Cash Payment Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+											</div>
 										</div>
 									</div>
 								</li>
@@ -207,11 +258,12 @@
 
 			$(document).ready(function() {
 			    var dialog, form;
+
 				dialog = $( "#pay" ).dialog({
 					autoOpen: false,
 					resizable: false,
-					height: 480,
-					width: 400,
+					minHeight: 'auto',
+					width: 600,
 					modal: true,
 					buttons: {
 						"Pay": function() {
@@ -346,27 +398,33 @@
 				});
 
 				$("#amount1").keyup(function() {
-					calTotal();
+					calTotal(1);
 				})
 				$("#amount2").keyup(function() {
-					calTotal();
+					calTotal(2);
 				})
 				$("#amount3").keyup(function() {
-					calTotal();
+					calTotal(3);
 				})
 				$("#amount4").keyup(function() {
-					calTotal();
+					calTotal(4);
 				})
 
-				function calTotal() {
+				function calTotal(type) {
 					console.log("Original Balance: "+$("#amount").val()+", save: "+$("#save").val()+", 1: "+$("#amount1").val()+", 3: "+$("#amount3").val())
 					balance = ($("#amount").val() - $("#save").val() - $("#amount1").val() - $("#amount2").val() - $("#amount3").val() - $("#amount4").val()).toFixed(2);
+console.log("balance: "+balance);
 
 					if(balance < 0) {
 						change = 0 - balance;
 						balance = 0;
 						$("#changediv").show();
-						$("#cashchange").html("$"+change);
+						if(type == 4) {
+							$("#cashchange").html("$"+change);
+						} else {
+							$("#cashchange").html("Make sure your charge the right amount!");
+						}
+
 					} else {
 						console.log("call:"+balance)
 						$("#changediv").hide();

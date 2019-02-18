@@ -44,14 +44,14 @@
 								<tbody>
 									<tr>
 										<th><i class="icon_documents"></i> Gift Card Code</th>
-										<th><i class="icon_calendar"></i> Pin</th>
+										<th><i class="icon_calendar"></i> Status</th>
 										<th><i class="icon_pin_alt"></i> Amount</th>
 										<th><i class="icon_pin_alt"></i> Balance</th>
 										<th><i class="icon_cogs"></i> Action</th>
 									</tr>
 									<tr th:each="giftcard:${giftcards}">
 										<td th:text="${giftcard.code}"></td>
-										<td th:text="${giftcard.pin}"></td>
+										<td th:text="${giftcard.status!=null?giftcard.status.name:''}"></td>
 										<td th:text="${giftcard.amount!=null?#numbers.formatDecimal(giftcard.amount, 0, 2):''}"></td>
 										<td th:text="${giftcard.balance!=null?#numbers.formatDecimal(giftcard.balance, 0, 2):''}"></td>
 										<td>

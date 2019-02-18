@@ -2,7 +2,8 @@
 <html layout:decorator="admin/layout/layout">
 
 	<div layout:fragment="content">
-
+		<!-- <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script> -->
+		<script type="text/javascript" th:src="@{/js/pekeUpload.js}"></script>
 	    <script>
 	    /*<![CDATA[*/
 	     	var acceptedfiletypes = ["pdf","PDF"];
@@ -263,60 +264,27 @@
 					<div class="col-lg-12">
 						<section class="panel">
 							<header class="panel-heading">
-								Gift Card
+								Upload Gift Cards
 							</header>
 							<div class="panel-body">
 								<div class="form">
-									<form class="form-validate form-horizontal" id="giftcard" name="giftcard" method="post" th:action="@{/admin/giftcard}">
+									<form class="form-validate form-horizontal" id="giftcardupload" name="giftcardupload" method="post" th:action="@{/admin/giftcardupload}" enctype="multipart/form-data">
 										<div class="form-group">
-										    <label for="code" class="control-label col-lg-2">Gift Card Code <span class="required">*</span></label>
-										    <div class="col-lg-10">
-										        <input class=" form-control" id="code" name="code" th:value="${giftcard==null?'':giftcard.code}" type="text" />
-										    </div>
+										    <label for="code" class="control-label col-lg-4">Only Excel file is accepted, and make sure the columns are in right order. <span class="required">*</span></label>
 										</div>
+
+										<div class="file-upload-wrapper">
+											<input id="file" type="file" name="file" />
+										</div>
+
 										<!-- <div class="form-group">
-										    <label for="pin" class="control-label col-lg-2">Pin Number </label>
-										    <div class="col-lg-10">
-										        <input class=" form-control" id="pin" name="pin" th:value="${giftcard==null?'':giftcard.pin}" type="password" />
-										    </div>
-										</div> -->
-										<div class="form-group">
-										    <label for="amount" class="control-label col-lg-2">Initial Amount </label>
-										    <div class="col-lg-10">
-										        <input class=" form-control" id="amount" name="amount" th:value="${giftcard==null or giftcard.amount==null?'':#numbers.formatDecimal(giftcard.amount, 0, 2)}" type="text" />
-										    </div>
-										</div>
-										<div class="form-group" th:if="${giftcard!=null}">
-										    <label for="balance" class="control-label col-lg-2">Balance </label>
-										    <div class="col-lg-10">
-										        <input class="form-control " id="balance" name="balance" type="text" th:value="${giftcard==null or giftcard.balance==null?'':#numbers.formatDecimal(giftcard.balance, 0, 2)}" />
-										    </div>
-										</div>
-										<div class="form-group">
-										    <label for="storeid" class="control-label col-lg-2">Store </label>
-										    <div class="col-lg-10">
-												<select class="form-control" id="storeid" name="storeid">
-													<option th:each="store: ${stores}" th:value="${store.storeid}" th:text="${store.name}" th:selected="${giftcard!=null and giftcard.store!=null and giftcard.store.storeid==store.storeid}"></option>
-												</select>
-										    </div>
-										</div>
-										<div class="form-group">
-										    <label for="pin" class="control-label col-lg-2">Status </label>
-										    <div class="col-lg-10">
-										    	<select class=" form-control" id="statusid" name="statusid">
-										    		<option th:each="status : ${statuss}" th:value="${status.statusid}" th:text="${status.name}" th:selected="${giftcard!=null and giftcard.status!=null and giftcard.status.statusid==status.statusid}"></option>
-										    	</select>
-										        <!-- <input class=" form-control" id="statusid" name="statusid" th:value="${giftcard==null?'':giftcard.status.statusid}" type="text" /> -->
-										    </div>
-										</div>
-										<div class="form-group">
 										    <div class="col-lg-offset-2 col-lg-10">
-										        <button class="btn btn-primary" type="submit"> Save </button>
-										        <!-- <button class="btn btn-default" type="button">Cancel</button> -->
+										        <button class="btn btn-primary" type="submit"> Upload </button>
+										        <button class="btn btn-default" type="button">Cancel</button>
 												<a th:href="@{/admin/giftcards}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
 										        <input type="hidden" id="giftcardid" name="giftcardid" th:value="${giftcard==null?'':giftcard.giftcardid}" />
 										    </div>
-										</div>
+										</div> -->
 									</form>
 								</div>
 							</div>
@@ -326,6 +294,9 @@
 
 			</section>
 		</section>
+		<script type="text/javascript">
+			$("#file").pekeUpload({bootstrap: true, dragMode: true, allowedExtensions: "xls|xlsx"});
+		</script>
       <!--main content end-->
 	</div>
 </html>

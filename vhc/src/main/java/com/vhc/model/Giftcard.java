@@ -66,6 +66,11 @@ public class Giftcard implements Serializable {
 	@ApiObjectField(description="Unique Store", required=true)
 	private Store store;
 
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="statusid")
+	@ApiObjectField(description="Gift card Status", required=true)
+	private Status status;
+
 
 	public Giftcard() {
 
@@ -133,6 +138,14 @@ public class Giftcard implements Serializable {
 
 	public void setStore(Store store) {
 		this.store = store;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 
 }

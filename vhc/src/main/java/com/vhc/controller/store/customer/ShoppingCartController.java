@@ -2,7 +2,6 @@ package com.vhc.controller.store.customer;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -111,7 +110,7 @@ public class ShoppingCartController extends StoreBase {
 
 		Customer customer = customerService.getByUser(getLoginUser(getPrincipal()));
 
-		ShoppingCart cart = cart = (ShoppingCart) session.getAttribute(cartKey);
+		ShoppingCart cart = (ShoppingCart) session.getAttribute(cartKey);
 
 		List<ShopItem> items = cart.getItems();
 

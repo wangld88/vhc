@@ -2,6 +2,7 @@ package com.vhc.controller.store.admin;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -124,60 +126,63 @@ public class StoreAdminSale extends StoreBase {
 
 		User loginUser = getLoginUser(principal);
 		Store store = staffService.getByUser(loginUser).getStore();
-		Status received = statusService.getByName("Received");
+		Status received = statusService.getByNameAndReftbl("Received", "inventories");
 
 		String sku = requestParams.get("sku");
 		logger.info("sku: "+sku+", storeid: "+store.getStoreid()+", status: "+received.getStatusid());
 		List<Inventory> inventories = inventoryService.getByStoreAvaiableUPC(sku, store.getStoreid(), received);
 
-		logger.info("inventories found: " + inventories.get(0).getItem().getItemid());
-
-		Object mutex = WebUtils.getSessionMutex(httpSession);
-		BigDecimal subTotal = BigDecimal.ZERO;
-
-		synchronized(mutex) {
-			List<Inventory> saleList = null;
-			if(httpSession.getAttribute("saleList") != null) {
-				saleList = (List<Inventory>) httpSession.getAttribute("saleList");
-				subTotal = calTotal(saleList);
-			} else {
-				saleList = new ArrayList<>();
-			}
-
-			if(inventories != null && !inventories.isEmpty()) {
-				logger.info("inventory is found:"+inventories.size()+", sku: "+sku);
-				Inventory current = inventories.get(0);
-				if(isSkuNotSelected(saleList,current)) {
-					saleList.add(current);
-					subTotal = subTotal.add(current.getItem().getProduct().getFinalprice());
-					logger.info("PRICE: "+current.getItem().getProduct().getFinalprice()+", subTotal: "+subTotal);
-					httpSession.setAttribute("saleList", saleList);
-				} else {
-					Message msg = new Message();
-					msg.setStatus(Message.ERROR);
-					msg.setMessage("The item (" + sku + ") has been added already.");
-					model.addAttribute("message", msg);
-				}
-			} else {
-				Message msg = new Message();
-				msg.setStatus(Message.ERROR);
-				msg.setMessage("Can not find the given item in inventories.");
-				model.addAttribute("message", msg);
-			}
-			model.addAttribute("saleList", saleList);
-		}
-
 		BigDecimal total = BigDecimal.ZERO;
 		BigDecimal tax = BigDecimal.ZERO;
+		BigDecimal subTotal = BigDecimal.ZERO;
 
-		if(subTotal != null) {
-			logger.info("subTotal: " + subTotal.toPlainString());
-			tax = subTotal;
-			tax = tax.multiply(new BigDecimal("0.13"));
-			tax = tax.setScale(2, BigDecimal.ROUND_HALF_UP);
-			total = total.add(subTotal);
-			total = total.add(tax);
-			total = total.setScale(2, BigDecimal.ROUND_HALF_UP);
+		Message msg = new Message();
+
+		if(inventories != null && !inventories.isEmpty()) {
+			logger.info("inventories found: " + inventories.get(0).getItem().getItemid());
+
+			Object mutex = WebUtils.getSessionMutex(httpSession);
+
+			synchronized(mutex) {
+				List<Inventory> saleList = null;
+				if(httpSession.getAttribute("saleList") != null) {
+					saleList = (List<Inventory>) httpSession.getAttribute("saleList");
+					subTotal = calTotal(saleList);
+				} else {
+					saleList = new ArrayList<>();
+				}
+
+				if(inventories != null && !inventories.isEmpty()) {
+					logger.info("inventory is found:"+inventories.size()+", sku: "+sku);
+					Inventory current = inventories.get(0);
+					if(isSkuNotSelected(saleList,current)) {
+						saleList.add(current);
+						subTotal = subTotal.add(current.getItem().getProduct().getFinalprice());
+						logger.info("PRICE: "+current.getItem().getProduct().getFinalprice()+", subTotal: "+subTotal);
+						httpSession.setAttribute("saleList", saleList);
+					} else {
+						msg.setStatus(Message.ERROR);
+						msg.setMessage("The item (" + sku + ") has been added already.");
+					}
+				} else {
+					msg.setStatus(Message.ERROR);
+					msg.setMessage("Can not find the given item in inventories.");
+				}
+				model.addAttribute("saleList", saleList);
+			}
+
+			if(subTotal != null) {
+				logger.info("subTotal: " + subTotal.toPlainString());
+				tax = subTotal;
+				tax = tax.multiply(new BigDecimal("0.13"));
+				tax = tax.setScale(2, BigDecimal.ROUND_HALF_UP);
+				total = total.add(subTotal);
+				total = total.add(tax);
+				total = total.setScale(2, BigDecimal.ROUND_HALF_UP);
+			}
+		} else {
+			msg.setStatus(Message.ERROR);
+			msg.setMessage("No item being found, please try a different UPC");
 		}
 
 		List<Paymentmethod> methods = paymentmethodService.getAll();
@@ -186,6 +191,7 @@ public class StoreAdminSale extends StoreBase {
 		model.addAttribute("subTotal", subTotal);
 		model.addAttribute("tax",tax);
 		model.addAttribute("total",total);
+		model.addAttribute("message", msg);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Sales");
 
@@ -232,10 +238,12 @@ public class StoreAdminSale extends StoreBase {
 
 
 	@SuppressWarnings("unchecked")
+	@Transactional(rollbackFor=Exception.class)
 	@RequestMapping(method=RequestMethod.POST, value="/itemsale")
-	public String doItemSale(@RequestParam Map<String,String> requestParams,
-			ModelMap model,
-			HttpSession httpSession) {
+	public String doItemSale(@RequestParam("methodid") String[] methodid,
+		@RequestParam Map<String,String> requestParams,
+		ModelMap model,
+		HttpSession httpSession) {
 
 		String rtn = "store/admin/itemsale";
 
@@ -258,7 +266,9 @@ public class StoreAdminSale extends StoreBase {
 
 		List<Inventory> inventories = new ArrayList<>();
 
-		String methodid = requestParams.get("methodid");
+		List<String> methodids = Arrays.asList(methodid);
+
+		String cardcode = requestParams.get("cardcode");
 		String cardnum = requestParams.get("cardnum");
 		String pin = requestParams.get("pin");
 		String code = requestParams.get("promocode");
@@ -270,207 +280,251 @@ public class StoreAdminSale extends StoreBase {
 		Invoice invoice = new Invoice();
 		Transaction trx = new Transaction();
 
-		if(methodid != null && !methodid.isEmpty()) {
+		if(methodids != null && !methodids.isEmpty()) {
 
-			if(!methodid.contains("1") && !methodid.contains("2") && !methodid.contains("3") && !methodid.contains("4")) {
-				//invalid payment method
-				Message msg = new Message();
-				msg.setStatus(Message.ERROR);
-				msg.setMessage("Invilad payment method.");
-				model.addAttribute("message", msg);
-				return "-1";
-			}
+			try {
 
-			Giftcard giftcard = null;
+				if( !methodids.contains("1") && !methodids.contains("2") && !methodids.contains("3") && !methodids.contains("4")) {
+					//invalid payment method
+					Message msg = new Message();
+					msg.setStatus(Message.ERROR);
+					msg.setMessage("Invilad payment method.");
+					model.addAttribute("message", msg);
+					return "-1";
+				}
 
-			if(cardnum != null && !cardnum.isEmpty()) {
-				if(pin != null && !pin.isEmpty()) {
-					giftcard = giftcardService.getByCodePin(code, pin);
+				Giftcard giftcard = null;
 
-					if(giftcard != null && giftcard.getBalance().compareTo(BigDecimal.ZERO) == 0) {
+				if(cardcode != null && !cardcode.isEmpty()) {
+					if(pin != null && !pin.isEmpty()) {
+						giftcard = giftcardService.getByCodePin(cardcode, pin);
+
+						if(giftcard != null && giftcard.getBalance().compareTo(BigDecimal.ZERO) == 0) {
+							Message msg = new Message();
+							msg.setStatus(Message.ERROR);
+							msg.setMessage("Current balance is zero.");
+							model.addAttribute("message", msg);
+							return "-1";
+						}
+					} else {
 						Message msg = new Message();
 						msg.setStatus(Message.ERROR);
 						msg.setMessage("Pin number is required.");
 						model.addAttribute("message", msg);
 						return "-1";
 					}
-				} else {
-					Message msg = new Message();
-					msg.setStatus(Message.ERROR);
-					msg.setMessage("Pin number is required.");
-					model.addAttribute("message", msg);
-					return "-1";
 				}
 
+				Object mutex = WebUtils.getSessionMutex(httpSession);
 
-			}
+				synchronized(mutex) {
+					List<Inventory> saleList = null;
+					if(httpSession.getAttribute("saleList") != null) {
+						saleList = (List<Inventory>) httpSession.getAttribute("saleList");
+						if(saleList == null || saleList.isEmpty()) {
+							Message msg = new Message();
+							msg.setStatus(Message.ERROR);
+							msg.setMessage("Please add shopping item, now the cart is empty.");
+							model.addAttribute("message", msg);
+							return "-1";
+						}
+						double total = 0.0;
 
-			Object mutex = WebUtils.getSessionMutex(httpSession);
+						Customer customer = customerService.getById(1);
 
-			synchronized(mutex) {
-				List<Inventory> saleList = null;
-				if(httpSession.getAttribute("saleList") != null) {
-					saleList = (List<Inventory>) httpSession.getAttribute("saleList");
-					if(saleList == null || saleList.isEmpty()) {
-						Message msg = new Message();
-						msg.setStatus(Message.ERROR);
-						msg.setMessage("Please add shopping item, now the cart is empty.");
-						model.addAttribute("message", msg);
-						return "-1";
-					}
-					double total = 0.0;
+						Order order = new Order();
+						order.setStore(store);
+						order.setStaff(staff);
+						order.setCreatedby(loginUser);
+						order.setCreationdate(Calendar.getInstance());
+						order.setCustomer(customer);
+						order = orderService.save(order);
 
-					Customer customer = customerService.getById(1);
+						Type type = typeService.getByNameReftbl("Sell", "transactions");
 
-					Order order = new Order();
-					order.setStore(store);
-					order.setStaff(staff);
-					order.setCreatedby(loginUser);
-					order.setCreationdate(Calendar.getInstance());
-					order.setCustomer(customer);
-					order = orderService.save(order);
+						for(Inventory inventory: saleList) {
+							inventory.setStatus(delivered);
+							inventory.setSentby(loginUser);
+							inventory.setSenddate(Calendar.getInstance());
+							inventories.add(inventoryService.save(inventory));
 
-					Type type = typeService.getByNameReftbl("Sell", "transactions");
+							Orderitem otm = new Orderitem();
+							Item item = inventory.getItem();
+							Product prod = item.getProduct();
 
-					for(Inventory inventory: saleList) {
-						inventory.setStatus(delivered);
-						inventory.setSentby(loginUser);
-						inventory.setSenddate(Calendar.getInstance());
-						inventories.add(inventoryService.save(inventory));
+							otm.setOrder(order);
+							otm.setItem(item);
+							otm.setQuantity(1);
+							double amt = item.getPrice();
+							amt = prod.getFinalprice().doubleValue();
 
-						Orderitem otm = new Orderitem();
-						Item item = inventory.getItem();
-						Product prod = item.getProduct();
+							if(p != null && p.getPromocodeid() != 0) {
+								otm.setPromocode(p);
+								amt = amt * (1 - p.getPercentage()/100);
+							}
 
-						otm.setOrder(order);
-						otm.setItem(item);
-						otm.setQuantity(1);
-						double amt = item.getPrice();
-						amt = prod.getFinalprice().doubleValue();
-
-						if(p != null && p.getPromocodeid() != 0) {
-							otm.setPromocode(p);
-							amt = amt * (1 - p.getPercentage()/100);
+							total += amt;
+							otm.setType(type);
+							otm.setAmount(new BigDecimal(amt));
+							orderitemService.save(otm);
 						}
 
-						total += amt;
-						otm.setType(type);
-						otm.setAmount(new BigDecimal(amt));
-						orderitemService.save(otm);
-					}
+						BigDecimal amount = new BigDecimal(total);
+						amount.setScale(2, BigDecimal.ROUND_HALF_UP);
 
-					BigDecimal amount = new BigDecimal(total);
-					amount.setScale(2, BigDecimal.ROUND_HALF_UP);
+						order.setAmount(amount);
 
-					order.setAmount(amount);
+						order = orderService.save(order);
 
-					order = orderService.save(order);
+						account = accountService.getById(1); //ByCustomer(customer)
 
-					account = accountService.getById(1); //ByCustomer(customer)
+						payment.setAmount(amount);
+						payment.setCreatedby(loginUser);
+						payment.setCreationdate(Calendar.getInstance());
 
-					payment.setAmount(amount);
-					payment.setCreatedby(loginUser);
-					payment.setCreationdate(Calendar.getInstance());
+						payment = paymentService.save(payment);
 
-					BigDecimal sum = BigDecimal.ZERO;
-					sum.setScale(2, BigDecimal.ROUND_HALF_UP);
+						BigDecimal sum = BigDecimal.ZERO;
+						sum.setScale(2, BigDecimal.ROUND_HALF_UP);
 
-					List<Paymentdetail> details = new ArrayList<>();
-					Status status = statusService.getByNameAndReftbl("payments","Completed");
+						List<Paymentdetail> details = new ArrayList<>();
+						Status status = statusService.getByNameAndReftbl("Completed","payments");
+						logger.info("Payment method: {}", methodids);
 
-					//multiple payment methods
-					if(methodid.contains("1")) {
-						BigDecimal credit = convertAmount(requestParams.get("creditamount"));
-						sum = sum.add(credit);
+						//multiple payment methods
+						if(methodids.contains("1")) {
+							logger.info("Credit card payment");
+							BigDecimal credit = convertAmount(requestParams.get("creditamount"));
+							sum = sum.add(credit);
 
-						Creditcard creditcard = new Creditcard(cardnum, customer);
-						creditcard = creditcardService.save(creditcard);
-						Paymentdetail detail = new Paymentdetail();
-						Paymentmethod method = paymentmethodService.getById(Long.parseLong(methodid));
-						detail.setAmount(credit);
-						detail.setPaymentmethod(method);
-						detail.setRefnum("" + creditcard.getCreditcardid());
-						detail.setPaydate(Calendar.getInstance());
-						detail.setReceived(credit);
-						detail.setStatus(status);
-						details.add(detail);
-					}
+							Creditcard creditcard = new Creditcard(cardnum, customer);
+							creditcard = creditcardService.save(creditcard);
+							Paymentdetail detail = new Paymentdetail();
+							Paymentmethod method = paymentmethodService.getById(1);
+							detail.setAmount(credit);
+							detail.setPaymentmethod(method);
+							detail.setRefnum("" + creditcard.getCreditcardid());
+							detail.setPaydate(Calendar.getInstance());
+							detail.setReceived(credit);
+							detail.setStatus(status);
+							detail.setPayment(payment);
 
-					if(methodid.contains("2")) {
-						BigDecimal debit = convertAmount(requestParams.get("debitamount"));
-						sum = sum.add(debit);
-
-						Debitcard debitcard = new Debitcard(cardnum, customer);
-						debitcard = debitcardService.save(debitcard);
-						Paymentdetail detail = new Paymentdetail();
-						Paymentmethod method = paymentmethodService.getById(Long.parseLong(methodid));
-						detail.setAmount(debit);
-						detail.setPaymentmethod(method);
-						detail.setRefnum("" + debitcard.getDebitcardid());
-						detail.setPaydate(Calendar.getInstance());
-						detail.setReceived(debit);
-						detail.setStatus(status);
-
-						details.add(detail);
-					}
-
-					if(methodid.contains("3")) {
-						BigDecimal gift = convertAmount(requestParams.get("debitamount"));
-						sum = sum.add(gift);
-						BigDecimal balance = giftcard.getBalance().subtract(gift);
-						if(balance.compareTo(BigDecimal.ZERO) < 0) {
-							balance = BigDecimal.ZERO;
+							details.add(detail);
 						}
-						Paymentdetail detail = new Paymentdetail();
-						giftcard.setBalance(balance);
-						giftcardService.save(giftcard);
-						detail.setAmount(gift);
-						details.add(detail);
+
+						if(methodids.contains("2")) {
+							BigDecimal debit = convertAmount(requestParams.get("debitamount"));
+							sum = sum.add(debit);
+
+							Debitcard debitcard = new Debitcard(cardnum, customer);
+							debitcard = debitcardService.save(debitcard);
+							Paymentdetail detail = new Paymentdetail();
+							Paymentmethod method = paymentmethodService.getById(2);
+							detail.setAmount(debit);
+							detail.setPaymentmethod(method);
+							detail.setRefnum("" + debitcard.getDebitcardid());
+							detail.setPaydate(Calendar.getInstance());
+							detail.setReceived(debit);
+							detail.setStatus(status);
+							detail.setPayment(payment);
+
+							details.add(detail);
+						}
+
+						if(methodids.contains("3")) {
+							BigDecimal gift = convertAmount(requestParams.get("giftamount"));
+							sum = sum.add(gift);
+							BigDecimal balance = giftcard.getBalance().subtract(gift);
+							if(balance.compareTo(BigDecimal.ZERO) < 0) {
+								balance = BigDecimal.ZERO;
+							}
+							Paymentdetail detail = new Paymentdetail();
+							Paymentmethod method = paymentmethodService.getById(3);
+							giftcard.setBalance(balance);
+							giftcard = giftcardService.save(giftcard);
+							detail.setRefnum(""+giftcard.getGiftcardid());
+							detail.setPaymentmethod(method);
+							detail.setPaydate(Calendar.getInstance());
+							detail.setAmount(gift);
+							detail.setReceived(gift);
+							detail.setStatus(status);
+							detail.setPayment(payment);
+
+							details.add(detail);
+						}
+
+						if (methodids.contains("4")) {
+							BigDecimal cash = convertAmount(requestParams.get("cashamount"));
+							Paymentmethod method = paymentmethodService.getById(4);
+							BigDecimal backchange = BigDecimal.ZERO;
+							Paymentdetail detail = new Paymentdetail();
+							BigDecimal residual = amount.subtract(sum);
+							detail.setReceived(cash);
+
+							if(cash.compareTo(residual) > 0) {
+								backchange = cash.subtract(residual);
+								backchange.setScale(2, BigDecimal.ROUND_HALF_UP);
+								detail.setAmount(residual);
+							} else {
+								detail.setAmount(cash);
+							}
+
+							sum = sum.add(residual);
+
+							detail.setPaymentmethod(method);
+							detail.setPaydate(Calendar.getInstance());
+							detail.setBackchange(backchange);
+							detail.setStatus(status);
+							detail.setPayment(payment);
+
+							details.add(detail);
+						}
+
+						if(amount.compareTo(sum) != 0) {
+							//Error amount are different
+							logger.error("Item amount: " + amount.doubleValue()+", payment amount: "+sum.doubleValue());
+							Message msg = new Message();
+							msg.setStatus(Message.ERROR);
+							msg.setMessage("Please add shopping item, now the cart is empty.");
+							model.addAttribute("message", msg);
+						}
+
+						payment.setPaymentdetails(details);
+						payment = paymentService.save(payment);
+
+						invoice.setAmount(amount);
+						invoice.setOrder(order);
+						invoice.setCreatedby(loginUser);
+						invoice.setCreationdate(Calendar.getInstance());
+						invoice = invoiceService.save(invoice);
+						String invoicenum = "000000000";
+						invoice.setInvoicenum(invoicenum.substring(0, invoicenum.length()-String.valueOf(invoice.getInvoiceid()).length())+invoice.getInvoiceid());
+						invoice = invoiceService.save(invoice);
+
+						trx.setType(type);
+						trx.setAccount(account);
+						trx.setPayment(payment);
+						trx.setInvoice(invoice);
+						trx.setRecordedby(loginUser);
+						trx.setRecorddate(Calendar.getInstance());
+
+						//rtn = String.valueOf(invoice.getInvoiceid());
+
+						transactionService.save(trx);
+						logger.info("The transaction completed, trx ID:" + trx.getTransactionid());
+						model.addAttribute("saleList", saleList);
+						httpSession.setAttribute("invoice", invoice);
+						httpSession.setAttribute("invoiceList", saleList);
+						httpSession.removeAttribute("saleList");
 					}
-					if (methodid.contains("4")) {
-						BigDecimal cash = convertAmount(requestParams.get("cashamount"));
-						sum = sum.add(cash);
-						Paymentdetail detail = new Paymentdetail();
-						detail.setAmount(cash);
-						details.add(detail);
-					}
-
-					if(amount.compareTo(sum) != 0) {
-						//Error amount are different
-						logger.error("Item amount: " + amount.doubleValue()+", payment amount: "+sum.doubleValue());
-						Message msg = new Message();
-						msg.setStatus(Message.ERROR);
-						msg.setMessage("Please add shopping item, now the cart is empty.");
-						model.addAttribute("message", msg);
-					}
-
-					payment = paymentService.save(payment);
-
-					invoice.setAmount(amount);
-					invoice.setOrder(order);
-					invoice.setCreatedby(loginUser);
-					invoice.setCreationdate(Calendar.getInstance());
-					invoice = invoiceService.save(invoice);
-					String invoicenum = "000000000";
-					invoice.setInvoicenum(invoicenum.substring(0, invoicenum.length()-String.valueOf(invoice.getInvoiceid()).length())+invoice.getInvoiceid());
-					invoice = invoiceService.save(invoice);
-
-					trx.setType(type);
-					trx.setAccount(account);
-					trx.setPayment(payment);
-					trx.setInvoice(invoice);
-					trx.setRecordedby(loginUser);
-					trx.setRecorddate(Calendar.getInstance());
-
-					//rtn = String.valueOf(invoice.getInvoiceid());
-
-					transactionService.save(trx);
-					logger.info("The transaction completed, trx ID:" + trx.getTransactionid());
-					model.addAttribute("saleList", saleList);
-					httpSession.setAttribute("invoice", invoice);
-					httpSession.setAttribute("invoiceList", saleList);
-					httpSession.removeAttribute("saleList");
 				}
+
+			} catch(Exception e) {
+				Message msg = new Message();
+				msg.setStatus(Message.ERROR);
+				msg.setMessage("There is an error while process the payment: " + e.getMessage());
+				model.addAttribute("message", msg);
+				return rtn;
 			}
 
 		} else {
@@ -550,8 +604,8 @@ public class StoreAdminSale extends StoreBase {
 
 		Object mutex = WebUtils.getSessionMutex(httpSession);
 
-		List<Inventory> saleList = null;
-		Invoice invoice = null;
+		List<Inventory> saleList = new ArrayList<>();
+		Invoice invoice = new Invoice();
 		BigDecimal subTotal = BigDecimal.ZERO;
 
 		synchronized(mutex) {
@@ -560,10 +614,8 @@ public class StoreAdminSale extends StoreBase {
 				saleList = (List<Inventory>) httpSession.getAttribute("invoiceList");
 				subTotal = calTotal(saleList);
 				invoice = (Invoice) httpSession.getAttribute("invoice");
-			} else {
-				saleList = new ArrayList<>();
-				invoice = new Invoice();
 			}
+
 			httpSession.setAttribute("saleList", saleList);
 			model.addAttribute("saleList", saleList);
 			model.addAttribute("invoice", invoice);
@@ -605,6 +657,7 @@ public class StoreAdminSale extends StoreBase {
 		}
 
 		User loginUser = getLoginUser(principal);
+		System.out.println("dspGiftcard");
 
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Sales");

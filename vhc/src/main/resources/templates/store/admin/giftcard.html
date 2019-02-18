@@ -33,12 +33,12 @@
 									        <input class=" form-control" id="code" name="code" th:value="${giftcard==null?'':giftcard.code}" type="text" />
 									    </div>
 									</div>
-									<div class="form-group">
+									<!-- <div class="form-group">
 									    <label for="pin" class="control-label col-lg-2">Pin Number </label>
 									    <div class="col-lg-10">
 									        <input class=" form-control" id="pin" name="pin" th:value="${giftcard==null?'':giftcard.pin}" type="password" />
 									    </div>
-									</div>
+									</div> -->
 									<div class="form-group">
 									    <label for="amount" class="control-label col-lg-2">Initial Amount </label>
 									    <div class="col-lg-10">
@@ -55,8 +55,16 @@
 									    <label for="storeid" class="control-label col-lg-2">Store </label>
 									    <div class="col-lg-10">
 											<select class="form-control" id="storeid" name="storeid">
-												<option th:each="store: ${stores}" th:value="${store.storeid}" th:text="${store.name}" th:selected="${giftcard!=null and giftcard.store.storeid==store.storeid}"></option>
+												<option th:each="store: ${stores}" th:value="${store.storeid}" th:text="${store.name}" th:selected="${giftcard!=null and giftcard.store!=null and giftcard.store.storeid==store.storeid}"></option>
 											</select>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="pin" class="control-label col-lg-2">Status </label>
+									    <div class="col-lg-10">
+									    	<select class=" form-control" id="statusid" name="statusid">
+									    		<option th:each="status : ${statuss}" th:value="${status.statusid}" th:text="${status.name}" th:selected="${giftcard!=null and giftcard.status!=null and giftcard.status.statusid==status.statusid}"></option>
+									    	</select>
 									    </div>
 									</div>
 									<div class="form-group">

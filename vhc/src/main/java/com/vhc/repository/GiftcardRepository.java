@@ -15,6 +15,6 @@ public interface GiftcardRepository extends CrudRepository<Giftcard, Long> {
 
 	Giftcard findByCode(String code);
 
-	Giftcard findByCodeAndPin(String code, String ping);
+	Giftcard findByCodeAndPin(String code, String pin);
 
 }

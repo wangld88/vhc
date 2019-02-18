@@ -520,7 +520,7 @@ public class AdminShipment extends BaseController {
 
 		logger.info("doShipment is call!!!!! - " + loginUser.getUsername());
 
-		String productname = requestParams.get("name");
+		String productname = requestParams.get("prodname");
 		String itemid = requestParams.get("itemid");
 		String sku = requestParams.get("sku");
 		String sizeid = requestParams.get("sizeid");

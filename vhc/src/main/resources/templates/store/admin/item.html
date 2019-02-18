@@ -266,10 +266,11 @@
 	                        },
 	                        error: function (response) {
 	                        	console.log(response);
-	                            alert(response.responseText);
+	                            //alert(response.responseText);
 	                        },
 	                        failure: function (response) {
-	                            alert(response.responseText);
+	                        	console.log(response);
+	                            //alert(response.responseText);
 	                        }
 	                    });
 	                },
@@ -295,8 +296,7 @@
 	                        },
 	                        success: function (data) {
 	                            response($.map(data, function (size) {
-	                            	console.log("sizeid: "+size.sizeid);
-	                            	//$("#sizeid")[0].value = size.sizeid;
+	                            	//console.log("sizeid: "+size.sizeid);
             		                return { value: size.region.name+' '+size.sizenum+' ('+size.type.name+')' , data: size.sizeid };
 	                            }))
 	                        },

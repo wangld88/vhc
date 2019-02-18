@@ -118,7 +118,7 @@ public class StoreAdminRemote extends StoreBase {
 	@RequestMapping(method=RequestMethod.POST, value="/giftcardbalance")
 	public BigDecimal checkBalance(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 
-		String cardnum = requestParams.get("cardnum");
+		String cardnum = requestParams.get("cardcode");
 		String pin = requestParams.get("pin");
 
 		Giftcard giftcard = null;
@@ -130,6 +130,8 @@ public class StoreAdminRemote extends StoreBase {
 		}
 
 		model.addAttribute("giftcard", giftcard);
+
+		logger.info("Gift card number {}, pin {}, content {}",cardnum, pin, giftcard);
 
 		if(giftcard == null) {
 			return BigDecimal.ZERO;
