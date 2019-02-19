@@ -106,9 +106,9 @@ public class AdminGiftcard extends BaseController {
 		return rtn;
 	}
 
-/*	@RequestMapping(method={RequestMethod.POST}, value={"/giftcardupload"})
+	@RequestMapping(method={RequestMethod.POST}, value={"/giftcardupload"})
 	public String doGiftcardUpload(@RequestParam("file") MultipartFile file, ModelMap model, HttpSession httpSession) {
-		String rtn = "1";
+		String rtn = "admin/giftcardupload";
 		User loginUser = getPrincipal();
 System.out.println("No Gift card called");
 		if(loginUser == null) {
@@ -117,9 +117,10 @@ System.out.println("No Gift card called");
 
 		try {
 		    InputStream in = file.getInputStream();
-		    File currDir = new File("C:\temp");
+		    File currDir = new File("C:\\temp\\");
 		    String path = currDir.getAbsolutePath();
-		    String fileLocation = path.substring(0, path.length() - 1) + file.getOriginalFilename();
+		    String fileLocation = path + "\\" + file.getOriginalFilename(); //path.substring(0, path.length() - 1) + file.getOriginalFilename();
+System.out.println("File Location: "+fileLocation+", path: "+path);
 		    FileOutputStream f = new FileOutputStream(fileLocation);
 		    int ch = 0;
 		    while ((ch = in.read()) != -1) {
@@ -129,7 +130,11 @@ System.out.println("No Gift card called");
 		    f.close();
 
 		    ExcelProcessor processor = new ExcelProcessor();
-			processor.read(fileLocation);
+			List<Giftcard> cards = processor.read(fileLocation, loginUser);
+
+			for(Giftcard card : cards) {
+				giftcardService.save(card);
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -144,7 +149,7 @@ System.out.println("No Gift card called");
 
 		return rtn;
 	}
-*/
+
 	@RequestMapping(method={RequestMethod.GET}, value={"/giftcard/{giftcardid}"})
 	public String updateGiftcard(ModelMap model, @PathVariable("giftcardid") Long giftcardid, HttpSession httpSession) {
 		String rtn = "admin/giftcard";
@@ -216,6 +221,7 @@ System.out.println("No Gift card called");
 		}
 
 		giftcardService.save(giftcard);
+
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Business");
 		model.addAttribute("submenu", "giftcards");

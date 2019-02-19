@@ -28,6 +28,10 @@ public class ItemService {
 		//return itemRepository.findAll();
 	}
 
+	/*public List<Item> getAllAvailable() {
+		return itemRepository.findAll();
+	}*/
+
 	public List<Item> getByShipment(long shipmentid) {
 		return itemRepository.findByShipment_shipmentid(shipmentid);
 	}

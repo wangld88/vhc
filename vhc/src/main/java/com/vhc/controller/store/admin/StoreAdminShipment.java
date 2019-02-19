@@ -486,6 +486,7 @@ public class StoreAdminShipment extends BaseController {
 		String rtn = "store/admin/items";
 
 		List<Item> items = itemService.getAll();
+
 		model.addAttribute("items", items);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");

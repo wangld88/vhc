@@ -62,7 +62,7 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr th:each="mf:${items}">
+									<tr th:each="mf:${items}" th:if="${mf.inventories!=null and mf.inventories.size()>0 and mf.inventories.get(0).status.statusid!=3}">
 										<td>
 											<div class="btn-group">
 												<!-- <a class="btn btn-primary" th:href="@{/admin/item}" title="Add New Item"><i class="icon_plus_alt2"></i></a> -->

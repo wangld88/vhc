@@ -193,7 +193,7 @@
 				border: 1px solid #3d3c3c;
 			    display: inline-block;
 			    cursor: pointer;
-			    width: 80%;
+			    width: 10%;
 			    height: 22px;
 			    vertical-align: middle;
 			}
@@ -273,18 +273,27 @@
 										    <label for="code" class="control-label col-lg-4">Only Excel file is accepted, and make sure the columns are in right order. <span class="required">*</span></label>
 										</div>
 
-										<div class="file-upload-wrapper">
+										<!-- <div class="file-upload-wrapper">
 											<input id="file" type="file" name="file" />
-										</div>
+										</div> -->
 
-										<!-- <div class="form-group">
+										<div class="form-group">
+											<div class="myLabel col-lg-offset-2 col-lg-2">
+												<input type="file" id="uploadBtn" name="file">
+												<span class="col-lg-4 col-md-4">+ Add File</span>
+											</div>
+											<div class="col-lg-8" style="height: 36px;vertical-align: middle;">
+												<span id="uploadFile"></span>
+											</div>
+										</div>
+										<div class="form-group">
 										    <div class="col-lg-offset-2 col-lg-10">
 										        <button class="btn btn-primary" type="submit"> Upload </button>
-										        <button class="btn btn-default" type="button">Cancel</button>
+										        <!-- <button class="btn btn-default" type="button">Cancel</button> -->
 												<a th:href="@{/admin/giftcards}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
 										        <input type="hidden" id="giftcardid" name="giftcardid" th:value="${giftcard==null?'':giftcard.giftcardid}" />
 										    </div>
-										</div> -->
+										</div>
 									</form>
 								</div>
 							</div>
@@ -294,9 +303,9 @@
 
 			</section>
 		</section>
-		<script type="text/javascript">
+		<!-- <script type="text/javascript">
 			$("#file").pekeUpload({bootstrap: true, dragMode: true, allowedExtensions: "xls|xlsx"});
-		</script>
+		</script> -->
       <!--main content end-->
 	</div>
 </html>

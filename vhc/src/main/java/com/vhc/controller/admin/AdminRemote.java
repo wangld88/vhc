@@ -42,7 +42,7 @@ public class AdminRemote extends AdminBase {
 	}
 
 
-	@RequestMapping(method=RequestMethod.POST, value="/giftcardupload")
+	/*@RequestMapping(method=RequestMethod.POST, value="/giftcardupload")
 	public String doGiftcardUpload(@RequestParam("file") MultipartFile file, ModelMap model, HttpSession httpSession) {
 		String rtn = "1";
 
@@ -68,13 +68,13 @@ public class AdminRemote extends AdminBase {
 			e.printStackTrace();
 		}
 
-		/*List<City> cities = cityService.getAll();
+		List<City> cities = cityService.getAll();
 		List<Status> statuss = statusService.getByReftbl("giftcards");
 
 		model.addAttribute("statuss", statuss);
 		model.addAttribute("cities", cities);
-		model.addAttribute("adminmenu", "Business");*/
+		model.addAttribute("adminmenu", "Business");
 
 		return rtn;
-	}
+	}*/
 }

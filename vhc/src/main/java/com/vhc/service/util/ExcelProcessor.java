@@ -2,7 +2,11 @@ package com.vhc.service.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -13,13 +17,19 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import com.vhc.model.Giftcard;
+import com.vhc.model.User;
+
 
 public class ExcelProcessor {
 
-	public void read(String filename) throws IOException, InvalidFormatException {
-		read(new File(filename));
+
+	public List<Giftcard> read(String filename, User user) throws IOException, InvalidFormatException {
+		return read(new File(filename), user);
 	}
-	public void read(File file) throws IOException, InvalidFormatException {
+
+
+	public List<Giftcard> read(File file, User user) throws IOException, InvalidFormatException {
 		// Creating a Workbook from an Excel file (.xls or .xlsx)
         Workbook workbook = WorkbookFactory.create(file);
 
@@ -65,7 +75,7 @@ public class ExcelProcessor {
         DataFormatter dataFormatter = new DataFormatter();
 
         // 1. You can obtain a rowIterator and columnIterator and iterate over them
-        System.out.println("\n\nIterating over Rows and Columns using Iterator\n");
+        /*System.out.println("\n\nIterating over Rows and Columns using Iterator\n");
         Iterator<Row> rowIterator = sheet.rowIterator();
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
@@ -79,31 +89,64 @@ public class ExcelProcessor {
                 System.out.print(cellValue + "\t");
             }
             System.out.println();
-        }
+        }*/
 
         // 2. Or you can use a for-each loop to iterate over the rows and columns
         System.out.println("\n\nIterating over Rows and Columns using for-each loop\n");
+        int counter = 0;
+
+        List<Giftcard> cards = new ArrayList<>();
+
         for (Row row: sheet) {
-            for(Cell cell: row) {
+        	counter++; //Skip header
+
+			if(counter == 1) {
+				continue;
+			}
+
+        	short minColIx = row.getFirstCellNum();
+			short maxColIx = row.getLastCellNum();
+
+			System.out.println("counter: "+counter+"minColIx: "+minColIx+", maxColIx: "+maxColIx);
+			for(short colIx=minColIx; colIx<maxColIx; colIx++) {
+				Cell cell = row.getCell(colIx);
+				if(cell == null) {
+					continue;
+				}
+				Giftcard card = new Giftcard();
+				card.setCode(dataFormatter.formatCellValue(row.getCell(0)));
+				card.setPin(dataFormatter.formatCellValue(row.getCell(1)));
+				card.setAmount(new BigDecimal(row.getCell(2).getNumericCellValue()));
+				card.setBalance(new BigDecimal(row.getCell(2).getNumericCellValue()));
+				card.setLoaddate(Calendar.getInstance());
+				card.setLoadedby(user);
+				cards.add(card);
+
+				//... do something with cell
+				String cellValue = dataFormatter.formatCellValue(cell);
+				System.out.print(cellValue + "\t" + card.getGiftcardid());
+			}
+
+            /*for(Cell cell: row) {
                 String cellValue = dataFormatter.formatCellValue(cell);
                 System.out.print(cellValue + "\t");
             }
-            System.out.println();
+            System.out.println();*/
         }
 
         // 3. Or you can use Java 8 forEach loop with lambda
-        System.out.println("\n\nIterating over Rows and Columns using Java 8 forEach with lambda\n");
+        /*System.out.println("\n\nIterating over Rows and Columns using Java 8 forEach with lambda\n");
         sheet.forEach(row -> {
             row.forEach(cell -> {
             	printCellValue(cell);
-                /*String cellValue = dataFormatter.formatCellValue(cell);
-                System.out.print(cellValue + "\t");*/
             });
             System.out.println();
-        });
+        });*/
 
         // Closing the workbook
         workbook.close();
+
+        return cards;
 	}
 
 	private static void printCellValue(Cell cell) {
