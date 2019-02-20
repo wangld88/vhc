@@ -84,12 +84,18 @@ public class AdminSetting extends AdminBase {
 		User loginUser = getLoginUser(principal);
 
 		logger.info("dspHomepage");
+		String pageid = requestParams.get("pageid");
 
 		Page page = new Page();
+
+		if(pageid != null || !pageid.isEmpty()) {
+			page = pageService.getById(Long.parseLong(pageid));
+		}
 
 		page.setName(requestParams.get("name"));
 		page.setTitle(requestParams.get("title"));
 		String h = requestParams.get("imgheight");
+
 		if(h != null && !h.isEmpty()) {
 			page.setImgheight(Long.parseLong(h));
 		}
