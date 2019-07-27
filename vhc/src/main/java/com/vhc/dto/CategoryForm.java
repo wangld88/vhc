@@ -2,7 +2,7 @@ package com.vhc.dto;
 
 import java.sql.Blob;
 
-import com.vhc.model.Category;
+import com.vhc.core.model.Category;
 import com.vhc.util.ImageProcessor;
 
 public class CategoryForm {

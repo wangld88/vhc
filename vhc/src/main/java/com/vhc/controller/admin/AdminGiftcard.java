@@ -26,13 +26,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vhc.controller.BaseController;
-import com.vhc.model.Address;
-import com.vhc.model.City;
-import com.vhc.model.Staff;
-import com.vhc.model.Status;
-import com.vhc.model.Giftcard;
-import com.vhc.model.Promocode;
-import com.vhc.model.User;
+import com.vhc.core.model.Address;
+import com.vhc.core.model.City;
+import com.vhc.core.model.Staff;
+import com.vhc.core.model.Status;
+import com.vhc.core.model.Giftcard;
+import com.vhc.core.model.Promocode;
+import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 import com.vhc.service.util.ExcelProcessor;
 
@@ -363,7 +363,7 @@ System.out.println("File Location: "+fileLocation+", path: "+path);
         		user = auth.getUser();
         	}
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
         return user;
     }

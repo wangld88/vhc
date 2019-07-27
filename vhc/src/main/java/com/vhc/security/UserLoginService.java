@@ -1,7 +1,7 @@
 package com.vhc.security;
 
-import com.vhc.model.User;
-import com.vhc.service.UserService;
+import com.vhc.core.model.User;
+import com.vhc.core.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class UserLoginService implements UserDetailsService {
     
 		logger.info(String.format("[UserLoginService] User Auth Begins. Locating User %s in DB", new Object[] { username }));
     
-		User user = this.userService.findByUsername(username);
+		User user = this.userService.getByUsername(username);
 		
 	    if (user == null) {
 	    	logger.info("[UserLoginService] User is not found!!!!!!!!!!!!!!");

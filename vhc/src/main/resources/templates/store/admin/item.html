@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html layout:decorator="store/admin/layout/layout">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="store/admin/layout/layout">
+
 	<head>
 		<link rel="stylesheet" th:href="@{/css/autocomplete.css}" />
 	</head>
@@ -35,7 +38,7 @@
 						</div>
 						<div class="box-body">
 							<div class="form">
-								<form class="form-validate form-horizontal " id="item" name="item" method="post" th:action="@{/store/admin/item}">
+								<form class="form-validate form-horizontal" id="item" name="item" method="post" th:action="@{/store/admin/item}">
 									<div class="form-group">
 									    <label for="productid" class="control-label col-lg-2">Product </label>
 									    <div class="col-lg-10">
@@ -110,7 +113,7 @@
 									<div class="form-group">
 									    <div class="col-lg-offset-2 col-lg-10">
 									        <button class="btn btn-primary" type="submit"> Save </button>
-									        <a href="javascript: next()" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Next Item</a>
+									        <a href="javascript: next()" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> New Item</a>
 									        <a th:href="@{/store/admin/items}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
 									        <input type="hidden" id="itemid" name="itemid" th:value="${item==null?'':item.itemid}" />
 									        <input type="hidden" th:if="${shipmentid!=null}" id="rtn_shipmentid" name="rtn_shipmentid" th:value="${shipmentid}" />

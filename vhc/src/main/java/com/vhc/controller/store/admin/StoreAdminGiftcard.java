@@ -19,16 +19,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.vhc.controller.BaseController;
-import com.vhc.model.City;
-import com.vhc.model.Giftcard;
-import com.vhc.model.Store;
-import com.vhc.model.User;
+import com.vhc.controller.store.StoreBase;
+import com.vhc.core.model.City;
+import com.vhc.core.model.Giftcard;
+import com.vhc.core.model.Status;
+import com.vhc.core.model.Store;
+import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 
 
 @Controller
 @RequestMapping({"/store/admin"})
-public class StoreAdminGiftcard extends BaseController {
+public class StoreAdminGiftcard extends StoreBase {
 
 	private final Logger logger = LoggerFactory.getLogger(StoreAdminGiftcard.class);
 
@@ -66,14 +68,17 @@ public class StoreAdminGiftcard extends BaseController {
 
 		Store store = staffService.getByUser(loginUser).getStore();
 
-		List<City> cities = cityService.getAll();
+		//List<City> cities = cityService.getAll();
 
 		List<Store> stores = new ArrayList<>();//storeService.getAll();
 
 		stores.add(store);
+		List<Status> statuss = statusService.getByReftbl("giftcards");
+
+		model.addAttribute("statuss", statuss);
 
 		model.addAttribute("stores", stores);
-		model.addAttribute("cities", cities);
+		//model.addAttribute("cities", cities);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Sales");
 
@@ -172,7 +177,7 @@ public class StoreAdminGiftcard extends BaseController {
         if (principal instanceof LoginUser) {
             user = ((LoginUser)principal).getUser();
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
 
         return user;

@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.vhc.model.City;
-import com.vhc.model.Product;
-import com.vhc.model.Status;
-import com.vhc.model.User;
+import com.vhc.core.model.City;
+import com.vhc.core.model.Product;
+import com.vhc.core.model.Status;
+import com.vhc.core.model.User;
 import com.vhc.service.util.ExcelProcessor;
 
 

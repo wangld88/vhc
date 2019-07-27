@@ -4,35 +4,130 @@
 	<head>
 		<meta charset="ISO-8859-1" />
 		<title>Receipt</title>
+		<style>
+			.header {
+				text-align: center;
+			}
+			.header h4 {
+				font-size: 18px;
+				margin-top: 10px;
+				margin-bottom: 10px;
+			}
+			.header h5 {
+				font-size: 15px;
+				margin-top: 10px;
+				margin-bottom: 10px;
+			}
+			.lefthalf {
+				border-left: 1px solid black;
+				border-top: 1px solid black;
+				border-bottom: 1px solid black;
+			}
+			.righthalf {
+				border-right: 1px solid black;
+				border-top: 1px solid black;
+				border-bottom: 1px solid black;
+			}
+		</style>
 	</head>
-	<body>
-		<div>
-			<div>
-				<H4>         My Pairs</H4>
+	<body style="font-family: Tahoma, Geneva, sans-serif;">
+		<div style="width: 320px;">
+			<div class="header">
+				<H4>My Pairs</H4>
 				<H5>3303 Bayview Ave, North York, ON</H5>
 				<H5>Phone: 416-730-1356</H5>
-				<H5>Date: <script> document.write(new Date().toDateString()); </script></H5>
-				<p th:if="${invoice!=null and invoice.invoicenum!=null}" th:text="'Invoice Number: '+${invoice.invoicenum}"></p>
+				<H5>HST: #794174482RT0001</H5>
+				<H5>Date: <span th:text="${#calendars.format(#calendars.createNow(), 'MMM dd, yyyy')}+' ('+${#calendars.dayOfWeekNameShort(#calendars.createNow())}+')'"></span></H5>
+				<H5>Time: <span th:text="${#calendars.format(#calendars.createNow(), 'HH:mm')}"></span>
 			</div>
-			<div>
-				<ul>
+			<hr/>
+			<div style="font-size: 14px; margin-top: 20px; padding-bottom: 20px;">
+				<!-- <p th:if="${invoice!=null and invoice.invoicenum!=null}" th:text="'Invoice Number: '+${invoice.invoicenum}"></p> -->
+				<table width="100%">
+					<tr>
+						<td><b>Item</b></td>
+						<td colspan="2"><b>Price</b></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr th:each="inventory: ${saleList}">
+						<td style="padding-bottom: 10px;"><span th:utext="${inventory.item.product.name}+'<br/>'+${inventory.item.product.modelnum}+' ('+${inventory.item.size.region.code}+${inventory.item.size.sizenum}+')<br/>'+${inventory.item.sku}"></span></td>
+						<td>$</td>
+						<td style="text-align:right;"><span th:text="${(inventory.status!=null and inventory.status.name=='Returned')?'-':''}+${inventory.item.product.finalprice}"></span></td>
+					</tr>
+					<tr>
+						<td colspan="3"><hr/></td>
+					</tr>
+					<tr>
+						<td>Sub-Total:</td>
+						<td>$</td>
+						<td style="text-align:right;"><span th:text="${(txType=='Return')?'-':''}+${subTotal}"></span></td>
+					</tr>
+					<tr>
+						<td>Tax:</td>
+						<td>$</td>
+						<td style="text-align:right;"><span th:text="${(txType=='Return')?'-':''}+${tax}"></span></td>
+					</tr>
+					<tr>
+						<td><b>Total:</b></td>
+						<td>$</td>
+						<td style="text-align:right;"><span th:utext="'<b>'+${(txType=='Return')?'-':''}+${total}+'</b>'"></span></td>
+					</tr>
+					<tr>
+						<td> </td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td colspan="3" style="border-bottom-style:dashed;"></td>
+					</tr>
+					<tr th:if="${payments.size()>0}" th:each="pymt: ${payments}">
+						<td th:if="${pymt.paymentmethod.code=='cash'}"><span th:utext="${pymt.paymentmethod.name}+'<br/><b>Change</b>'"></span></td>
+						<td th:if="${pymt.paymentmethod.code!='cash'}" th:text="${pymt.paymentmethod.name}"></td>
+						<td th:if="${pymt.paymentmethod.code=='cash'}">$<br/><span>$</span></td>
+						<td th:if="${pymt.paymentmethod.code!='cash'}">$</td>
+						<td style="text-align:right;" th:if="${pymt.paymentmethod.code=='cash'}"><span th:text="${pymt.received}"></span><br/><span th:utext="'<b>'+${pymt.backchange}+'</b>'"></span></td>
+						<td style="text-align:right;" th:if="${pymt.paymentmethod.code!='cash'}" th:text="${pymt.amount}"></td>
+					</tr>
+					<!-- <tr>
+						<td>Total:</td>
+						<td class="lefthalf">$</td>
+						<td class="righthalf" style="text-align:right;" th:text="${#numbers.formatDecimal(invoice.amount,2,2)}"></td>
+					</tr>
+					<tr>
+						<td>Balance:</td>
+						<td class="lefthalf">$</td>
+						<td class="righthalf" style="text-align:right;">0.00</td>
+					</tr> -->
+				</table>
+				<!-- <ul>
 					<li th:each="inventory: ${saleList}">
 						<span th:text="${inventory.item.product.name}+'   '+${inventory.item.product.modelnum}+' ('+${inventory.item.size.region.code}+${inventory.item.size.sizenum}+')'"></span><br />
 						<span th:text="'Price: $'+${inventory.item.product.finalprice}"></span>
 					</li>
 				</ul>
 				<p th:text="'Sub-Total: $' + ${subTotal}"></p>
-				<p th:text="'Tax(13%):  $' + ${tax}"></p>
-				<p th:text="'Total:     $' + ${total}"></p>
+				<p th:text="'Tax:       $' + ${tax}"></p>
+				<p th:text="'Total:     $' + ${total}"></p> -->
 			</div>
-			<div>
+			<hr/>
+			<div style="padding-top: 20px;">
+				<img th:src="'data:image/jpg;base64,'+${barcode}"
+					class="media-object img-thumbnail"
+					style="height: 60px; width: 260px; margin-left: auto; margin-right: auto; display: block;" />
+
+			</div>
+			<div style="text-align: center;">
+				<!-- <span th:text="${barcode}"></span> -->
 				<H5>**RETURN POLICY**</H5>
 				<H5>Exchange/credit/refund within</H5>
-				<H5>30 days with original receipt</H5>
-				<H5>THANK YOU!</H5>
+				<H5>15 days with original receipt</H5>
+				<H5>Please visit us at https://www.mypairs.ca</H5>
+				<H5><a href="javascript: window.print()" style="text-decoration:none">**</a>THANK YOU!<a href="javascript: self.close()" style="text-decoration:none">**</a></H5>
 			</div>
 		</div>
-		<a href="javascript: window.print()" class="btn btn-primary btn-label-left">Print</a>
-		<a href="javascript: self.close()" class="btn btn-primary btn-label-left">Close</a>
 	</body>
 </html>

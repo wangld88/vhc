@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html layout:decorator="store/admin/layout/layout">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="store/admin/layout/layout">
+
+	<div layout:fragment="content">
+
 	    <script>
 	    /*<![CDATA[*/
 	     	var acceptedfiletypes = ["pdf","PDF"];
@@ -243,8 +248,6 @@
 			}
 		</style>
 
-	<div layout:fragment="content">
-
 		<section class="content-header">
 			<h1>
 				Product Management
@@ -371,6 +374,18 @@
 									    <label for="storefront" class="control-label col-lg-2">Store Front </label>
 									    <div class="col-lg-10">
 									        <input type="checkbox" id="storefront" name="storefront" value="1" th:checked="${(product!=null and product.storefront=='1')}" /> Display the product at store front
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="storefront" class="control-label col-lg-2">Show on Web </label>
+									    <div class="col-lg-10">
+									        <input type="checkbox" id="display" name="display" value="1" th:checked="${(product!=null and product.display=='1')}" /> Display the product on website
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="storefront" class="control-label col-lg-2">Category </label>
+									    <div class="col-lg-10">
+									        <input type="checkbox" id="categoryid" name="categoryid" th:each="ctgy : ${categories}" th:value="${ctgy.categoryid}" th:checked="${(product!=null and product.inCategory(ctgy.categoryid))}" th:utext="${ctgy.name}+'&nbsp;&nbsp;&nbsp;&nbsp;'" />
 									    </div>
 									</div>
 									<div class="form-group">

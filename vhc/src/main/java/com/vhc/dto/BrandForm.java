@@ -2,8 +2,8 @@ package com.vhc.dto;
 
 import java.sql.Blob;
 
-import com.vhc.model.Address;
-import com.vhc.model.Brand;
+import com.vhc.core.model.Address;
+import com.vhc.core.model.Brand;
 import com.vhc.util.ImageProcessor;
 
 public class BrandForm {

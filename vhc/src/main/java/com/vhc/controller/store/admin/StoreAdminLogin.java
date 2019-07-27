@@ -14,38 +14,38 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.vhc.controller.BaseController;
+import com.vhc.controller.store.StoreBase;
 
 @Controller
 @RequestMapping({"/store/admin"})
-public class StoreAdminLogin extends BaseController {
-  
+public class StoreAdminLogin extends StoreBase {
+
 	private static final Logger logger = LoggerFactory.getLogger(StoreAdminLogin.class);
-  
+
 	@RequestMapping(method={RequestMethod.GET}, value={"/errorpage/{errorid}"})
 	public String globalerrorpage(ModelMap model, @PathVariable("errorid") Long errorid) {
-		
+
 		logger.info("globalerrorpage is called");
 		String toRet = "error";
 		model.addAttribute("errorid", errorid);
 		model.addAttribute("title", "Error");
-    
+
 		return toRet;
 	}
-  
+
 	@RequestMapping(method={RequestMethod.GET}, value={"/login"})
 	public String dspLogin(ModelMap model) {
 		return "store/admin/login/login";
 	}
-	
+
 	@RequestMapping(value="/logout", method = RequestMethod.GET)
 	public String logoutPage (HttpServletRequest request, HttpServletResponse response) {
 
 	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-	    if (auth != null){    
+	    if (auth != null){
 	        new SecurityContextLogoutHandler().logout(request, response, auth);
 	    }
 	    return "redirect:/store/admin/login?logout";//You can redirect wherever you want, but generally it's a good practice to show login screen again.
 	}
-	
+
 }

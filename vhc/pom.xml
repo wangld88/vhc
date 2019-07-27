@@ -87,11 +87,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- <dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency> -->
 
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -128,6 +123,23 @@
 		    <artifactId>poi-ooxml</artifactId>
 		    <version>3.17</version>
 		</dependency>
+		<!-- <dependency>
+			<groupId>org.krysalis.barcode4j</groupId>
+			<artifactId>barcode4j</artifactId>
+			<version>2.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/barcode4j.jar</systemPath>
+		</dependency> -->
+		<!-- <dependency>
+			<groupId>com.vhc.core</groupId>
+			<artifactId>vhc-core</artifactId>
+			<version>1.0.0</version>
+		</dependency> -->
+		<dependency>
+			<groupId>barcode4j</groupId>
+			<artifactId>barcode4j</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -136,16 +148,23 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
 		</plugins>
 		<finalName>vhc</finalName>
 	</build>
 
 	<profiles>
 		<profile>
-			<id>development-jerry</id>
+			<id>development</id>
 			<properties>
 				<env>development</env>
-				<subenv>jerry</subenv>
+				<!-- <subenv>jerry</subenv> -->
 				<appname>${project.artifactId}</appname>
 				<appversion>${project.version}</appversion>
 			</properties>
@@ -153,7 +172,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 		</profile>
-		<profile>
+		<!-- <profile>
 			<id>development-dong</id>
 			<properties>
 				<env>development</env>
@@ -161,12 +180,12 @@
 				<appname>${project.artifactId}</appname>
 				<appversion>${project.version}</appversion>
 			</properties>
-		</profile>
+		</profile> -->
 		<profile>
 			<id>production</id>
 			<properties>
 				<env>production</env>
-				<subenv></subenv>
+				<!-- <subenv></subenv> -->
 				<appname>${project.artifactId}</appname>
 				<appversion>${project.version}</appversion>
                 <maven.test.skip>true</maven.test.skip>
@@ -176,7 +195,7 @@
 			<id>distribution</id>
 			<properties>
 				<env>distribution</env>
-				<subenv></subenv>
+				<!-- <subenv></subenv> -->
 				<appname>${project.artifactId}</appname>
 				<appversion>${project.version}</appversion>
                 <maven.test.skip>true</maven.test.skip>

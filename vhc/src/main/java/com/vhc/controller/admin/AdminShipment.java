@@ -19,19 +19,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.vhc.controller.BaseController;
-import com.vhc.model.Address;
-import com.vhc.model.City;
-import com.vhc.model.Inventory;
-import com.vhc.model.Item;
-import com.vhc.model.Product;
-import com.vhc.model.Purchaseorder;
-import com.vhc.model.Region;
-import com.vhc.model.Shipment;
-import com.vhc.model.Size;
-import com.vhc.model.Status;
-import com.vhc.model.Store;
-import com.vhc.model.Supplier;
-import com.vhc.model.User;
+import com.vhc.core.model.Address;
+import com.vhc.core.model.City;
+import com.vhc.core.model.Inventory;
+import com.vhc.core.model.Item;
+import com.vhc.core.model.Product;
+import com.vhc.core.model.Purchaseorder;
+import com.vhc.core.model.Region;
+import com.vhc.core.model.Shipment;
+import com.vhc.core.model.Size;
+import com.vhc.core.model.Status;
+import com.vhc.core.model.Store;
+import com.vhc.core.model.Supplier;
+import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 
 
@@ -784,7 +784,7 @@ public class AdminShipment extends BaseController {
         if (principal instanceof LoginUser) {
             user = ((LoginUser)principal).getUser();
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
         return user;
     }

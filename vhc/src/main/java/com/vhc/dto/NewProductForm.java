@@ -3,12 +3,12 @@ package com.vhc.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.vhc.model.Brand;
-import com.vhc.model.Color;
-import com.vhc.model.Product;
-import com.vhc.model.Producttag;
-import com.vhc.model.Style;
-import com.vhc.model.Type;
+import com.vhc.core.model.Brand;
+import com.vhc.core.model.Color;
+import com.vhc.core.model.Product;
+import com.vhc.core.model.Producttag;
+import com.vhc.core.model.Style;
+import com.vhc.core.model.Type;
 
 public class NewProductForm {
 

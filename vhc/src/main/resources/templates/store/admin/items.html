@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html layout:decorator="store/admin/layout/layout">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="store/admin/layout/layout">
+
 	<div layout:fragment="content">
 
 		<style>
@@ -44,7 +47,7 @@
 							<table id="mainTable" class="table table-striped table-bordered" th:if="${items != null}">
 								<thead>
 									<tr>
-										<th><i class="icon_cogs"></i> Action</th>
+										<th><i class="icon_cogs"></i></th>
 										<th><i class="icon_mobile"></i> ID</th>
 										<th><i class="icon_documents"></i> Product</th>
 										<th><i class="icon_mobile"></i> Model</th>
@@ -52,10 +55,10 @@
 										<th><i class="icon_mobile"></i> Size</th>
 										<!-- <th><i class="icon_mobile"></i> Cost</th> -->
 										<!-- <th><i class="icon_mobile"></i> Price</th> -->
-										<th><i class="icon_pin_alt"></i> Quantity</th>
-										<th><i class="icon_mobile"></i> PO No.</th>
+										<th><i class="icon_pin_alt"></i> Qty</th>
+										<!-- <th><i class="icon_mobile"></i> PO No.</th>
 										<th><i class="icon_mobile"></i> Shipment</th>
-										<!-- <th><i class="icon_pin_alt"></i> Received By</th> -->
+										<th><i class="icon_pin_alt"></i> Received By</th> -->
 										<th><i class="icon_contacts_alt"></i> Received Date</th>
 										<th> Inventory</th>
 										<th> Location</th>
@@ -78,10 +81,10 @@
 										<!-- <td th:text="${mf.cost}"></td> -->
 										<!-- <td th:text="${mf.price}"></td> -->
 										<td th:text="${mf.quantity}"></td>
-										<td th:text="${mf.purchaseorder!=null?mf.purchaseorder.code:''}"></td>
+										<!-- <td th:text="${mf.purchaseorder!=null?mf.purchaseorder.code:''}"></td>
 										<td th:text="${mf.shipment!=null?mf.shipment.code:''}"></td>
-										<!-- <td th:text="${mf.receivedby!=null?mf.receivedby.firstname+' '+mf.receivedby.lastname:''}"></td> -->
-										<td th:text="${#calendars.format(mf.receivedate,'dd MMMM yyyy')}"></td>
+										<td th:text="${mf.receivedby!=null?mf.receivedby.firstname+' '+mf.receivedby.lastname:''}"></td> -->
+										<td th:text="${#calendars.format(mf.receivedate,'dd MMM yyyy')}"></td>
 										<td th:text="${mf.inventories!=null and mf.inventories.size()>0?'Y':'N'}"></td>
 										<td th:text="${mf.inventories!=null and mf.inventories.size()>0 and mf.inventories.get(0).location!=null?mf.inventories.get(0).location.name:''}"></td>
 									</tr>

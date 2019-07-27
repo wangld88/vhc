@@ -1,7 +1,7 @@
 package com.vhc.security;
 
-import com.vhc.model.User;
-import com.vhc.service.UserService;
+import com.vhc.core.model.User;
+import com.vhc.core.service.UserService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class UserAdminAuthenticationProvider
 	    }
 
 		//User user = this.userService.authenticate(auth.getName(), auth.getCredentials().toString());
-		User user = this.userService.findByUsername(auth.getName());
+		User user = this.userService.getByUsername(auth.getName());
 
 		if (user == null) {
 			logger.error("User " + auth.getName() + " can not be found!!!!");

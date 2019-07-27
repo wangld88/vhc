@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import com.vhc.model.Inventory;
-import com.vhc.model.Item;
-import com.vhc.model.Product;
-import com.vhc.model.Purchaseorder;
-import com.vhc.model.Shipment;
-import com.vhc.model.Size;
-import com.vhc.model.User;
+import com.vhc.core.model.Inventory;
+import com.vhc.core.model.Item;
+import com.vhc.core.model.Product;
+import com.vhc.core.model.Purchaseorder;
+import com.vhc.core.model.Shipment;
+import com.vhc.core.model.Size;
+import com.vhc.core.model.User;
 
 public class ItemForm {
 
@@ -188,12 +188,12 @@ public class ItemForm {
 	}
 
 
-	public com.vhc.model.Size getSize() {
+	public com.vhc.core.model.Size getSize() {
 		return size;
 	}
 
 
-	public void setSize(com.vhc.model.Size size) {
+	public void setSize(com.vhc.core.model.Size size) {
 		this.size = size;
 	}
 

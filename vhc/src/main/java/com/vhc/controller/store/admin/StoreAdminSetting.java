@@ -17,17 +17,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.vhc.model.Country;
-import com.vhc.model.Location;
-import com.vhc.model.Province;
-import com.vhc.model.Size;
-import com.vhc.model.Store;
-import com.vhc.model.Style;
-import com.vhc.model.Type;
+import com.vhc.core.model.Country;
+import com.vhc.core.model.Location;
+import com.vhc.core.model.Province;
+import com.vhc.core.model.Size;
+import com.vhc.core.model.Store;
+import com.vhc.core.model.Style;
+import com.vhc.core.model.Type;
 import com.vhc.controller.store.StoreBase;
-import com.vhc.model.City;
-import com.vhc.model.Color;
-import com.vhc.model.User;
+import com.vhc.core.model.City;
+import com.vhc.core.model.Color;
+import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 
 
@@ -830,7 +830,7 @@ public class StoreAdminSetting extends StoreBase {
         if (principal instanceof LoginUser) {
             user = ((LoginUser)principal).getUser();
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
 
         return user;

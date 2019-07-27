@@ -28,19 +28,19 @@ import com.vhc.dto.BrandForm;
 import com.vhc.dto.CategoryForm;
 import com.vhc.dto.ImageForm;
 import com.vhc.dto.ProductForm;
-import com.vhc.model.Brand;
-import com.vhc.model.Category;
-import com.vhc.model.Categoryproduct;
-import com.vhc.model.Color;
-import com.vhc.model.Giftcard;
-import com.vhc.model.Image;
-import com.vhc.model.Inventory;
-import com.vhc.model.Item;
-import com.vhc.model.Page;
-import com.vhc.model.Product;
-import com.vhc.model.Producttag;
-import com.vhc.model.Size;
-import com.vhc.model.Style;
+import com.vhc.core.model.Brand;
+import com.vhc.core.model.Category;
+import com.vhc.core.model.Categoryproduct;
+import com.vhc.core.model.Color;
+import com.vhc.core.model.Giftcard;
+import com.vhc.core.model.Image;
+import com.vhc.core.model.Inventory;
+import com.vhc.core.model.Item;
+import com.vhc.core.model.Page;
+import com.vhc.core.model.Product;
+import com.vhc.core.model.Producttag;
+import com.vhc.core.model.Size;
+import com.vhc.core.model.Style;
 
 
 @Controller

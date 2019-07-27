@@ -402,6 +402,7 @@
 		    $(document).ready(function(){
 			    var token = $("meta[name='_csrf']").attr("content");
 			    var header = $("meta[name='_csrf_header']").attr("content");
+			    var friends = [];
 		    	dialog = $('#SearchCustomer').dialog({
     				width: 500,
     				autoOpen: false,
@@ -439,14 +440,14 @@
     	                .click(function () {
     	                    dialog.dialog('close');
     	                });
-
-    	                ShowResults('', friends);
+						console.log("Here it is!")
+    	                //ShowResults('', friends);
     	            }
 	    		});
 
 		    	$('#find').click(function(){
 		    		$.ajax({
-                        url: 'searchCustomer?',
+                        url: 'searchCustomers?',
                         //data: "{ 'prefix': '" + request.term + "'}",
                         dataType: "json",
                         type: "POST",
@@ -455,9 +456,18 @@
                             xhr.setRequestHeader(header, token);
                         },
                         success: function (data) {
-                            response($.map(data, function (item) {
+                        	console.log("customer: "+data);
+                        	friends = data;
+
+                        	/* output = "";
+                        	for(i in data[0]) {
+                        		output += i + ": "+data[0][i]+"\n";
+                        	}
+                        	console.log(output) */
+                            /* response($.map(data, function (item) {
         		                return { value: item.name, data: item.productid };
-                            }))
+                            })) */
+                        	ShowResults('', friends);
                         },
                         error: function (response) {
                         	console.log(response);
@@ -472,7 +482,6 @@
 
 	    	});
 
-		    var friends = ["John","Bob","Jones","Tessa","Anna","Casper","Ed","Francis","Greg","Hanna","Ivan" ];
 
 		    function ShowResults(filterText,dataSource) {
 		    	var html = ''
@@ -481,7 +490,7 @@
 
 		    		if(filterText.length < 1 || value.toLowerCase().indexOf(filterText)!=-1)
 		    		{
-		    			html += '<li><a href="#" onClick="SelectResult(this)">'+value+'</a></li>';
+		    			html += '<li><a href="#" onClick="SelectResult(this,'+value.customerid+')">'+value.user.firstname+' '+value.user.lastname+'</a></li>';
 		    		}
 
 		    	});
@@ -490,8 +499,36 @@
 
 		    }
 
-		    function SelectResult(element) {
-		    	alert('Hello, I am ' + $(element).text())
+		    function SelectResult(element, customerid) {
+		    	/* output = "";
+            	for(i in element) {
+            		output += i + ": "+element[i]+"\n";
+            	}
+            	console.log(output) */
+		    	alert('Hello, I am ' + $(element).text()+", customer ID: "+customerid)
+		    	//load shopping history
+				$.ajax({
+					url: 'customerHistory?',
+					//data: "{ 'prefix': '" + request.term + "'}",
+					dataType: "json",
+					type: "POST",
+					contentType: "application/json; charset=utf-8",
+					beforeSend: function(xhr){
+						xhr.setRequestHeader(header, token);
+					},
+					success: function (data) {
+						console.log("customer: "+data);
+						friends = data;
+						ShowResults('', friends);
+					},
+					error: function (response) {
+						console.log(response);
+						alert(response.responseText);
+					},
+					failure: function (response) {
+						alert(response.responseText);
+					}
+				});
 		    }
 		</script>
 		<!-- <script>

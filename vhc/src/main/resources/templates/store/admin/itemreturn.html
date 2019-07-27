@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html layout:decorator="store/admin/layout/layout">
+	<div layout:fragment="content">
+
+		<section class="content-header">
+			<h1>
+				Business Management
+				<small>Item Returns</small>
+			</h1>
+			<ol class="breadcrumb">
+				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
+				<li><a th:href="@{/store/admin/sales}"><i class="fa fa-cubes"></i>Sales</a></li>
+				<li><i class="fa fa-file-text-o"></i><span th:text="${' Return'}"></span></li>
+			</ol>
+		</section>
+
+		<section class="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="box" style="min-height: 800px;">
+						<div class="box-header">
+							<h3 class="box-title" th:text="${'Item Sale'}"></h3>
+						</div>
+						<div class="box-body">
+							<div class="from">
+								<div class="col-lg-12" style="margin-bottom: 10px;">
+									<form id="lookup" name="lookup" th:action="@{/store/admin/itemreturn/add}" method="get">
+										<label class="control-label col-lg-3">Original Invoice No. / Barcode:</label>
+										<input type="text" id="sku" name="sku" value="" class="col-lg-2" placeholder="Scan or type Invoice No." />
+										<div class="col-lg-7">
+											<button type="submit" class="btn btn-xs btn-primary"><i class="fa fa-plus"></i>  Check</button>
+										</div>
+									</form>
+								</div>
+								<div th:if="${message!=null}" class="col-lg-12">
+									<span class="control-label col-lg-2" th:text="${''}"></span>
+									<span th:class="${message.status} + ' col-lg-5'" th:text="${message.message}"></span>
+								</div>
+								<form id="sale"  name="sale" th:action="@{/store/admin/itemreturn/}" method="post" th:if="${orderitems!=null and orderitems.size()>0}">
+									<input type="hidden" id="invoiceid" name="invoiceid" th:value="${invoice.invoiceid}" />
+									<input type="hidden" id="barcode" name="barcode" th:value="${barcode}" />
+									<div style="padding: 5px; min-height: 200px;">
+										<table id="mainTable" class="table table-striped">
+											<tr>
+												<th>Action</th>
+												<th>Item</th>
+												<th>UPC</th>
+												<th>Size</th>
+												<th>Qty</th>
+												<th>Price</th>
+												<th>Final</th>
+											</tr>
+											<tr th:each="oitem : ${orderitems}">
+												<td><input type="checkbox" id="orderitemid" name="orderitemid" th:value="${oitem.orderitemid}" th:if="${oitem.inventory.status.name=='Delivered'}"></td>
+												<td th:text="${oitem.item.product.name}"></td>
+												<td th:text="${oitem.item.sku}"></td>
+												<td th:text="${oitem.item.size.sizenum+'('+oitem.item.size.region.name+'-'+oitem.item.size.type.name+')'}"></td>
+												<td th:text="${oitem.quantity}"></td>
+												<td th:text="${oitem.item.product.retail}"></td>
+												<td th:text="${oitem.item.product.finalprice}"></td>
+											</tr>
+											<tr>
+												<td>Sub-Total: </td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td><span th:text="${subTotal}"></span></td>
+											</tr>
+											<tr>
+												<td>Tax: </td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td><span th:text="${tax}"></span></td>
+											</tr>
+											<tr>
+												<td>Total: </td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td><span th:text="${total}"></span></td>
+											</tr>
+										</table>
+									</div>
+									<div style="float: right; padding-right: 70px; bottom:0px;">
+										<button id="payment" class="btn btn-app btn-success" th:if="${orderitems!=null and orderitems.size()>0 and rtn_invoice==null}"><i class="fa fa-credit-card"></i>Process Return</button>
+										<!-- <a id="print" th:href="@{/store/admin/itemreturn/invoice}" class="btn btn-app btn-primary" style="display: none"><i class="fa fa-file-text"></i>Print Invoice</a> -->
+										<a id="print" class="btn btn-app btn-primary" th:if="${rtn_invoice!=null}" ><i class="fa fa-file-text"></i>Print Invoice</a><!-- style="display: none" -->
+										<a id="newsale" th:href="@{/store/admin/itemreturn}" class="btn btn-app btn-primary" style="display: none"><i class="fa fa-file-text"></i>New Return</a>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<script th:src="@{/js/jquery-1.10.2.min.js}"></script>
+		<script th:src="@{/js/jquery-ui-1.12.1.js}"></script>
+
+		<script type="text/javascript">
+			/*<![CDATA[*/
+		    var token = $("meta[name='_csrf']").attr("content");
+		    var header = $("meta[name='_csrf_header']").attr("content");
+
+			$(document).ready(function() {
+				$("#print").click(function() {
+					window.open("printinvoice");
+					return false;
+				});
+			});
+			/*]]>*/
+		</script>
+	</div>
+</html>

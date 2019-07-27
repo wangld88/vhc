@@ -2,8 +2,8 @@ package com.vhc.dto;
 
 import java.sql.Blob;
 
-import com.vhc.model.Image;
-import com.vhc.model.Product;
+import com.vhc.core.model.Image;
+import com.vhc.core.model.Product;
 import com.vhc.util.ImageProcessor;
 
 public class ImageForm {

@@ -26,31 +26,30 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.common.collect.Lists;
-import com.vhc.controller.BaseController;
+import com.vhc.controller.store.StoreBase;
 import com.vhc.dto.BrandForm;
 import com.vhc.dto.CategoryForm;
 import com.vhc.dto.ImageForm;
 import com.vhc.dto.ProductForm;
-import com.vhc.model.Address;
-import com.vhc.model.Brand;
-import com.vhc.model.Category;
-import com.vhc.model.Categoryproduct;
-import com.vhc.model.City;
-import com.vhc.model.Color;
-import com.vhc.model.Image;
-import com.vhc.model.Inventory;
-import com.vhc.model.Product;
-import com.vhc.model.Style;
-import com.vhc.model.Type;
-import com.vhc.model.User;
+import com.vhc.core.model.Address;
+import com.vhc.core.model.Brand;
+import com.vhc.core.model.Category;
+import com.vhc.core.model.Categoryproduct;
+import com.vhc.core.model.City;
+import com.vhc.core.model.Color;
+import com.vhc.core.model.Image;
+import com.vhc.core.model.Inventory;
+import com.vhc.core.model.Product;
+import com.vhc.core.model.Style;
+import com.vhc.core.model.Type;
+import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 import com.vhc.util.ImageProcessor;
 
 
 @Controller
 @RequestMapping(value="/store/admin")
-public class StoreAdminProduct extends BaseController {
+public class StoreAdminProduct extends StoreBase {
 
 	private final Logger logger = LoggerFactory.getLogger(StoreAdminProduct.class);
 
@@ -97,7 +96,7 @@ public class StoreAdminProduct extends BaseController {
 		return "store/index";
 	}
 
-	@RequestMapping(method={RequestMethod.GET}, value={"/brands"})
+	@RequestMapping(method=RequestMethod.GET, value="/brands")
 	public String dspBrands(ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
@@ -118,7 +117,7 @@ public class StoreAdminProduct extends BaseController {
 	}
 
 
-	@RequestMapping(method={RequestMethod.GET}, value={"/brand"})
+	@RequestMapping(method=RequestMethod.GET, value="/brand")
 	public String dspBrand(ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
@@ -140,7 +139,7 @@ public class StoreAdminProduct extends BaseController {
 	}
 
 
-	@RequestMapping(method={RequestMethod.GET}, value={"/brand/{brandid}"})
+	@RequestMapping(method=RequestMethod.GET, value="/brand/{brandid}")
 	public String updateBrand(ModelMap model, @PathVariable("brandid") Long brandid, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
@@ -168,8 +167,12 @@ public class StoreAdminProduct extends BaseController {
 	}
 
 
-	@RequestMapping(method={RequestMethod.POST}, value={"/brand"})
-	public String doBrand(@RequestParam("picture") MultipartFile picture, @RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
+	@RequestMapping(method=RequestMethod.POST, value="/brand")
+	public String doBrand(@RequestParam Map<String,String> requestParams,
+			@RequestParam(name="picture", required=false) MultipartFile picture,
+			ModelMap model,
+			HttpSession httpSession) {
+
 		String rtn = "brands";
 
 		Object principal = getPrincipal();
@@ -244,7 +247,7 @@ public class StoreAdminProduct extends BaseController {
 	}
 
 
-	@RequestMapping(value = "/brand/removeImage", method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.POST, value = "/brand/removeImage")
 	public String removeImage(@RequestParam("brandid") Long brandid,
 			ModelMap model, HttpSession httpSession) {
 
@@ -279,6 +282,7 @@ public class StoreAdminProduct extends BaseController {
 
 		User loginUser = getLoginUser(principal);
 		List<Product> products = productService.getAll();
+
 		model.addAttribute("products", products);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Products");
@@ -304,7 +308,9 @@ public class StoreAdminProduct extends BaseController {
 		List<Brand> brands = brandService.getAll();
 		List<Color> colors = colorService.getAll();
 		List<Style> styles = styleService.getAll();
+		List<Category> categories = categoryService.getAll();
 
+		model.addAttribute("categories", categories);
 		model.addAttribute("styles", styles);
 		model.addAttribute("types", types);
 		model.addAttribute("brands", brands);
@@ -340,9 +346,11 @@ public class StoreAdminProduct extends BaseController {
 
 		images.forEach(image->imageForms.add(new ImageForm(image)));
 
+		List<Category> categories = categoryService.getAll();
 
 		List<Style> styles = styleService.getAll();
 
+		model.addAttribute("categories", categories);
 		model.addAttribute("styles", styles);
 		model.addAttribute("types", types);
 		model.addAttribute("brands", brands);
@@ -357,8 +365,10 @@ public class StoreAdminProduct extends BaseController {
 	}
 
 
-	@RequestMapping(method={RequestMethod.POST}, value={"/product"})
-	public String doProduct(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
+	@RequestMapping(method=RequestMethod.POST, value="/product")
+	public String doProduct(@RequestParam Map<String,String> requestParams,
+			@RequestParam(name="categoryid",required = false) Long[] categoryids,
+			ModelMap model, HttpSession httpSession) {
 		String rtn = "products";
 
 		Object principal = getPrincipal();
@@ -387,14 +397,20 @@ public class StoreAdminProduct extends BaseController {
 		String points = requestParams.get("points");
 		String comments = requestParams.get("comments");
 		String storefront = requestParams.get("storefront");
+		String display = requestParams.get("display");
+
+		logger.info("display: {}, categoryids: {}", display, categoryids);
 
 		Brand brand = brandService.getById(Long.parseLong(brandid));
 		Color color = colorService.getById(Long.parseLong(colorid));
 		Type type = typeService.getById(Long.parseLong(typeid));
 
 		Product product = new Product();
+		List<Category> categories = new ArrayList<>();
+
 		if(productid != null && !productid.isEmpty()) {
-			product.setProductid(Long.parseLong(productid));
+			product = productService.getById(Long.parseLong(productid));
+			categories = product.getCategories();
 		}
 
 		if(styleid != null && !styleid.isEmpty()) {
@@ -421,6 +437,7 @@ public class StoreAdminProduct extends BaseController {
 		product.setType(type);
 		product.setMaterial(material);
 		//product.setWholesale(new BigDecimal(wholesale));
+
 		if(points != null && !points.isEmpty()) {
 			product.setPoints(Long.parseLong(points));
 		}
@@ -429,8 +446,36 @@ public class StoreAdminProduct extends BaseController {
 			storefront = "0";
 		}
 		product.setStorefront(storefront);
+		if(display == null || display.isEmpty()) {
+			display = "0";
+		}
+		product.setDisplay(display);
 
 		product = productService.save(product);
+
+		if(categoryids != null && categoryids.length != 0) {
+			for(Long categoryid : categoryids) {
+				//System.out.println("categories: "+categories.size()+", categoryid: "+categoryid);
+				Category ctgy = categories.stream().filter(c -> c.getCategoryid() == categoryid.longValue()).findFirst().orElse(null);
+
+				if(ctgy != null) {
+					categories.remove(ctgy);
+				} else {
+					Categoryproduct cp = new Categoryproduct();
+					Category category = categoryService.getById(categoryid);
+					cp.setCategory(category);
+					cp.setProduct(product);
+					cp = categoryproductService.save(cp);
+				}
+			}
+		}
+
+		if(categories != null && !categories.isEmpty()) {
+			for(Category c : categories) {
+				Categoryproduct cp = categoryproductService.getByCategoryidProductid(c.getCategoryid(), product.getProductid());
+				categoryproductService.delete(cp);
+			}
+		}
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Products");
 		model.addAttribute("subMenu", "products");
@@ -522,10 +567,10 @@ public class StoreAdminProduct extends BaseController {
 	}
 
 
-	@RequestMapping(method={RequestMethod.POST}, value={"/category"})
-	public String doCategory(@RequestParam("picture") MultipartFile picture,
-							 @RequestParam("name") String name,
-							 @RequestParam("title") String title,
+	@RequestMapping(method=RequestMethod.POST, value="/category")
+	public String doCategory(@RequestParam(name="picture", required=false) MultipartFile picture,
+							 @RequestParam(name="name", required=false) String name,
+							 @RequestParam(name="title", required=false) String title,
 							 @RequestParam("categoryid") Long categoryid,
 							 ModelMap model,
 							 HttpSession httpSession) {
@@ -607,7 +652,9 @@ public class StoreAdminProduct extends BaseController {
 
 	@RequestMapping(method={RequestMethod.POST}, value={"/category/product"})
 	public String addCategoryproduct(@RequestParam("categoryid") Long categoryid,
-			@RequestParam("productid") List<Long> productids, ModelMap model, HttpSession httpSession) {
+			@RequestParam("productid") List<Long> productids,
+			ModelMap model,
+			HttpSession httpSession) {
 
 		logger.info("add category product");
 		Object principal = getPrincipal();
@@ -722,7 +769,8 @@ public class StoreAdminProduct extends BaseController {
 	@RequestMapping(value = "/removeImage", method = RequestMethod.POST)
 	public String uploadImage(@RequestParam("imageid") Long imageid,
 			@RequestParam("productid") Long productid,
-			ModelMap model, HttpSession httpSession) {
+			ModelMap model,
+			HttpSession httpSession) {
 
 		Object principal = getPrincipal();
 
@@ -753,7 +801,7 @@ public class StoreAdminProduct extends BaseController {
         if (principal instanceof LoginUser) {
             user = ((LoginUser)principal).getUser();
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
 
         return user;

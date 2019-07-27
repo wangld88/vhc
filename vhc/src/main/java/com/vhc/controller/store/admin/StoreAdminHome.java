@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.vhc.controller.store.StoreBase;
-import com.vhc.model.User;
+import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 
 
@@ -81,7 +81,7 @@ public class StoreAdminHome extends StoreBase {
         if (principal instanceof LoginUser) {
             user = ((LoginUser)principal).getUser();
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
 
         return user;

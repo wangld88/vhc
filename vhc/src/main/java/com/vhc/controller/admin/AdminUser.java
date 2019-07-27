@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.vhc.model.Role;
-import com.vhc.model.User;
-import com.vhc.model.Userrole;
+import com.vhc.core.model.Role;
+import com.vhc.core.model.User;
+import com.vhc.core.model.Userrole;
 import com.vhc.security.LoginUser;
 
 
@@ -214,7 +214,7 @@ public class AdminUser extends AdminBase {
         		user = auth.getUser();
         	}
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
         return user;
     }

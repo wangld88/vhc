@@ -22,12 +22,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.vhc.controller.store.StoreBase;
-import com.vhc.model.Address;
-import com.vhc.model.City;
-import com.vhc.model.Customer;
-import com.vhc.model.Role;
-import com.vhc.model.User;
-import com.vhc.model.Userrole;
+import com.vhc.core.model.Address;
+import com.vhc.core.model.City;
+import com.vhc.core.model.Customer;
+import com.vhc.core.model.Role;
+import com.vhc.core.model.User;
+import com.vhc.core.model.Userrole;
 import com.vhc.security.LoginUser;
 import com.vhc.util.Message;
 
@@ -63,7 +63,7 @@ public class StoreAdminUser extends StoreBase {
 
 			customers = customerService.getByLastnamePhone(user);
 		}
-		System.out.println("customers: "+customers.size());
+		//System.out.println("customers: "+customers.size());
 		logger.debug("customers: "+customers.size());
 		model.addAttribute("customers", customers);
 		model.addAttribute("message", msg);
@@ -230,7 +230,7 @@ public class StoreAdminUser extends StoreBase {
         		user = auth.getUser();
         	}
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
         return user;
     }

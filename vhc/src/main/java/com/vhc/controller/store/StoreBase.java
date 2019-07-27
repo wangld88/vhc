@@ -3,6 +3,7 @@ package com.vhc.controller.store;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -12,12 +13,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
 
 import com.vhc.controller.BaseController;
+import com.vhc.util.Message;
 
 
 public class StoreBase extends BaseController {
@@ -26,6 +30,7 @@ public class StoreBase extends BaseController {
 
 	protected static final String ERROR_VIEW = "store/admin/error/error";
 
+	private static final String ALERT_MESSAGE = "errorMessage";
 
 	protected boolean hasRole(String role) {
         // get security context from thread local
@@ -46,51 +51,54 @@ public class StoreBase extends BaseController {
     }
 
 	@ExceptionHandler(TemplateProcessingException.class)
-	public ModelAndView handleTemplateProcessingException(Exception e) {
+	public String handleTemplateProcessingException(ModelMap model, Exception e) {
 
-		final ModelAndView model = initModelView(null);
-
-		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-		model.setStatus(HttpStatus.NOT_FOUND);
-		model.addObject("errordetails", "No such page found!");
+		//System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+		//model.setStatus(HttpStatus.NOT_FOUND);
+		model.addAttribute("errordetails", "No such page found!");
 		//model.addObject(RETURN_MESSAGE, new Message(Message.ERROR, "The requested resource could not be found!"));
 		logger.info("Error: " + e.getMessage());
+		model.addAttribute(ALERT_MESSAGE, new Message(Message.ERROR, "The requested page could not be found!"));
 
-        return model;
+        return "/error/error";
     }
 
 
-	/*@ExceptionHandler(NoHandlerFoundException.class)
-	public ModelAndView handleNoHandlerFoundException(NoHandlerFoundException e) {
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public String methodNotSupportExceptionHandling(HttpServletRequest request,
+    		HttpServletResponse response,
+    		ModelMap model,
+    		HttpRequestMethodNotSupportedException e) {
 
-		final ModelAndView model = initModelView(null);
+        //final ModelAndView model = initModelView(null);
+        logger.error("[x] HttpRequestMethodNotSupportedException: Http Request Method Not Supported!");
+        //model.setStatus(HttpStatus.NOT_FOUND);
+        model.addAttribute("errordetails", "No such page found!");
+        model.addAttribute(ALERT_MESSAGE, new Message(Message.ERROR, "The requested method could not be found!"));
 
-		//model.addObject(RETURN_MESSAGE, new Message(Message.ERROR, "The requested resource could not be found!"));
-		logger.info("Error: " + ((NoHandlerFoundException) e).getRequestURL());
-		logger.info("Error: " + ((NoHandlerFoundException) e).getCause());
-		logger.info("Error: " + e.getMessage());
-		Map<String, Object> att = new HashMap<>();
-    	att.put("requestURL", e.getRequestURL());
-		att.put("title", "No such page found!");
-    	att.put("trace", e.getStackTrace());
-    	att.put("message", e.getMessage());
+        return "/error/error";
+    }
 
-    	model.setStatus(HttpStatus.NOT_FOUND);
-		model.addObject("exception", att);
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public String handleNoHandlerFoundException(ModelMap model, Exception e) {
 
-		return model;
-    }*/
+        logger.error("[x] NoHandlerFoundException: No such page found!");
+
+        model.addAttribute("errordetails", "Bad Request!");
+        model.addAttribute(ALERT_MESSAGE, new Message(Message.ERROR, "The requested resource could not be found!"));
+
+        return "/error/error";
+    }
 
 
 	@ExceptionHandler({ Exception.class })
-	public ModelAndView uncaughtExceptionHandling (Exception e, HttpServletResponse httpresponse) {
+	public String uncaughtExceptionHandling (Exception e) {
 
 		logger.info("General Error is caught" + e.getMessage());
 		e.printStackTrace();
-		//String errorMsg = "";
-		String errorDetails = "N/A";
+		ModelMap model = new ModelMap();
 
-		final ModelAndView model = initModelView(ERROR_VIEW);
+		String errorDetails = "N/A";
 
 		if (e != null) {
 			errorDetails = e.getMessage();
@@ -100,12 +108,12 @@ public class StoreBase extends BaseController {
 			}
 
 		}
+        model.addAttribute("errordetails", errorDetails);
+        model.addAttribute(ALERT_MESSAGE, new Message(Message.ERROR, "Unexpected Error!"));
 
-		model.addObject("errordetails", errorDetails);
-
-		return model;
-
+        return "/error/error";
 	}
+
 
 	/*public Calendar parseDate(String date) {
 

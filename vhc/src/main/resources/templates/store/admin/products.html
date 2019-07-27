@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html layout:decorator="store/admin/layout/layout">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="store/admin/layout/layout">
+
 	<div layout:fragment="content">
 
 		<style>
@@ -86,7 +89,6 @@
 										<td th:text="${product.clinic!=null?#numbers.formatDecimal(product.clinic, 0, 2):''}"></td>
 										<td th:text="${product.onsale!=null?#numbers.formatDecimal(product.onsale, 0, 2):''}"></td>
 										<td th:text="${product.points}"></td>
-										<!-- <td th:text="${product.comments}"></td> -->
 										<td th:text="${product.images!=null and product.images.size()>0?'Uploaded':'Not Upload'}"></td>
 									</tr>
 								</tbody>

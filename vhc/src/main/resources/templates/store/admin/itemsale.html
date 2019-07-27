@@ -27,7 +27,7 @@
 		<section class="content-header">
 			<h1>
 				Business Management
-				<small>Point of Sales</small>
+				<small>Item Sales</small>
 			</h1>
 			<ol class="breadcrumb">
 				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -39,7 +39,7 @@
 		<section class="content">
 			<div class="row">
 				<div class="col-lg-12">
-					<div class="box">
+					<div class="box" style="min-height: 800px;">
 						<div class="box-header">
 							<h3 class="box-title" th:text="${'Item Sale'}"></h3>
 						</div>
@@ -92,14 +92,18 @@
 												<th>Action</th>
 												<th>Item</th>
 												<th>UPC</th>
-												<th>Quantity</th>
+												<th>Size</th>
+												<th>Qty</th>
 												<th>Price</th>
+												<th>Final</th>
 											</tr>
 											<tr th:each="inventory: ${saleList}">
-												<td><a class="btn btn-danger" th:onclick="${'removeInv('+inventory.inventoryid+')'}"><i class="fa fa-trash-o"></i></a></td>
+												<td><a id="rmvBtn" class="btn btn-danger" th:onclick="${'removeInv('+inventory.inventoryid+')'}"><i class="fa fa-trash-o"></i></a></td>
 												<td th:text="${inventory.item.product.name}"></td>
 												<td th:text="${inventory.item.sku}"></td>
+												<td th:text="${inventory.item.size.sizenum+'('+inventory.item.size.region.name+'-'+inventory.item.size.type.name+')'}"></td>
 												<td th:text="${inventory.quantity}"></td>
+												<td th:text="${inventory.item.product.retail}"></td>
 												<td th:text="${inventory.item.product.finalprice}"></td>
 											</tr>
 											<tr>
@@ -107,10 +111,14 @@
 												<td></td>
 												<td></td>
 												<td></td>
+												<td></td>
+												<td></td>
 												<td><span th:text="${subTotal}"></span></td>
 											</tr>
 											<tr>
-												<td>Tax: 13%</td>
+												<td>Tax: </td>
+												<td></td>
+												<td></td>
 												<td></td>
 												<td></td>
 												<td></td>
@@ -118,6 +126,8 @@
 											</tr>
 											<tr>
 												<td>Total: </td>
+												<td></td>
+												<td></td>
 												<td></td>
 												<td></td>
 												<td></td>
@@ -129,6 +139,7 @@
 										<a id="payment" class="btn btn-app btn-success" th:if="${saleList!=null and saleList.size()>0}"><i class="fa fa-credit-card"></i>Pay Request</a>
 										<!-- <a id="print" th:href="@{/store/admin/itemsale/invoice}" class="btn btn-app btn-primary" style="display: none"><i class="fa fa-file-text"></i>Print Invoice</a> -->
 										<a id="print" class="btn btn-app btn-primary" style="display: none"><i class="fa fa-file-text"></i>Print Invoice</a>
+										<a id="newsale" th:href="@{/store/admin/itemsale}" class="btn btn-app btn-primary" style="display: none"><i class="fa fa-file-text"></i>New Sale</a>
 									</div>
 								</form>
 							</div>
@@ -260,6 +271,7 @@
 			    var dialog, form;
 
 				dialog = $( "#pay" ).dialog({
+					dialogClass: 'payDialog',
 					autoOpen: false,
 					resizable: false,
 					minHeight: 'auto',
@@ -272,6 +284,9 @@
 							var formURL = form.attr("action");
 
 							console.log("URL: " + formURL);
+
+							//if() return false;
+
 							$.ajax({
 								url: formURL,
 								type: "POST",
@@ -281,11 +296,13 @@
 				                },
 								success: function(data, textStatus, jqXHR) {
 									//console.log("URL: "+data);
-									alert("Payment completed succssfully!")
+									alert("Payment completed successfully!")
 									//$('#pay #balance').html(data);
 									//return true;
 									$("#payment").hide();
 									$("#print").show();
+									$("#newsale").show();
+									$("a[id=rmvBtn]").hide();
 									dialog.dialog( "close" );
 								},
 								error: function(jqXHR, status, error) {
@@ -309,6 +326,7 @@
 
 				$('#payment').click(function(){
 				    dialog.dialog( "open" );
+				    calTotal();
 				});
 
 				//form = dialog.find( "form" ).on( "submit", function( event ) {
@@ -322,7 +340,7 @@
 						event.preventDefault();
 						console.log("postData: " + postData);
 						$.ajax({
-							url: "/vhc/store/admin/giftcardbalance",
+							url: "/vhc/store/admin/checkgiftcard",
 							type: "POST",
 							data: postData,
 			                beforeSend:function(xhr) {
@@ -338,6 +356,7 @@
 								} else {
 									$("#giftbalance").html("Gift card has 0 balance or pin is not correct")
 								}
+								console.log("SSSSSSSSSSSSS")
 								calTotal();
 								return false;
 							},
@@ -398,22 +417,46 @@
 				});
 
 				$("#amount1").keyup(function() {
+					console.log("S1")
 					calTotal(1);
-				})
+				});
 				$("#amount2").keyup(function() {
+					console.log("SS2")
 					calTotal(2);
-				})
+				});
 				$("#amount3").keyup(function() {
+					console.log("SSS3")
 					calTotal(3);
-				})
+				});
 				$("#amount4").keyup(function() {
+					console.log("SSSS4")
 					calTotal(4);
-				})
+				});
 
 				function calTotal(type) {
 					console.log("Original Balance: "+$("#amount").val()+", save: "+$("#save").val()+", 1: "+$("#amount1").val()+", 3: "+$("#amount3").val())
 					balance = ($("#amount").val() - $("#save").val() - $("#amount1").val() - $("#amount2").val() - $("#amount3").val() - $("#amount4").val()).toFixed(2);
 console.log("balance: "+balance);
+					var btns = $('.payDialog'+' .ui-dialog-buttonpane button');
+					var btn = null;
+console.log('button number: '+btns.length)
+					for(var i=0; i<btns.length; ++i) {
+						tmp = $(btns[i]);
+						console.log('button name: '+tmp.text())
+						if(tmp.text() == 'Pay') {
+							btn = tmp;
+						}
+					}
+
+					if(btn) {
+						if(balance > 0) {
+							btn.attr('disabled', true).addClass('ui-state-disabled');
+						} else {
+							btn.attr('disabled', false).removeClass('ui-state-disabled');
+						}
+					} else {
+						console.log('button not found');
+					}
 
 					if(balance < 0) {
 						change = 0 - balance;

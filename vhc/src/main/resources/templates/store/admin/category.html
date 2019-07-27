@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html layout:decorator="store/admin/layout/layout">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="store/admin/layout/layout">
 
 	<div layout:fragment="content">
 
@@ -343,7 +345,7 @@
 										</div>
 									</div>
 									<div style="margin-left: 150px; margin-top: 0px; margin-right: 100px;">
-									<table id="mainTable" class="table table-striped table-bordered">
+									<table id="mainTable2" class="table table-striped table-bordered">
 										<thead>
 											<tr>
 												<th><i class="icon_documents"></i> Product</th>
@@ -420,6 +422,17 @@
 		<script th:src="@{/js/jquery-ui-1.12.1.js}"></script>
 		<script th:src="@{/js/jquery.autocomplete.min.js}"></script>
 		<script>
+			$(function () {
+				$('#mainTable2').DataTable({
+				  'paging'      : false,
+				  'lengthChange': false,
+				  'searching'   : true,
+				  'ordering'    : true,
+				  'info'        : true,
+				  'autoWidth'   : false
+				})
+			});
+
 			$(document).ready(function() {
 			    var token = $("meta[name='_csrf']").attr("content");
 			    var header = $("meta[name='_csrf_header']").attr("content");
@@ -460,7 +473,7 @@
 
 				// Grab the files and set them to our variable
 				function prepareUpload(event) {
-					alert("xxxdf")
+					//alert("xxxdf")
 					files = event.target.files;
 				}
 
@@ -468,7 +481,7 @@
 
 				// Catch the form submit and upload the files
 				function uploadFiles(event) {
-					alert("cccc")
+					//alert("cccc")
 					event.stopPropagation(); // Stop stuff happening
 					event.preventDefault(); // Totally stop stuff happening
 

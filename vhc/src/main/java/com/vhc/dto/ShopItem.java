@@ -3,9 +3,9 @@ package com.vhc.dto;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import com.vhc.model.Item;
-import com.vhc.model.Product;
-import com.vhc.model.Size;
+import com.vhc.core.model.Item;
+import com.vhc.core.model.Product;
+import com.vhc.core.model.Size;
 
 public class ShopItem implements Serializable {
 
@@ -30,6 +30,7 @@ public class ShopItem implements Serializable {
 	private String sizenum;
 	private String region;
 	private int total;
+	private String type;
 
 
 	public long getSizeid() {
@@ -68,6 +69,7 @@ public class ShopItem implements Serializable {
 		this.sizenum = item.getSize().getSizenum();
 		this.sizeid = item.getSize().getSizeid();
 		this.region = item.getSize().getRegion().getCode();
+		this.type = item.getSize().getType().getName();
 
 		if(onsale != null && onsale != BigDecimal.ZERO) {
 			price = onsale.doubleValue();
@@ -75,6 +77,16 @@ public class ShopItem implements Serializable {
 			price = retail.doubleValue();
 		}
 	}
+
+	public String getType() {
+		return type;
+	}
+
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 
 	public String getRegion() {
 		return region;

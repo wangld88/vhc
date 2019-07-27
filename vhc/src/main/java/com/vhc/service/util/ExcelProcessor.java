@@ -17,8 +17,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-import com.vhc.model.Giftcard;
-import com.vhc.model.User;
+import com.vhc.core.model.Giftcard;
+import com.vhc.core.model.User;
 
 
 public class ExcelProcessor {

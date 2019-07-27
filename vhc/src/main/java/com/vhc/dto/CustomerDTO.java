@@ -2,8 +2,8 @@ package com.vhc.dto;
 
 import java.util.Calendar;
 
-import com.vhc.model.Address;
-import com.vhc.model.User;
+import com.vhc.core.model.Address;
+import com.vhc.core.model.User;
 
 public class CustomerDTO {
 

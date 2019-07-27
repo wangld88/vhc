@@ -4,61 +4,53 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.vhc.security.PromocodeService;
-import com.vhc.service.AccountService;
-import com.vhc.service.AddressService;
-import com.vhc.service.BrandService;
-import com.vhc.service.CategoryService;
-import com.vhc.service.CategoryproductService;
-import com.vhc.service.CityService;
-import com.vhc.service.ColorService;
-import com.vhc.service.CountryService;
-import com.vhc.service.CreditcardService;
-import com.vhc.service.CustomerService;
-import com.vhc.service.DebitcardService;
-import com.vhc.service.GiftcardService;
-import com.vhc.service.ImageService;
-import com.vhc.service.InventoryService;
-import com.vhc.service.InvoiceService;
-import com.vhc.service.ItemService;
-import com.vhc.service.LocationService;
-import com.vhc.service.OrderService;
-import com.vhc.service.OrderitemService;
-import com.vhc.service.PageService;
-import com.vhc.service.PageimageService;
-import com.vhc.service.PaymentService;
-import com.vhc.service.PaymentmethodService;
-import com.vhc.service.TypeService;
-import com.vhc.service.ProductService;
-import com.vhc.service.ProducttagService;
-import com.vhc.service.ProvinceService;
-import com.vhc.service.PurchaseorderService;
-import com.vhc.service.RegionService;
-import com.vhc.service.RoleService;
-import com.vhc.service.ShipmentService;
-import com.vhc.service.SizeService;
-import com.vhc.service.StaffService;
-import com.vhc.service.StatusService;
-import com.vhc.service.StoreService;
-import com.vhc.service.StyleService;
-import com.vhc.service.SupplierService;
-import com.vhc.service.TagService;
-import com.vhc.service.TransactionService;
-import com.vhc.service.UserService;
-import com.vhc.service.UserroleService;
-import com.vhc.util.Message;
+import com.vhc.core.service.PromocodeService;
+import com.vhc.core.service.AccountService;
+import com.vhc.core.service.AddressService;
+import com.vhc.core.service.BrandService;
+import com.vhc.core.service.CategoryService;
+import com.vhc.core.service.CategoryproductService;
+import com.vhc.core.service.CityService;
+import com.vhc.core.service.ColorService;
+import com.vhc.core.service.CountryService;
+import com.vhc.core.service.CreditcardService;
+import com.vhc.core.service.CustomerService;
+import com.vhc.core.service.DebitcardService;
+import com.vhc.core.service.GiftcardService;
+import com.vhc.core.service.ImageService;
+import com.vhc.core.service.InventoryService;
+import com.vhc.core.service.InvoiceService;
+import com.vhc.core.service.ItemService;
+import com.vhc.core.service.LocationService;
+import com.vhc.core.service.OrderService;
+import com.vhc.core.service.OrderitemService;
+import com.vhc.core.service.PageService;
+import com.vhc.core.service.PageimageService;
+import com.vhc.core.service.PaymentService;
+import com.vhc.core.service.PaymentmethodService;
+import com.vhc.core.service.TypeService;
+import com.vhc.core.service.ProductService;
+import com.vhc.core.service.ProducttagService;
+import com.vhc.core.service.ProvinceService;
+import com.vhc.core.service.PurchaseorderService;
+import com.vhc.core.service.RegionService;
+import com.vhc.core.service.RoleService;
+import com.vhc.core.service.ShipmentService;
+import com.vhc.core.service.SizeService;
+import com.vhc.core.service.StaffService;
+import com.vhc.core.service.StatusService;
+import com.vhc.core.service.StoreService;
+import com.vhc.core.service.StyleService;
+import com.vhc.core.service.SupplierService;
+import com.vhc.core.service.TagService;
+import com.vhc.core.service.TransactionService;
+import com.vhc.core.service.UserService;
+import com.vhc.core.service.UserroleService;
 import com.vhc.util.MessageHandler;
 
 
@@ -201,7 +193,7 @@ public class BaseController {
 
 	protected static final String DATE_FORMAT = "MM/dd/yyyy";
 
-	private static final String ALERT_MESSAGE = "errorMessage";
+	//private static final String ALERT_MESSAGE = "errorMessage";
 
 
 	public Calendar parseDate(String date) {
@@ -225,7 +217,7 @@ public class BaseController {
 		return rtn;
 	}
 
-	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	/*@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public String methodNotSupportExceptionHandling(HttpServletRequest request,
     		HttpServletResponse response,
     		ModelMap model,
@@ -243,14 +235,36 @@ public class BaseController {
     @ExceptionHandler(NoHandlerFoundException.class)
     public String handleNoHandlerFoundException(ModelMap model, Exception e) {
 
-        //final ModelAndView model = initModelView("graduploadform");
         logger.error("[x] NoHandlerFoundException: No such page found!");
-        //model.setStatus(HttpStatus.NOT_FOUND);
-        model.addAttribute("errordetails", "No such page found!");
+
+        model.addAttribute("errordetails", "Bad Request!");
         model.addAttribute(ALERT_MESSAGE, new Message(Message.ERROR, "The requested resource could not be found!"));
 
         return "/error/error";
     }
+
+
+	@ExceptionHandler({ Exception.class })
+	public String uncaughtExceptionHandling (ModelMap model, Exception e) {
+
+		logger.info("General Error is caught" + e.getMessage());
+		e.printStackTrace();
+
+		String errorDetails = "N/A";
+
+		if (e != null) {
+			errorDetails = e.getMessage();
+
+			if (e.getCause() != null && e.getCause().getMessage() != null) {
+				errorDetails += " - " + e.getCause().getMessage();
+			}
+
+		}
+        model.addAttribute("errordetails", errorDetails);
+        model.addAttribute(ALERT_MESSAGE, new Message(Message.ERROR, "Unexpected Error!"));
+
+        return "/error/error";
+	}*/
 
 	/*@ExceptionHandler(TemplateProcessingException.class)
 	public ModelAndView handleTemplateProcessingException(Exception e) {
@@ -279,31 +293,6 @@ public class BaseController {
         return model;
     }
 
-
-	@ExceptionHandler({ Exception.class })
-	public ModelAndView uncaughtExceptionHandling (Exception e, HttpServletResponse httpresponse) {
-
-		logger.info("General Error is caught" + e.getMessage());
-		e.printStackTrace();
-		//String errorMsg = "";
-		String errorDetails = "N/A";
-
-		final ModelAndView model = initModelView(ERROR_VIEW);
-
-		if (e != null) {
-			errorDetails = e.getMessage();
-
-			if (e.getCause() != null && e.getCause().getMessage() != null) {
-				errorDetails += " - " + e.getCause().getMessage();
-			}
-
-		}
-
-		model.addObject("errordetails", errorDetails);
-
-		return model;
-
-	}
 
 	private ModelAndView initModelView(String view) {
 		ModelAndView model = new ModelAndView(ERROR_VIEW);

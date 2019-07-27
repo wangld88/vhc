@@ -21,35 +21,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.vhc.controller.BaseController;
 import com.vhc.util.Message;
+import com.vhc.controller.store.StoreBase;
 import com.vhc.dto.ItemForm;
-import com.vhc.model.Address;
-import com.vhc.model.City;
-import com.vhc.model.Inventory;
-import com.vhc.model.Item;
-import com.vhc.model.Location;
-import com.vhc.model.Product;
-import com.vhc.model.Purchaseorder;
-import com.vhc.model.Region;
-import com.vhc.model.Shipment;
-import com.vhc.model.Size;
-import com.vhc.model.Status;
-import com.vhc.model.Store;
-import com.vhc.model.Supplier;
-import com.vhc.model.User;
+import com.vhc.core.model.Address;
+import com.vhc.core.model.City;
+import com.vhc.core.model.Inventory;
+import com.vhc.core.model.Item;
+import com.vhc.core.model.Location;
+import com.vhc.core.model.Product;
+import com.vhc.core.model.Purchaseorder;
+import com.vhc.core.model.Region;
+import com.vhc.core.model.Shipment;
+import com.vhc.core.model.Size;
+import com.vhc.core.model.Status;
+import com.vhc.core.model.Store;
+import com.vhc.core.model.Supplier;
+import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 
 
 /**
  *
  *
- * @author Jerry
+ * @author K&J
  *
  */
 @Controller
 @RequestMapping({"/store/admin"})
-public class StoreAdminShipment extends BaseController {
+public class StoreAdminShipment extends StoreBase {
 
 	private final Logger logger = LoggerFactory.getLogger(StoreAdminShipment.class);
 
@@ -367,9 +367,9 @@ public class StoreAdminShipment extends BaseController {
 		String rtn = "store/admin/shipment";
 
 		long mfid = supplierid.longValue();
-		System.out.println("++++++++++++++++++");
+		//System.out.println("++++++++++++++++++");
 		List<Purchaseorder> orders = purchaseorderService.getUnusedOrdersBySupplierid(mfid);
-		System.out.println("++++++++++++++++++");
+		//System.out.println("++++++++++++++++++");
 
 		List<Supplier> suppliers = supplierService.getAll();
 		//List<Item> items = itemService.getByShipment(mfid);
@@ -405,9 +405,9 @@ public class StoreAdminShipment extends BaseController {
 
 		List<Supplier> suppliers = supplierService.getAll();
 		List<Item> items = itemService.getByShipment(mfid);
-		System.out.println("++++++++++++++++++");
+		//System.out.println("++++++++++++++++++");
 		List<Purchaseorder> orders = purchaseorderService.getUnusedOrdersBySupplierid(mf.getSupplier().getSupplierid());
-		System.out.println("++++++++++++++++++");
+		//System.out.println("++++++++++++++++++");
 
 		model.addAttribute("orders", orders);
 		model.addAttribute("items", items);
@@ -977,7 +977,7 @@ logger.info("uinventoryid: "+uinventoryid);
         if (principal instanceof LoginUser) {
             user = ((LoginUser)principal).getUser();
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
 
         return user;

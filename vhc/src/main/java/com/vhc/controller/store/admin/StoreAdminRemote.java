@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,13 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vhc.controller.store.StoreBase;
-import com.vhc.model.Category;
-import com.vhc.model.Customer;
-import com.vhc.model.Giftcard;
-import com.vhc.model.Product;
-import com.vhc.model.Promocode;
-import com.vhc.model.Size;
-import com.vhc.model.User;
+import com.vhc.dto.OrderDTO;
+import com.vhc.core.model.Category;
+import com.vhc.core.model.Customer;
+import com.vhc.core.model.Giftcard;
+import com.vhc.core.model.Order;
+import com.vhc.core.model.Product;
+import com.vhc.core.model.Promocode;
+import com.vhc.core.model.Size;
+import com.vhc.core.model.User;
 import com.vhc.util.Message;
 
 
@@ -69,7 +72,7 @@ public class StoreAdminRemote extends StoreBase {
 	}
 
 
-	@RequestMapping(method=RequestMethod.POST, value="/searchCustomer")
+	@RequestMapping(method=RequestMethod.POST, value="/searchCustomers")
 	public List<Customer> getCustomers(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		logger.info("AJAX Customer search is called");
 
@@ -100,6 +103,15 @@ public class StoreAdminRemote extends StoreBase {
 		return customers;
 	}
 
+
+	@RequestMapping(method=RequestMethod.GET, value="/customerHistory/{customerid}")
+	public List<OrderDTO> getCustomerHistory(@PathVariable Long customerid, ModelMap model, HttpSession httpSession) {
+
+		List<Order> orders = orderService.getByCustomer(customerid);
+
+		return null;//orders.stream().forEach(action);;
+	}
+
 	@RequestMapping(method=RequestMethod.POST, value="/promocode")
 	public long getPromotion(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		long rtn = 0;
@@ -115,7 +127,8 @@ public class StoreAdminRemote extends StoreBase {
 		return rtn;
 	}
 
-	@RequestMapping(method=RequestMethod.POST, value="/giftcardbalance")
+
+	@RequestMapping(method=RequestMethod.POST, value="/checkgiftcard")
 	public BigDecimal checkBalance(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 
 		String cardnum = requestParams.get("cardcode");

@@ -47,7 +47,8 @@
 
 	</head>
 
-	<body class="hold-transition skin-blue sidebar-mini">
+	<!-- <body class="hold-transition skin-blue sidebar-mini"> --> <!-- Production -->
+	<body class="hold-transition skin-yellow-light sidebar-mini"> <!-- Test -->
 
 		<div class="wrapper">
 
@@ -72,7 +73,10 @@
         						<a th:href="@{/store/admin/items}"><i class="fa fa-circle-o"></i> Items</a>
         					</li>
         					<li class="user user-menu">
-        						<a th:href="@{/store/admin/itemSale}"><i class="fa fa-circle-o"></i> Item Sales</a>
+        						<a th:href="@{/store/admin/itemsale}"><i class="fa fa-circle-o"></i> Item Sales</a>
+        					</li>
+        					<li class="user user-menu">
+        						<a th:href="@{/store/admin/itemreturn}"><i class="fa fa-circle-o"></i> Returns</a>
         					</li>
 						</ul>
 					</div>
@@ -348,7 +352,7 @@
 							</span>
 						</a>
 						<ul class="treeview-menu">
-							<li th:class="${subMenu}=='Products'?active:''"><a th:href="@{/store/admin/itemSale}"><i class="fa fa-circle-o"></i> Item Sales</a></li>
+							<li th:class="${subMenu}=='Products'?active:''"><a th:href="@{/store/admin/itemsale}"><i class="fa fa-circle-o"></i> Item Sales</a></li>
 							<li th:class="${subMenu}=='Products'?active:''"><a th:href="@{/store/admin/sales}"><i class="fa fa-circle-o"></i> Point of Sales</a></li>
 							<li th:class="${subMenu}=='Products'?active:''"><a th:href="@{/store/admin/giftcard}"><i class="fa fa-circle-o"></i> Gift Card</a></li>
 							<li th:class="${subMenu}=='Products'?active:''"><a th:href="@{/store/admin/giftcardbalance}"><i class="fa fa-circle-o"></i> Card Balances</a></li>
@@ -1285,7 +1289,7 @@
 				  'paging'      : true,
 				  'lengthChange': false,
 				  'searching'   : true,
-				  'ordering'    : false,
+				  'ordering'    : true,
 				  'info'        : true,
 				  'autoWidth'   : false
 				})

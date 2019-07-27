@@ -3,10 +3,10 @@ package com.vhc.dto;
 import java.io.Serializable;
 import java.util.List;
 
-import com.vhc.model.Address;
-import com.vhc.model.Customer;
-import com.vhc.model.Item;
-import com.vhc.model.Payment;
+import com.vhc.core.model.Address;
+import com.vhc.core.model.Customer;
+import com.vhc.core.model.Item;
+import com.vhc.core.model.Payment;
 
 
 public class ShoppingCart implements Serializable {

@@ -24,14 +24,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.vhc.controller.BaseController;
 import com.vhc.dto.ShopItem;
 import com.vhc.dto.ShoppingCart;
-import com.vhc.model.Account;
-import com.vhc.model.Address;
-import com.vhc.model.City;
-import com.vhc.model.Customer;
-import com.vhc.model.Role;
-import com.vhc.model.Status;
-import com.vhc.model.User;
-import com.vhc.model.Userrole;
+import com.vhc.core.model.Account;
+import com.vhc.core.model.Address;
+import com.vhc.core.model.City;
+import com.vhc.core.model.Customer;
+import com.vhc.core.model.Role;
+import com.vhc.core.model.Status;
+import com.vhc.core.model.User;
+import com.vhc.core.model.Userrole;
 import com.vhc.security.LoginUser;
 
 
@@ -303,7 +303,7 @@ public class CustomerProfile extends BaseController {
         if (principal instanceof LoginUser) {
             user = ((LoginUser)principal).getUser();
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
 
         return user;

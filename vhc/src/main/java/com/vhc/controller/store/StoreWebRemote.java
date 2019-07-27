@@ -29,15 +29,15 @@ import com.vhc.dto.ItemForm;
 import com.vhc.dto.NewProductForm;
 import com.vhc.dto.ShopItem;
 import com.vhc.dto.ShoppingCart;
-import com.vhc.model.Category;
-import com.vhc.model.Giftcard;
-import com.vhc.model.Image;
-import com.vhc.model.Inventory;
-import com.vhc.model.Item;
-import com.vhc.model.Product;
-import com.vhc.model.Producttag;
-import com.vhc.model.Status;
-import com.vhc.model.Store;
+import com.vhc.core.model.Category;
+import com.vhc.core.model.Giftcard;
+import com.vhc.core.model.Image;
+import com.vhc.core.model.Inventory;
+import com.vhc.core.model.Item;
+import com.vhc.core.model.Product;
+import com.vhc.core.model.Producttag;
+import com.vhc.core.model.Status;
+import com.vhc.core.model.Store;
 
 
 @RestController

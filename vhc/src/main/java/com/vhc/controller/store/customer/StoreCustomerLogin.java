@@ -28,8 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.vhc.util.Message;
-import com.vhc.model.User;
-import com.vhc.service.PasswordtokenService;
+import com.vhc.core.model.User;
+import com.vhc.core.service.PasswordtokenService;
 import com.vhc.controller.BaseController;
 import com.vhc.dto.ForgetPasswordForm;
 
@@ -101,7 +101,7 @@ public class StoreCustomerLogin extends BaseController {
 			}
 
 			final String token = UUID.randomUUID().toString();
-			User emhcuser = userService.findByUsername(username);
+			User emhcuser = userService.getByUsername(username);
 
 			if (emhcuser.getUserid() > 0) {
 				String url = getAppUrl(request);

@@ -22,20 +22,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.vhc.model.City;
-import com.vhc.model.Color;
-import com.vhc.model.Country;
-import com.vhc.model.Image;
-import com.vhc.model.Location;
-import com.vhc.model.Page;
-import com.vhc.model.Pageimage;
-import com.vhc.model.Product;
-import com.vhc.model.Province;
-import com.vhc.model.Size;
-import com.vhc.model.Store;
-import com.vhc.model.Style;
-import com.vhc.model.Type;
-import com.vhc.model.User;
+import com.vhc.core.model.City;
+import com.vhc.core.model.Color;
+import com.vhc.core.model.Country;
+import com.vhc.core.model.Image;
+import com.vhc.core.model.Location;
+import com.vhc.core.model.Page;
+import com.vhc.core.model.Pageimage;
+import com.vhc.core.model.Product;
+import com.vhc.core.model.Province;
+import com.vhc.core.model.Size;
+import com.vhc.core.model.Store;
+import com.vhc.core.model.Style;
+import com.vhc.core.model.Type;
+import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 import com.vhc.util.ImageProcessor;
 
@@ -1157,7 +1157,7 @@ public class AdminSetting extends AdminBase {
         if (principal instanceof LoginUser) {
             user = ((LoginUser)principal).getUser();
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
 
         return user;

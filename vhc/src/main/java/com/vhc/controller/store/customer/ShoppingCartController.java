@@ -23,11 +23,11 @@ import com.vhc.controller.store.StoreBase;
 import com.vhc.dto.ItemForm;
 import com.vhc.dto.ShopItem;
 import com.vhc.dto.ShoppingCart;
-import com.vhc.model.Customer;
-import com.vhc.model.Item;
-import com.vhc.model.Status;
-import com.vhc.model.Store;
-import com.vhc.model.User;
+import com.vhc.core.model.Customer;
+import com.vhc.core.model.Item;
+import com.vhc.core.model.Status;
+import com.vhc.core.model.Store;
+import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 
 
@@ -257,7 +257,7 @@ public class ShoppingCartController extends StoreBase {
         if (principal instanceof LoginUser) {
             user = ((LoginUser)principal).getUser();
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
 
         return user;

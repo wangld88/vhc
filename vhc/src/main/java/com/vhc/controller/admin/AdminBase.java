@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
 
 import com.vhc.controller.BaseController;
+import com.vhc.core.model.User;
+import com.vhc.security.LoginUser;
 
 
 @Controller
@@ -24,7 +27,7 @@ public class AdminBase extends BaseController {
 
 	private static final Logger logger = LoggerFactory.getLogger(AdminBase.class);
 
-	protected static final String ERROR_VIEW = "error/error";
+	protected static final String ERROR_VIEW = "admin/error/error";
 
 
 	@ExceptionHandler(TemplateProcessingException.class)
@@ -42,23 +45,27 @@ public class AdminBase extends BaseController {
     }
 
 
-	/*@ExceptionHandler(NoHandlerFoundException.class)
+	@ExceptionHandler(NoHandlerFoundException.class)
 	public ModelAndView handleRestNoHandlerFoundException(NoHandlerFoundException e) {
 
 		final ModelAndView model = initModelView(null);
 
 		logger.info("Error: " + e.getMessage());
 		Map<String, Object> att = new HashMap<>();
+    	att.put("url", e.getRequestURL());
     	att.put("requestURL", e.getRequestURL());
 		att.put("title", "No such page found!");
     	att.put("trace", e.getStackTrace());
     	att.put("message", e.getMessage());
+    	att.put("path", e.getHttpMethod());
+    	att.put("error", e.getCause());
 
     	model.setStatus(HttpStatus.NOT_FOUND);
 		model.addObject("exception", att);
+		model.addObject("loginUser", getPrincipal());
 
         return model;
-    }*/
+    }
 
 
 	@ExceptionHandler({ Exception.class })
@@ -79,7 +86,7 @@ public class AdminBase extends BaseController {
 			}
 
 		}
-
+		model.addObject("loginUser", getPrincipal());
 		model.addObject("errordetails", errorDetails);
 
 		return model;
@@ -106,5 +113,17 @@ public class AdminBase extends BaseController {
 
 		return model;
 	}
+
+	private User getPrincipal(){
+    	User user = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        //System.out.println("Role is : "+((LoginStudent)principal).toString());
+        if (principal instanceof LoginUser) {
+            user = ((LoginUser)principal).getUser();
+        } else {
+            user = userService.getByUsername("");
+        }
+        return user;
+    }
 
 }

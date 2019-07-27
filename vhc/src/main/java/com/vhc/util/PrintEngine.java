@@ -24,8 +24,8 @@ import javax.print.PrintServiceLookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vhc.model.Inventory;
-import com.vhc.model.Product;
+import com.vhc.core.model.Inventory;
+import com.vhc.core.model.Product;
 
 
 public class PrintEngine implements Printable {

@@ -25,8 +25,8 @@ public class MultiHttpSecurityConfig {
     @Autowired
 	UserLoginService userLoginService;
 
-	@Autowired
-	static CustomSuccessHandler customSuccessHandler;
+	/*@Autowired
+	static CustomSuccessHandler customSuccessHandler;*/
 
 
 	@Configuration

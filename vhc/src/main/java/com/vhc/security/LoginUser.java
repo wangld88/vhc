@@ -1,7 +1,7 @@
 package com.vhc.security;
 
 
-import com.vhc.model.Userrole;
+import com.vhc.core.model.Userrole;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.ArrayList;
@@ -22,9 +22,9 @@ public class LoginUser extends User {
 
 	private static final long serialVersionUID = 1L;
 
-	private com.vhc.model.User user;
+	private com.vhc.core.model.User user;
 
-	public LoginUser(com.vhc.model.User user) {
+	public LoginUser(com.vhc.core.model.User user) {
 		super(user.getUsername(), user.getPassword(), AuthorityUtils.createAuthorityList(user.getRoles()));
 		/*System.out.println("user.getUsername(): "+user.getUsername() + ", Password:" +user.getPassword()+", roles: "+user.getRoles());
 		String[] roles = user.getRoles();
@@ -56,7 +56,7 @@ public class LoginUser extends User {
 		return user.getUsername();
 	}
 
-	public com.vhc.model.User getUser() {
+	public com.vhc.core.model.User getUser() {
 		return this.user;
 	}
 

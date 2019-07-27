@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.vhc.controller.BaseController;
-import com.vhc.model.Address;
-import com.vhc.model.City;
-import com.vhc.model.Staff;
-import com.vhc.model.Store;
-import com.vhc.model.User;
+import com.vhc.core.model.Address;
+import com.vhc.core.model.City;
+import com.vhc.core.model.Staff;
+import com.vhc.core.model.Store;
+import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 
 
@@ -278,7 +278,7 @@ public class AdminStore extends BaseController {
         		user = auth.getUser();
         	}
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
         return user;
     }

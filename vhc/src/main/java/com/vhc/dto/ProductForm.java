@@ -2,8 +2,8 @@ package com.vhc.dto;
 
 import java.util.List;
 
-import com.vhc.model.Product;
-import com.vhc.model.Producttag;
+import com.vhc.core.model.Product;
+import com.vhc.core.model.Producttag;
 
 public class ProductForm {
 

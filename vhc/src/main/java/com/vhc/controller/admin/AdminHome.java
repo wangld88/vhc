@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.vhc.controller.BaseController;
-import com.vhc.model.User;
+import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 
 
 @Controller
 @RequestMapping({"/admin"})
-public class AdminHome extends BaseController {
+public class AdminHome extends AdminBase {
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/","/home"})
 	public String dspHome(ModelMap model, HttpSession httpSession) {
@@ -81,7 +81,7 @@ public class AdminHome extends BaseController {
 		ModelMap model = new ModelMap();
 
 		model.addAttribute("loginUser", getPrincipal());
-
+System.out.println("handleInvalidRequest=================");
 		throw new NoHandlerFoundException(request.getMethod(), request.getRequestURL().toString(), new HttpHeaders());
     }
 
@@ -93,7 +93,7 @@ public class AdminHome extends BaseController {
         if (principal instanceof LoginUser) {
             user = ((LoginUser)principal).getUser();
         } else {
-            user = userService.findByUsername("");
+            user = userService.getByUsername("");
         }
         return user;
     }
