@@ -14,5 +14,7 @@ public interface TypeRepository extends CrudRepository<Type, Long> {
 
 	Type findByNameIgnoreCaseAndReftblIgnoreCase(String name, String reftbl);
 
+	List<Type> findByReftblIgnoreCase(String reftbl);
+
 	List<Type> findByNameIgnoreCaseLike(String name);
 }

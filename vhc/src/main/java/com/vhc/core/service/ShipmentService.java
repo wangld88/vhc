@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vhc.core.model.Purchaseorder;
 import com.vhc.core.model.Shipment;
 import com.vhc.core.repository.ShipmentRepository;
 
@@ -21,8 +22,16 @@ public class ShipmentService {
 		return shipmentRepository.findByShipmentid(shipmentid);
 	}
 
+	public Shipment getByCode(String code) {
+		return shipmentRepository.findByCode(code);
+	}
+
+	public List<Shipment> getByPO(Purchaseorder purchaseorder) {
+		return shipmentRepository.findByPurchaseorder(purchaseorder);
+	}
+
 	public List<Shipment> getAll() {
-		return shipmentRepository.findAll();
+		return shipmentRepository.findAllByOrderByReceivedateDesc();
 	}
 
 	public List<Shipment> getByName(String name) {

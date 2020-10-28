@@ -4,8 +4,8 @@
 
 		<section class="content-header">
 			<h1>
-				Sales Management
-				<small>Gift Card Balance</small>
+				Gift Card Balance
+				<small>Sales Management</small>
 			</h1>
 			<ol class="breadcrumb">
 				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -47,10 +47,217 @@
 								<span th:text="${'CA$'+giftcard.balance}"></span>
 							</div>
 						</div>
+
+						<div class="box-header" th:if="${giftcard!=null}">
+							<h3 class="box-title">Transfer From</h3>
+						</div>
+
+						<div class="box-body" th:if="${giftcard!=null}">
+							<div class="form" th:if="${msg==null}">
+								<form class="form-validate form-horizontal" id="transfer" name="transfer" method="post" th:action="@{/store/admin/transferbalance}">
+									<div class="form-group">
+									    <label for="cardnum1" class="control-label col-lg-2">Gift Card 1 <span class="required">*</span></label>
+									    <div class="col-lg-5">
+									        <input class="form-control" id="cardnum1" name="cardnum1" value="" type="text" />
+									    </div>
+									    <span class="col-lg-1">Available balance </span>
+									    <div id="div1" class="col-lg-3">
+									    	<span id="transpan1" text=""></span>
+									    	<input class="form-control" type="hidden" id="transfer1" name="transfer1">
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="cardnum2" class="control-label col-lg-2">Gift Card 2 <span class="required">*</span></label>
+									    <div class="col-lg-5">
+									        <input class="form-control" id="cardnum2" name="cardnum2" value="" type="text" />
+									    </div>
+									    <span class="col-lg-1">Available balance </span>
+									    <div id="div2" class="col-lg-3">
+									    	<span id="transpan2" text=""></span>
+									    	<input class="form-control" type="hidden" id="transfer2" name="transfer2">
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="cardnum3" class="control-label col-lg-2">Gift Card 3 <span class="required">*</span></label>
+									    <div class="col-lg-5">
+									        <input class="form-control" id="cardnum3" name="cardnum3" value="" type="text" />
+									    </div>
+									    <span class="col-lg-1">Available balance </span>
+									    <div id="div3" class="col-lg-3">
+									    	<span id="transpan3" text=""></span>
+									    	<input class="form-control" type="hidden" id="transfer3" name="transfer3">
+									    </div>
+									</div>
+									<div class="form-group">
+									    <div class="col-lg-offset-2 col-lg-10">
+									        <button class="btn btn-primary" type="submit"> Transfer </button>
+									        <input id="cardnum0" name="cardnum0" th:value="${giftcard==null?'':giftcard.code}" type="hidden" />
+									    </div>
+									</div>
+								</form>
+							</div>
+							<div class="form" th:if="${msg!=null}">
+								<span th:utext="${msg}"></span>
+							</div>
+						</div>
+						<div class="box-body">
+						</div>
 					</div>
 				</div>
 			</div>
 		</section>
-      <!--main content end-->
+		<!--main content end-->
+		<script th:src="@{/js/jquery-3.2.1.min.js}"></script>
+		<script>
+		$(document).ready(function() {
+		    var token = $("meta[name='_csrf']").attr("content");
+		    var header = $("meta[name='_csrf_header']").attr("content");
+			$("#cardnum1").on('keyup', function() {
+				var cardnum1 = this.value;
+				var formdata = new FormData();
+				formdata.append('cardcode', cardnum1);
+				console.log("formData: "+formdata);
+
+				if(cardnum1.length == 8 && findDuplicate(this)) {
+					event.preventDefault();
+					$.ajax({
+						url: "/vhc/store/admin/checkgiftcard",
+						type: "POST",
+						data: formdata,
+						dataType: false, //"json",
+						processData: false,
+						contentType: false, //"application/json; charset=utf-8",
+                        beforeSend: function(xhr){
+                            xhr.setRequestHeader(header, token);
+                        },
+                        success: function (data) {
+							console.log("URL: "+data);
+							if(data > 0) {
+								$('#transpan1').text(data);
+								$('#transfer1').val(data);
+							} else {
+								$('#transpan1').text('Gift card has 0 balance');
+								$("#transfer1").val("0"); // or pin is not correct
+							}
+                        },
+                        error: function (response) {
+                        	console.log(response);
+                            //alert(response.responseText);
+                        },
+                        failure: function (response) {
+                        	console.log(response);
+                            //alert(response.responseText);
+                        }
+					});
+				}
+				console.log("xxxx1: "+this.value)
+			});
+			$("#cardnum2").on('keyup', function() {
+				var cardnum2 = this.value;
+				var formdata = new FormData();
+				formdata.append('cardcode', cardnum2);
+				console.log("formData: "+formdata);
+
+				if(cardnum2.length == 8 && findDuplicate(this)) {
+					event.preventDefault();
+					$.ajax({
+						url: "/vhc/store/admin/checkgiftcard",
+						type: "POST",
+						data: formdata,
+						dataType: false, //"json",
+						processData: false,
+						contentType: false, //"application/json; charset=utf-8",
+                        beforeSend: function(xhr){
+                            xhr.setRequestHeader(header, token);
+                        },
+                        success: function (data) {
+							console.log("URL: "+data);
+							if(data > 0) {
+								$('#transpan2').text(data);
+								$('#transfer2').val(data);
+							} else {
+								$('#transspan2').text('Gift card has 0 balance');
+								$("#transfer2").val("0"); // or pin is not correct
+							}
+                        },
+                        error: function (response) {
+                        	console.log(response);
+                            //alert(response.responseText);
+                        },
+                        failure: function (response) {
+                        	console.log(response);
+                            //alert(response.responseText);
+                        }
+					});
+				}
+				console.log("xxxx2: "+this.value)
+			});
+			$("#cardnum3").on('keyup', function() {
+				var cardnum3 = this.value;
+				var formdata = new FormData();
+				formdata.append('cardcode', cardnum3);
+				console.log("formData: "+formdata);
+
+				if(cardnum3.length > 3 && findDuplicate(this)) {
+					event.preventDefault();
+					$.ajax({
+						url: "/vhc/store/admin/checkgiftcard",
+						type: "POST",
+						data: formdata,
+						dataType: false, //"json",
+						processData: false,
+						contentType: false, //"application/json; charset=utf-8",
+                        beforeSend: function(xhr){
+                            xhr.setRequestHeader(header, token);
+                        },
+                        success: function (data) {
+							console.log("URL: "+data);
+							if(data > 0) {
+								$('#transpan3').text(data);
+								$('#transfer3').val(data);
+							} else {
+								$('#transpan3').text('Gift card has 0 balance');
+								$("#transfer3").val("0"); // or pin is not correct
+							}
+                        },
+                        error: function (response) {
+                        	console.log(response);
+                            //alert(response.responseText);
+                        },
+                        failure: function (response) {
+                        	console.log(response);
+                            //alert(response.responseText);
+                        }
+					});
+				}
+				console.log("xxxx3: "+this.value)
+			});
+		})
+
+		function findDuplicate(current) {
+			console.log("compare the card numbers:"+current.value);
+			main = document.getElementById("cardnum");
+			var flag = 0;
+			for(i=1; i<4; i++) {
+				item = document.getElementById("cardnum"+i); //$("#cardnum"+i);
+				console.log(i+" val: "+item.value)
+				if(item.value == current.value) {
+					flag++;
+				}
+			}
+			console.log("Times is called: "+flag);
+			if(flag >= 2) {
+				alert("Please verify the card numbers provided, same card can be entered multiple times while the same transfer!");
+				current.focus();
+				return false;
+			}
+			if(main.value == current.value) {
+				alert("Please verify the card numbers provided, same card can not be for both transfer from and to!");
+				current.focus();
+				return false;
+			}
+			return true;
+		}
+		</script>
 	</div>
 </html>

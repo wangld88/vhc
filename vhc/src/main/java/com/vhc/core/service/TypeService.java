@@ -32,6 +32,10 @@ public class TypeService {
 		return typeRepository.findByNameIgnoreCaseAndReftblIgnoreCase(name, reftbl);
 	}
 
+	public List<Type> getByReftbl(String reftbl) {
+		return typeRepository.findByReftblIgnoreCase(reftbl);
+	}
+
 	@Transactional(rollbackFor=Exception.class)
 	public Type save(Type type) {
 		return this.typeRepository.save(type);

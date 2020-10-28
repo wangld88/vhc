@@ -25,8 +25,8 @@ public class RestErrorController implements ErrorController {
 
     private static final String PATH = "/error";
 
-    @Value("${debug}")
-    private boolean debug;
+    @Value("${includestacktrace}")
+    private boolean debug=true;
 
     @Autowired
     private ErrorAttributes errorAttributes;

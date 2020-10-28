@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vhc.core.model.Staff;
+import com.vhc.core.model.Store;
 import com.vhc.core.model.User;
 import com.vhc.core.repository.StaffRepository;
 
@@ -29,6 +30,11 @@ public class StaffService {
 	@Transactional(readOnly=true)
 	public List<Staff> getAll() {
 		return staffRespository.findAll();
+	}
+
+	@Transactional(readOnly=true)
+	public List<Staff> getByStore(Store store) {
+		return staffRespository.findByStore(store);
 	}
 
 	@Transactional(rollbackFor=Exception.class)

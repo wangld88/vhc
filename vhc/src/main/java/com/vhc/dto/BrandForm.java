@@ -30,6 +30,8 @@ public class BrandForm {
 
 	private String imageData;
 
+	private String display;
+
 
 	public BrandForm() {
 
@@ -46,6 +48,7 @@ public class BrandForm {
 		this.website = brand.getWebsite();
 		this.address = brand.getAddress();
 		this.comments = brand.getComments();
+		this.display = brand.getDisplay();
 
 		ImageProcessor processor = new ImageProcessor();
 		this.imageData = processor.getImageByteArray(brand.getImage());
@@ -137,6 +140,14 @@ public class BrandForm {
 
 	public void setAddress(Address address) {
 		this.address = address;
+	}
+
+	public String getDisplay() {
+		return display;
+	}
+
+	public void setDisplay(String display) {
+		this.display = display;
 	}
 
 }

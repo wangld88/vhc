@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html layout:decorator="admin/layout/layout">
+
+	<div layout:fragment="content">
+
+	    <script>
+	    /*<![CDATA[*/
+	     	var acceptedfiletypes = ["pdf","PDF"];
+
+			function wordCount(elmt) {
+				size = elmt.maxLength;
+				len = size - utf8Length(elmt.value);
+				if(len > 0) {
+					msg = "  <Font color='green'>Character(s) Left: " + len + "</Font>";
+				}
+				else {
+					msg = "  You have reached the character limit."	;
+				}
+				name = elmt.name + 'counter';
+
+				document.getElementById(name).innerHTML=msg;
+			}
+
+			function utf8Length(unicodeString) {
+				var usl=0;
+				for(var i=0;unicodeString.length>i;++i) {
+					var codePoint=unicodeString.charCodeAt(i);
+					if(codePoint===10||codePoint===13){
+						usl+=2;
+					}else if(128>codePoint){
+						usl+=1;
+					}else if((codePoint>127)&&(2048>codePoint)){
+						usl+=2;
+					}else{
+						usl+=3;
+					}
+				}
+				return usl;
+			}
+
+			function addMessage(msgs) {
+				rmvMessage();
+				var main = document.getElementById("main1");
+				var errors = document.createElement("div");
+				var ul = document.createElement("ul");
+				var upload = document.getElementById("upload");
+
+				errors.setAttribute("id", "errors");
+				errors.setAttribute("class", "alert alert-danger");
+
+				for(i in msgs) {
+					ul.appendChild(createListNode(msgs[i]));
+				}
+
+				errors.appendChild(ul)
+				main.appendChild(errors);
+				main.focus();
+			}
+
+			function createListNode(item) {
+				var li = document.createElement("li");
+				var txt = document.createTextNode(item);
+
+				li.appendChild(txt);
+				return li;
+			}
+
+			function rmvMessage() {
+				var main = document.getElementById("main1");
+				var errors = document.getElementById("errors");
+
+				if(errors || errors != null) {
+					main.removeChild(errors);
+				}
+			}
+
+			function validateDoc(itemid) {
+				var elmt = document.getElementById("uploadBtn"+itemid);
+				var main = document.getElementById("main1");
+				var btn = document.getElementById("submitBtn"+itemid);
+				var errors = [];
+
+				if(!elmt  || (elmt.value).trim().length == 0) {
+					errors.push("Please choose your document to upload.");
+				} else {
+					doctype =  elmt.value.trim().split(".").pop();
+
+					if(acceptedfiletypes.indexOf(doctype) < 0) {
+						errors.push("This file type is not accepted by the Document Upload Page.  Please upload an acceptable file type.");
+					}
+
+					if(elmt.files[0].size > 52428800) {
+						errors.push("Files must be less than 50MB in size.");
+					}
+				}
+
+				if(errors.length > 0) {
+					addMessage(errors);
+					return false;
+				}
+
+				btn.disabled = true;
+
+				document.getElementById("uploadForm"+itemid).submit();
+
+			}
+
+			function callThis(itemid) {
+				var elmt = document.getElementById("uploadBtn"+itemid);
+				var filename = elmt.value.split('\\').pop().split('/').pop();
+				var text = document.getElementById("uploadFile"+itemid);
+				var submitBtn = document.getElementById("submitBtn"+itemid);
+
+				rmvMessage();
+				clearSelection(itemid);
+
+				document.getElementById("row"+itemid).style.backgroundColor="#ECE8E8";
+				text.style.backgroundColor="#ECE8E8";
+				text.innerHTML = filename + "&nbsp;&nbsp;&nbsp;&nbsp;";
+
+			    anchor = document.createElement("a");
+			    anchor.setAttribute("href", "javascript: clearSelection()");
+
+			    //image = document.createElement("img");
+			    //image.setAttribute("src", "/rodocs/gradupload/resources/assets/images/remove.png");
+			    //anchor.appendChild(image);
+
+			    span = document.createElement("span");
+			    span.setAttribute("class", "glyphicon glyphicon-trash alert-danger minus");
+			    anchor.appendChild(span);
+
+			    text.appendChild(anchor);
+
+			    submitBtn.style.display = "";
+			}
+
+			function clearSelection(itemid) {
+				var elmts = document.getElementsByName("uploadFile");
+
+				for(i = 0; i < elmts.length; i++) {
+					elmts[i].innerHTML = "";
+					elmts[i].style.backgroundColor="#ffffff";
+				}
+
+				var rows = document.getElementsByName("row");
+
+				for(i = 0; i < rows.length; i++) {
+					rows[i].style.backgroundColor="#ffffff";
+				}
+
+				var files = document.getElementsByName("uploadBtn");
+
+				for(i = 0; i < files.length; i++) {
+					if(files[i].id != "uploadBtn"+itemid) {
+						files[i].value = "";
+					}
+				}
+
+				var btns = document.getElementsByName("submitBtn");
+				for(i=0; i < btns.length; i++) {
+					btns[i].style.display = "none";
+				}
+			}
+			/*]]>*/
+	    </script>
+		<style>
+			.myLabel {
+			    position: relative;
+				/* padding-top: -10px; */
+			    display: inline-block;
+			    /* margin-left: 0px; */
+			    margin-top: 1px;
+			    cursor: pointer;
+			}
+
+			.myLabel input {
+			    position: absolute;
+			    z-index: 12;
+			    opacity: 0;
+			    width: 100%;
+			    height: 100%;
+			    cursor: pointer;
+			}
+
+			.myLabel {
+				background-color: #bce0ee;
+				padding-bottom: 10px;
+				color: #3d3c3c;
+				font-size:1.2em;
+				font-weight:bold;
+				border-radius: 3px;
+				border: 1px solid #3d3c3c;
+			    display: inline-block;
+			    cursor: pointer;
+			    width: 80%;
+			    height: 22px;
+			    vertical-align: middle;
+			}
+
+			.myLabel:hover {
+				background-color: #3cb0fd;
+				border: 1px solid #575657;
+				color: #ffffff;
+				border-radius: 3px;
+				cursor: pointer;
+			}
+
+			.myLabel span {
+				/* padding-left: 10%; */
+				display: table-cell;
+				vertical-align: middle;
+				padding-top: 2px;
+				width: 100%;
+				text-align: center;
+				font-size: 12px;
+				font-weight: bold;
+				cursor: pointer;
+			}
+
+			#uploadFile {
+				/* margin-left: 2%; */
+				font-size: 0.9em;
+				font-weight: bold;
+				color: #1f3b08;
+			}
+
+			.submitBtn {
+				width: 160px;
+				background-color: #bce0ee;
+				color: #3d3c3c;
+				border-color: #3d3c3c;
+				font-weight: bold;
+			}
+
+			.submitBtn:hover {
+				width: 160px;
+				background-color: #3cb0fd;
+				color: #ffffff;
+				border-color: #575657
+			}
+
+			/* .header {
+				background-color:#bce0ee;
+				color:#3d3c3c !important;
+				font-family: UniversCondensed, Arial, sans-serif !important;
+			} */
+		</style>
+
+		<section id="main-content">
+			<section class="wrapper">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Business Management</h3>
+						<ol class="breadcrumb">
+							<li><i class="fa fa-home"></i><a th:href="@{/admin/home}">Home</a></li>
+							<li><i class="icon_document_alt"></i>Gift Cards</li>
+							<li><i class="fa fa-file-text-o"></i><span text="Gift Card History">Gift Card History</span></li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+						<section class="panel">
+							<header class="panel-heading">
+								Gift Card History for #<span th:text="${giftcard.code}"></span>
+							</header>
+							<table class="table table-striped table-advance table-hover">
+								<tbody>
+									<tr>
+										<th><i class="icon_calendar"></i> Date</th>
+										<th><i class="icon_calendar"></i> Operated By</th>
+										<th><i class="icon_calendar"></i> Status</th>
+										<th><i class="icon_pin_alt"></i> Amount</th>
+										<th><i class="icon_pin_alt"></i> Balance</th>
+										<th><i class="icon_pin_alt"></i> Reference</th>
+									</tr>
+									<tr th:each="history:${histories}">
+										<td th:text="${#calendars.format(history.operatedate,'yyyy/MM/dd')}"></td>
+										<td th:text="${history.operatedby!=null?history.operatedby.firstname+' '+history.operatedby.lastname:''}"></td>
+										<td th:text="${history.type!=null?history.type.name:''}"></td>
+										<td th:text="${history.amount!=null?#numbers.formatDecimal(history.amount, 0, 2):''}"></td>
+										<td th:text="${history.balance!=null?#numbers.formatDecimal(history.balance, 0, 2):''}"></td>
+										<td th:text="${history.refcard!=null?history.refcard.code:''}"></td>
+									</tr>
+								</tbody>
+							</table>
+						</section>
+					</div>
+				</div>
+
+			</section>
+		</section>
+      <!--main content end-->
+	</div>
+</html>

@@ -7,7 +7,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
@@ -31,10 +30,12 @@ import org.springframework.web.util.WebUtils;
 import com.vhc.controller.store.StoreBase;
 import com.vhc.dto.OrderitemDTO;
 import com.vhc.core.model.Account;
+import com.vhc.core.model.City;
 import com.vhc.core.model.Creditcard;
 import com.vhc.core.model.Customer;
 import com.vhc.core.model.Debitcard;
 import com.vhc.core.model.Giftcard;
+import com.vhc.core.model.GiftcardHistory;
 import com.vhc.core.model.Inventory;
 import com.vhc.core.model.Invoice;
 import com.vhc.core.model.Item;
@@ -74,12 +75,27 @@ public class StoreAdminSale extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
 
+		List<Staff> staffs = staffService.getByStore(store);
+		List<Type> types = typeService.getByReftbl("transactions");
+
+		List<Paymentmethod> methods = paymentmethodService.getAll();
+		List<City> cities = cityService.getAll();
+
+		model.addAttribute("cities", cities);
+		model.addAttribute("methods", methods);
+		model.addAttribute("store", store);
+		model.addAttribute("staffs", staffs);
+		model.addAttribute("types", types);
 		model.addAttribute("customer", customer);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Sales");
@@ -87,18 +103,22 @@ public class StoreAdminSale extends StoreBase {
 		return rtn;
 	}
 
-
 	@RequestMapping(method=RequestMethod.GET, value="/itemsale")
 	public String dspItemSale(ModelMap model, @ModelAttribute("customer") Customer customer, HttpSession httpSession) {
 		String rtn = "store/admin/itemsale";
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
 		//Status received = statusService.getByName("Received");
 
 		//Store store = staffService.getByUser(loginUser).getStore();
@@ -118,6 +138,7 @@ public class StoreAdminSale extends StoreBase {
 
 		//model.addAttribute("avaialbe", avaialbe);
 
+		model.addAttribute("store", store);
 		model.addAttribute("customer", customer);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Sales");
@@ -133,17 +154,25 @@ public class StoreAdminSale extends StoreBase {
 		logger.info("product sale add is called");
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
-		Store store = staffService.getByUser(loginUser).getStore();
-		Status received = statusService.getByNameAndReftbl("Received", "inventories");
+		Store store = staff.getStore();
 
+		Status received = statusService.getByNameAndReftbl("Received", "inventories");
+		Status returned = statusService.getByNameAndReftbl("Returned", "inventories");
+
+		List<Status> statuss = new ArrayList<>();
+		statuss.add(received);
+		statuss.add(returned);
 		String sku = requestParams.get("sku");
 		logger.info("sku: "+sku+", storeid: "+store.getStoreid()+", status: "+received.getStatusid());
-		List<Inventory> inventories = inventoryService.getByStoreAvaiableUPC(sku, store.getStoreid(), received);
+		List<Inventory> inventories = inventoryService.getByStoreAvaiableUPC(sku, store.getStoreid(), statuss); //received);
 
 		Message msg = new Message();
 
@@ -187,18 +216,9 @@ public class StoreAdminSale extends StoreBase {
 				}*/
 				model.addAttribute("saleList", saleList);
 
-				processCart(model, saleList);
+				processCart(model, saleList, null);
 			}
 
-			/*if(subTotal != null) {
-				logger.info("subTotal: " + subTotal.toPlainString());
-				tax = subTotal;
-				tax = tax.multiply(new BigDecimal("0.13"));
-				tax = tax.setScale(2, BigDecimal.ROUND_HALF_UP);
-				total = total.add(subTotal);
-				total = total.add(tax);
-				total = total.setScale(2, BigDecimal.ROUND_HALF_UP);
-			}*/
 		} else {
 			msg.setStatus(Message.ERROR);
 			msg.setMessage("No item being found, please try a different UPC");
@@ -228,11 +248,18 @@ public class StoreAdminSale extends StoreBase {
 		logger.info("product sale remove is called, inventoryid is {}", inventoryid);
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		Message msg = new Message();
 
 		Object mutex = WebUtils.getSessionMutex(httpSession);
@@ -244,7 +271,7 @@ public class StoreAdminSale extends StoreBase {
 				logger.info("Size of old: {}, size of new {}", saleList.size(), newList.size());
 				httpSession.setAttribute("saleList", newList);
 
-				processCart(model, newList);
+				processCart(model, newList, null);
 				msg.setStatus(Message.SUCCESS);
 				msg.setMessage("The item has been removed successfully.");
 				model.addAttribute("saleList", newList);
@@ -274,24 +301,28 @@ public class StoreAdminSale extends StoreBase {
 		ModelMap model,
 		HttpSession httpSession) {
 
+		logger.info("doItemSale is called");
 		String rtn = "store/admin/itemsale";
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
 
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Sales");
 
 		logger.info("doItemSale is called");
 
 		Status delivered = statusService.getByName("Delivered");
-		Staff staff = staffService.getByUser(loginUser);
-		Store store = staff.getStore();
 
 		List<Inventory> inventories = new ArrayList<>();
 
@@ -301,6 +332,7 @@ public class StoreAdminSale extends StoreBase {
 		String cardnum = requestParams.get("cardnum");
 		String pin = requestParams.get("pin");
 		String code = requestParams.get("promocode");
+		String dsct = requestParams.get("discount");
 
 		Promocode p = promocodeService.getByCode(code);
 
@@ -319,7 +351,7 @@ public class StoreAdminSale extends StoreBase {
 					msg.setStatus(Message.ERROR);
 					msg.setMessage("Invilad payment method.");
 					model.addAttribute("message", msg);
-					return "-1";
+					return "redirect:/store/admin/itemsale"; // Why return -1???
 				}
 
 				Giftcard giftcard = null;
@@ -328,19 +360,29 @@ public class StoreAdminSale extends StoreBase {
 					if(pin != null && !pin.isEmpty()) {
 						giftcard = giftcardService.getByCodePin(cardcode, pin);
 
-						if(giftcard != null && giftcard.getBalance().compareTo(BigDecimal.ZERO) == 0) {
+						/*if(giftcard != null && giftcard.getBalance().compareTo(BigDecimal.ZERO) == 0) {
 							Message msg = new Message();
 							msg.setStatus(Message.ERROR);
 							msg.setMessage("Current balance is zero.");
 							model.addAttribute("message", msg);
 							return "-1";
-						}
+						}*/
 					} else {
-						Message msg = new Message();
+						giftcard = giftcardService.getByCode(cardcode);
+						/*Message msg = new Message();
 						msg.setStatus(Message.ERROR);
 						msg.setMessage("Pin number is required.");
 						model.addAttribute("message", msg);
-						return "-1";
+						return "-1";*/
+					}
+
+					if(giftcard != null && giftcard.getBalance().compareTo(BigDecimal.ZERO) == 0) {
+						Message msg = new Message();
+						msg.setStatus(Message.ERROR);
+						msg.setMessage("Current balance is zero.");
+						model.addAttribute("message", msg);
+						logger.error("Current Giftcard ({}) balance is zero.", giftcard.getGiftcardid());
+						return "redirect:/store/admin/itemsale";
 					}
 				}
 
@@ -351,14 +393,16 @@ public class StoreAdminSale extends StoreBase {
 					if(httpSession.getAttribute("saleList") != null) {
 						saleList = (List<Inventory>) httpSession.getAttribute("saleList");
 						if(saleList == null || saleList.isEmpty()) {
+							logger.error("There is no sale item, current loginUser ID {}", loginUser.getUserid());
 							Message msg = new Message();
 							msg.setStatus(Message.ERROR);
 							msg.setMessage("Please add shopping item, now the cart is empty.");
 							model.addAttribute("message", msg);
-							return "-1";
+							return "redirect:/store/admin/itemsale";
 						}
 
 						double total = 0.0;
+						BigDecimal discount = BigDecimal.ZERO;
 
 						Customer customer = customerService.getById(1);
 
@@ -368,9 +412,19 @@ public class StoreAdminSale extends StoreBase {
 						order.setCreatedby(loginUser);
 						order.setCreationdate(Calendar.getInstance());
 						order.setCustomer(customer);
+
+						if(p != null && p.getPromocodeid() != 0) {
+							order.setPromocode(p);
+						}
+
+						if(dsct != null && !dsct.isEmpty()) {
+							discount = convertAmount(dsct);
+							order.setDiscount(discount);
+						}
 						order = orderService.save(order);
 
 						Type type = typeService.getByNameReftbl("Sell", "transactions");
+						GiftcardHistory gfHistory = new GiftcardHistory();
 
 						for(Inventory inventory: saleList) {
 							inventory.setStatus(delivered);
@@ -413,11 +467,14 @@ public class StoreAdminSale extends StoreBase {
 						}
 //System.out.println("Total: "+total);
 						BigDecimal amount = new BigDecimal(total);
+						amount = amount.subtract(discount);
 						amount.setScale(2, BigDecimal.ROUND_HALF_UP);
 
 						order.setAmount(amount);
 
 						order = orderService.save(order);
+
+						httpSession.setAttribute("order", order);
 
 						account = accountService.getById(1); //ByCustomer(customer)
 
@@ -475,6 +532,7 @@ public class StoreAdminSale extends StoreBase {
 						}
 
 						if(methodids.contains("3")) {
+							System.out.println("Gift card payment: "+giftcard.getCode());
 							BigDecimal gift = convertAmount(requestParams.get("giftamount"));
 							sum = sum.add(gift);
 							BigDecimal balance = giftcard.getBalance().subtract(gift);
@@ -485,6 +543,16 @@ public class StoreAdminSale extends StoreBase {
 							Paymentmethod method = paymentmethodService.getById(3);
 							giftcard.setBalance(balance);
 							giftcard = giftcardService.save(giftcard);
+							//History
+							Type gfType = typeService.getByNameReftbl("Purchase", "giftcards");
+							gfHistory.setType(gfType);
+							gfHistory.setGiftcard(giftcard);
+							gfHistory.setAmount(gift);
+							gfHistory.setBalance(balance);
+							gfHistory.setOperatedate(Calendar.getInstance());
+							gfHistory.setOperatedby(loginUser);
+							gfHistory = giftcardHistoryService.save(gfHistory);
+
 							detail.setRefnum(""+giftcard.getGiftcardid());
 							detail.setPaymentmethod(method);
 							detail.setPaydate(Calendar.getInstance());
@@ -522,6 +590,9 @@ public class StoreAdminSale extends StoreBase {
 
 							details.add(detail);
 						}
+
+						amount = amount.setScale(2, BigDecimal.ROUND_HALF_UP);
+						sum = sum.setScale(2, BigDecimal.ROUND_HALF_UP);
 
 						if(amount.compareTo(sum) != 0) {
 							//Error amount are different
@@ -562,7 +633,13 @@ public class StoreAdminSale extends StoreBase {
 
 						//rtn = String.valueOf(invoice.getInvoiceid());
 
-						transactionService.save(trx);
+						trx = transactionService.save(trx);
+
+						if(gfHistory.getGfhistoryid() != 0) {
+							gfHistory.setTrxn(trx);
+							giftcardHistoryService.save(gfHistory);
+						}
+
 						logger.info("The transaction completed, trx ID:" + trx.getTransactionid());
 						model.addAttribute("saleList", saleList);
 						httpSession.setAttribute("invoice", invoice);
@@ -607,11 +684,17 @@ public class StoreAdminSale extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
 
 		Object mutex = WebUtils.getSessionMutex(httpSession);
 		String image = "";
@@ -653,18 +736,23 @@ public class StoreAdminSale extends StoreBase {
 
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method=RequestMethod.GET, value={"/itemsale/printinvoice","/itemreturn/printinvoice"})
+	@RequestMapping(method=RequestMethod.GET, value={"/itemsale/printinvoice","/itemreturn/printinvoice","/printinvoice"})
 	public String dspPrintInvoice(ModelMap model, HttpSession httpSession) {
 
+		logger.info("dspPrintInvoice is called");
 		String rtn = "store/admin/invoice";
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
 
 		Object mutex = WebUtils.getSessionMutex(httpSession);
 
@@ -672,14 +760,15 @@ public class StoreAdminSale extends StoreBase {
 		Invoice invoice = new Invoice();
 		//BigDecimal subTotal = BigDecimal.ZERO;
 		String image = "";
+		Order order = null;
 
 		synchronized(mutex) {
 
 			if(httpSession.getAttribute("invoiceList") != null) {
 				saleList = (List<Inventory>) httpSession.getAttribute("invoiceList");
-//System.out.println("!!!!!!!!!!!invoiceList:"+saleList.size());;
+System.out.println("!!!!!!!!!!!invoiceList:"+saleList.size());;
 				invoice = (Invoice) httpSession.getAttribute("invoice");
-
+				order = (Order) httpSession.getAttribute("order");
 				List<Transaction> txs = transactionService.getByInvoice(invoice);
 				List<Paymentdetail> payments = new ArrayList<>();
 				String txType = "";
@@ -690,6 +779,7 @@ public class StoreAdminSale extends StoreBase {
 						txType = tx.getType().getName();
 					}
 				}
+				model.addAttribute("order", order);
 				model.addAttribute("payments", payments);
 				model.addAttribute("txType", txType);
 
@@ -704,28 +794,11 @@ public class StoreAdminSale extends StoreBase {
 
 			model.addAttribute("saleList", saleList);
 			model.addAttribute("invoice", invoice);
-			processCart(model, saleList);
+			processCart(model, saleList, order);
 		}
 
-		/*BigDecimal total = BigDecimal.ZERO;
-		BigDecimal tax = BigDecimal.ZERO;
+		model.addAttribute("store", store);
 
-		if(subTotal != null) {
-			logger.info("subTotal: " + subTotal.toPlainString());
-			tax = subTotal;
-			tax = tax.multiply(new BigDecimal("0.13"));
-			tax = tax.setScale(2, BigDecimal.ROUND_HALF_UP);
-			total = total.add(subTotal);
-			total = total.add(tax);
-			total = total.setScale(2, BigDecimal.ROUND_HALF_UP);
-		}*/
-
-		/*List<Paymentmethod> methods = paymentmethodService.getAll();
-
-		model.addAttribute("methods", methods);*/
-		/*model.addAttribute("subTotal", subTotal);
-		model.addAttribute("tax",tax);
-		model.addAttribute("total",total);*/
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("barcode", image);
 
@@ -739,12 +812,17 @@ public class StoreAdminSale extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
 
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Sales");
 
@@ -758,12 +836,18 @@ public class StoreAdminSale extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
-		Store store = staffService.getByUser(loginUser).getStore();
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		Status received = statusService.getByNameAndReftbl("Received", "inventories");
 
 		Message msg = new Message();
@@ -810,7 +894,8 @@ public class StoreAdminSale extends StoreBase {
 
 
 	@PostMapping(value="/itemreturn")
-	public String doReturn(@RequestParam(name="orderitemid", required=false) Long[] orderitemids,
+	public String doReturn(
+			@RequestParam(name="orderitemid", required=false) Long[] orderitemids,
 			@RequestParam Map<String,String> requestParams,
 			ModelMap model,
 			HttpSession httpSession) {
@@ -819,11 +904,17 @@ public class StoreAdminSale extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
 
 		//Account account = accountService.getById(1); //ByCustomer(customer)
 
@@ -834,7 +925,7 @@ public class StoreAdminSale extends StoreBase {
 
 		String barcode = requestParams.get("barcode");
 
-		List<Orderitem> items = invoice.getOrder().getOrderitems();
+		//List<Orderitem> items = invoice.getOrder().getOrderitems();
 		List<OrderitemDTO> oitmDTOs = new ArrayList<>();
 
 		logger.info("orderitemids count: {}, invoice barcode: {}", orderitemids.length, invoice.getBarcode());
@@ -848,14 +939,17 @@ public class StoreAdminSale extends StoreBase {
 				Status completed = statusService.getByNameAndReftbl("Completed","payments");
 				Status returned = statusService.getByNameAndReftbl("Returned","inventories");
 				Status delivered = statusService.getByNameAndReftbl("Delivered","inventories");
-				Staff staff = staffService.getByUser(loginUser);
-				Store store = staff.getStore();
 				Type type = typeService.getByNameReftbl("Return", "transactions");
 				List<Paymentdetail> details = new ArrayList<>();
 				//Customer customer = customerService.getById(1);
 				List<Inventory> invoiceList = new ArrayList<>();
 
 				Transaction trx = tx.get(0);
+				Payment payment = trx.getPayment();
+				List<Paymentdetail> oldDetails = payment.getPaymentdetails();
+				Paymentmethod oldMethod = paymentmethodService.getById(3);
+				Paymentdetail oldDetail = oldDetails.stream().filter(d -> d.getPaymentmethod().equals(oldMethod)).findAny().orElse(null);
+
 				//create new order for return
 				Order order = new Order();
 				order.setStore(store);
@@ -902,23 +996,88 @@ public class StoreAdminSale extends StoreBase {
 				Paymentmethod method = paymentmethodService.getById(4);
 				BigDecimal backchange = BigDecimal.ZERO;
 				Paymentdetail detail = new Paymentdetail();
-				BigDecimal residual = BigDecimal.ZERO;
-//System.out.println("amount after tax: "+amount.doubleValue());
+				//BigDecimal residual = BigDecimal.ZERO;
 
 				rtn_payment.setAccount(trx.getAccount());
 				rtn_payment.setAmount(amount);
 				rtn_payment.setCreatedby(loginUser);
 				rtn_payment.setCreationdate(Calendar.getInstance());
 
-				detail.setReceived(amount);
-				detail.setAmount(amount);
-				detail.setPaymentmethod(method);
-				detail.setPaydate(Calendar.getInstance());
-				detail.setBackchange(backchange);
-				detail.setStatus(completed);
-				detail.setPayment(rtn_payment);
+				if(oldDetail != null) {
+					BigDecimal oldAmount = oldDetail.getAmount();
+					BigDecimal newAmount = BigDecimal.ZERO;
+					BigDecimal balance = BigDecimal.ZERO;
+					BigDecimal residual = BigDecimal.ZERO;
 
-				details.add(detail);
+					long giftcardid = Long.parseLong(oldDetail.getRefnum());
+					Giftcard giftcard = giftcardService.getById(giftcardid);
+
+					if(oldAmount.compareTo(total) < 0) {
+
+						balance = giftcard.getBalance().add(oldAmount);
+						newAmount = oldAmount;
+						residual = total.subtract(oldAmount);
+
+					} else {
+
+						balance = giftcard.getBalance().add(total);
+						newAmount = total;
+					}
+
+					giftcard.setBalance(balance);
+					giftcard = giftcardService.save(giftcard);
+
+					//History
+					Type gfType = typeService.getByNameReftbl("Receive", "giftcards");
+					GiftcardHistory gfHistory = new GiftcardHistory();
+
+					gfHistory.setType(gfType);
+					gfHistory.setGiftcard(giftcard);
+					gfHistory.setAmount(newAmount);
+					gfHistory.setBalance(balance);
+					gfHistory.setOperatedate(Calendar.getInstance());
+					gfHistory.setOperatedby(loginUser);
+
+					gfHistory = giftcardHistoryService.save(gfHistory);
+
+					//Payment detail for returned giftcard amount
+					Paymentdetail newDetail = new Paymentdetail();
+					newDetail.setReceived(newAmount.negate());
+					newDetail.setAmount(newAmount.negate());
+					newDetail.setPaymentmethod(method);
+					newDetail.setPaydate(Calendar.getInstance());
+					newDetail.setBackchange(backchange);
+					newDetail.setStatus(completed);
+					newDetail.setPayment(rtn_payment);
+
+					details.add(newDetail);
+
+					if(!residual.equals(BigDecimal.ZERO)) {
+						detail.setReceived(residual.negate());
+						detail.setAmount(residual.negate());
+						detail.setPaymentmethod(method);
+						detail.setPaydate(Calendar.getInstance());
+						detail.setBackchange(backchange);
+						detail.setStatus(completed);
+						detail.setPayment(rtn_payment);
+
+						details.add(detail);
+					}
+
+				} else {
+
+					detail.setReceived(amount);
+					detail.setAmount(amount);
+					detail.setPaymentmethod(method);
+					detail.setPaydate(Calendar.getInstance());
+					detail.setBackchange(backchange);
+					detail.setStatus(completed);
+					detail.setPayment(rtn_payment);
+
+					details.add(detail);
+
+				}
+//System.out.println("amount after tax: "+amount.doubleValue());
 
 				rtn_payment.setPaymentdetails(details);
 				rtn_payment = paymentService.save(rtn_payment);
@@ -929,8 +1088,9 @@ public class StoreAdminSale extends StoreBase {
 				rtn_invoice.setCreatedby(loginUser);
 				rtn_invoice.setCreationdate(Calendar.getInstance());
 				rtn_invoice = invoiceService.save(rtn_invoice);
+
 				String mask = "000000000";
-				String invoicenum = mask.substring(0, mask.length()-String.valueOf(invoice.getInvoiceid()).length())+invoice.getInvoiceid();
+				String invoicenum = mask.substring(0, mask.length()-String.valueOf(invoice.getInvoiceid()).length())+rtn_invoice.getInvoiceid();
 
 				rtn_invoice.setInvoicenum(invoicenum);
 
@@ -975,19 +1135,110 @@ public class StoreAdminSale extends StoreBase {
 	}
 
 
+	@GetMapping(value="/salesummary")
+	public String dspSaleSummary(ModelMap model, HttpSession httpSession) {
+
+		logger.info("dspSaleSummary is called");
+		String rtn = "/store/admin/salesummary";
+
+		Object principal = getPrincipal();
+
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
+			return "redirect:/store/admin/logout";
+		}
+
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
+		List<Transaction> txs = transactionService.getAllBySore(store); //getAllByDate();
+
+		model.addAttribute("txs", txs);
+		model.addAttribute("loginUser", loginUser);
+
+		return rtn;
+	}
+
+
+	@GetMapping(value="/salesummary/printinvoice/{invoiceid}")
+	public String doReprint(@PathVariable("invoiceid") Long invoiceid, ModelMap model, HttpSession httpSession) {
+
+		logger.info("doReprint is called");
+		String rtn = "store/admin/invoice";
+
+		Object principal = getPrincipal();
+
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
+			return "redirect:/store/admin/logout";
+		}
+
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
+		Invoice invoice = invoiceService.getById(invoiceid);
+		Order order = invoice.getOrder();
+
+		List<Transaction> txs = transactionService.getByInvoice(invoice);
+		List<Paymentdetail> payments = new ArrayList<>();
+		String txType = "";
+
+		List<Inventory> saleList = new ArrayList<>();
+		List<Orderitem> oitms = order.getOrderitems();
+
+		for(Orderitem oitm : oitms) {
+			saleList.add(inventoryService.getByItemid(oitm.getItem().getItemid()));
+		}
+
+		if(txs != null && !txs.isEmpty()) {
+			for(Transaction tx : txs) {
+				payments.addAll(tx.getPayment().getPaymentdetails());
+				txType = tx.getType().getName();
+			}
+		}
+
+		BarcodeProcessor processor = new BarcodeProcessor();
+		String image = processor.process(invoice.getBarcode());
+
+		processCart(model, saleList, order);
+
+		model.addAttribute("order", order);
+		model.addAttribute("payments", payments);
+		model.addAttribute("txType", txType);
+		model.addAttribute("invoice", invoice);
+		model.addAttribute("saleList", saleList);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("barcode", image);
+
+		return rtn;
+	}
+
+
 	@RequestMapping(method=RequestMethod.GET, value="/giftcardbalance")
 	public String dspGiftcard(ModelMap model, HttpSession httpSession) {
 		String rtn = "/store/admin/giftcardbalance";
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
-//System.out.println("dspGiftcard");
+		Store store = staff.getStore();
 
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Sales");
 
@@ -1001,12 +1252,17 @@ public class StoreAdminSale extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
-//System.out.println("dspGiftcard");
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
 
 		String cardnum = requestParams.get("cardnum");
 		String pin = requestParams.get("pin");
@@ -1024,6 +1280,174 @@ public class StoreAdminSale extends StoreBase {
 		}
 
 		model.addAttribute("giftcard", giftcard);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("menu", "Sales");
+
+		return rtn;
+	}
+
+
+	@RequestMapping(method=RequestMethod.POST, value="/transferbalance")
+	public String doGiftcardTransfer(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
+		String rtn = "/store/admin/giftcardbalance";
+
+		Object principal = getPrincipal();
+
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
+			return "redirect:/store/admin/logout";
+		}
+
+		Store store = staff.getStore();
+
+System.out.println("Giftcard transferbalance");
+
+		String cardnum0 = requestParams.get("cardnum0");
+		String cardnum1 = requestParams.get("cardnum1");
+		String cardnum2 = requestParams.get("cardnum2");
+		String cardnum3 = requestParams.get("cardnum3");
+		String transfer1 = requestParams.get("transfer1");
+		String transfer2 = requestParams.get("transfer2");
+		String transfer3 = requestParams.get("transfer3");
+		String msg = "";
+
+		Giftcard giftcard0 = giftcardService.getByCode(cardnum0);
+
+		BigDecimal balance = giftcard0.getBalance();
+
+		if(cardnum1 != null && transfer1 != null && !transfer1.isEmpty()) {
+			Giftcard giftcard1 = giftcardService.getByCode(cardnum1);
+
+			if(giftcard1 != null) {
+				BigDecimal balance1 = giftcard1.getBalance();
+				BigDecimal amount1 = new BigDecimal(transfer1);
+				if(balance1.compareTo(amount1) >= 0) {
+					giftcard1.setBalance(balance1.subtract(amount1));
+					balance = balance.add(amount1);
+					System.out.println("Giftcard balance1: "+balance);
+					giftcard0.setBalance(balance);
+					giftcardService.save(giftcard1);
+					giftcardService.save(giftcard0);
+
+					GiftcardHistory gfHistory0 = new GiftcardHistory();
+					GiftcardHistory gfHistory1 = new GiftcardHistory();
+					//History
+					Type gfType0 = typeService.getByNameReftbl("Receive", "giftcards");
+					Type gfType1 = typeService.getByNameReftbl("Transfer", "giftcards");
+					gfHistory0.setType(gfType0);
+					gfHistory0.setGiftcard(giftcard0);
+					gfHistory0.setAmount(amount1);
+					gfHistory0.setRefcard(giftcard1);
+					gfHistory0.setOperatedate(Calendar.getInstance());
+					gfHistory0.setOperatedby(loginUser);
+					gfHistory0 = giftcardHistoryService.save(gfHistory0);
+
+					gfHistory1.setType(gfType1);
+					gfHistory1.setGiftcard(giftcard1);
+					gfHistory1.setAmount(amount1);
+					gfHistory1.setRefcard(giftcard0);
+					gfHistory1.setOperatedate(Calendar.getInstance());
+					gfHistory1.setOperatedby(loginUser);
+					gfHistory1 = giftcardHistoryService.save(gfHistory1);
+					msg = "From card #" + cardnum1 + " transferred amount:  CA$" + transfer1;
+				}
+			} else {
+				logger.error("The gift card with {} can not be found.", cardnum1);
+			}
+		}
+
+		if(cardnum2 != null && transfer2 != null && !transfer2.isEmpty()) {
+			Giftcard giftcard2 = giftcardService.getByCode(cardnum2);
+
+			if(giftcard2 != null) {
+				BigDecimal balance2 = giftcard2.getBalance();
+				BigDecimal amount2 = new BigDecimal(transfer2);
+				if(balance2.compareTo(amount2) >= 0) {
+					giftcard2.setBalance(balance2.subtract(amount2));
+					balance = balance.add(amount2);
+					System.out.println("Giftcard balance2: "+balance);
+					giftcard0.setBalance(balance);
+					giftcardService.save(giftcard2);
+					giftcardService.save(giftcard0);
+					GiftcardHistory gfHistory0 = new GiftcardHistory();
+					GiftcardHistory gfHistory2 = new GiftcardHistory();
+					//History
+					Type gfType0 = typeService.getByNameReftbl("Receive", "giftcards");
+					Type gfType1 = typeService.getByNameReftbl("Transfer", "giftcards");
+					gfHistory0.setType(gfType0);
+					gfHistory0.setGiftcard(giftcard0);
+					gfHistory0.setAmount(amount2);
+					gfHistory0.setRefcard(giftcard2);
+					gfHistory0.setOperatedate(Calendar.getInstance());
+					gfHistory0.setOperatedby(loginUser);
+					gfHistory0 = giftcardHistoryService.save(gfHistory0);
+
+					gfHistory2.setType(gfType1);
+					gfHistory2.setGiftcard(giftcard2);
+					gfHistory2.setAmount(amount2);
+					gfHistory2.setRefcard(giftcard0);
+					gfHistory2.setOperatedate(Calendar.getInstance());
+					gfHistory2.setOperatedby(loginUser);
+					gfHistory2 = giftcardHistoryService.save(gfHistory2);
+					msg += "<br/> From card #" + cardnum2 + " transferred amount:  CA$" + transfer2;
+				}
+			} else {
+				logger.error("The gift card with {} can not be found.", cardnum1);
+			}
+		}
+
+		if(transfer3 != null && !transfer3.isEmpty()) {
+			Giftcard giftcard3 = giftcardService.getByCode(cardnum3);
+
+			if(giftcard3 != null) {
+				BigDecimal balance3 = giftcard3.getBalance();
+				BigDecimal amount3 = new BigDecimal(transfer3);
+				if(balance3.compareTo(amount3) >= 0) {
+					giftcard3.setBalance(balance3.subtract(amount3));
+					balance = balance.add(amount3);
+					System.out.println("Giftcard balance3: "+balance);
+					giftcard0.setBalance(balance);
+					giftcardService.save(giftcard3);
+					giftcardService.save(giftcard0);
+
+					//History
+					GiftcardHistory gfHistory0 = new GiftcardHistory();
+					GiftcardHistory gfHistory3 = new GiftcardHistory();
+
+					Type gfType0 = typeService.getByNameReftbl("Receive", "giftcards");
+					Type gfType1 = typeService.getByNameReftbl("Transfer", "giftcards");
+					gfHistory0.setType(gfType0);
+					gfHistory0.setGiftcard(giftcard0);
+					gfHistory0.setAmount(amount3);
+					gfHistory0.setRefcard(giftcard3);
+					gfHistory0.setOperatedate(Calendar.getInstance());
+					gfHistory0.setOperatedby(loginUser);
+					gfHistory0 = giftcardHistoryService.save(gfHistory0);
+
+					gfHistory3.setType(gfType1);
+					gfHistory3.setGiftcard(giftcard3);
+					gfHistory3.setAmount(amount3);
+					gfHistory3.setRefcard(giftcard0);
+					gfHistory3.setOperatedate(Calendar.getInstance());
+					gfHistory3.setOperatedby(loginUser);
+					gfHistory3 = giftcardHistoryService.save(gfHistory3);
+					msg += "<br/> From card #" + cardnum3 + " transferred amount:  CA$" + transfer3;
+				}
+			} else {
+				logger.error("The gift card with {} can not be found.", cardnum3);
+			}
+		}
+
+		giftcard0 = giftcardService.getByCode(cardnum0);
+
+		System.out.println("Giftcard msg: "+msg);
+
+		model.addAttribute("giftcard", giftcard0);
+		model.addAttribute("msg", msg);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Sales");
 
@@ -1089,14 +1513,14 @@ public class StoreAdminSale extends StoreBase {
 
 
 
-	private BigDecimal calTotal(List<Inventory> inv) {
-		BigDecimal total = BigDecimal.ZERO;
-
-		for(Inventory i: inv) {
-			total = total.add(i.getItem().getProduct().getFinalprice());
-		}
-		return total;
-	}
+//	private BigDecimal calTotal(List<Inventory> inv) {
+//		BigDecimal total = BigDecimal.ZERO;
+//
+//		for(Inventory i: inv) {
+//			total = total.add(i.getItem().getProduct().getFinalprice());
+//		}
+//		return total;
+//	}
 
 
 
@@ -1111,7 +1535,7 @@ public class StoreAdminSale extends StoreBase {
 
 
 
-	private void processCart(ModelMap model, List<Inventory> inventories) {
+	private void processCart(ModelMap model, List<Inventory> inventories, Order order) {
 
 		BigDecimal total = BigDecimal.ZERO;
 		BigDecimal tax = BigDecimal.ZERO;
@@ -1120,18 +1544,20 @@ public class StoreAdminSale extends StoreBase {
 		if(inventories != null && !inventories.isEmpty()) {
 			for(Inventory i: inventories) {
 				//total = total.add(i.getItem().getProduct().getFinalprice());
-				Item p = i.getItem();
-				BigDecimal tmpTotal = p.getProduct().getFinalprice();
+				Product p = i.getItem().getProduct();
+				BigDecimal tmpTotal = p.getFinalprice();
 				BigDecimal tmpTax = BigDecimal.ZERO;
 
 				if(tmpTotal != null) {
 					logger.info("subTotal: " + tmpTotal.toPlainString());
 
-					if(p.getSize().getType().getName().equals("Kids")) {
+					/*if(p.getSize().getType().getName().equals("Kids")) {
 						tmpTax = tmpTotal.multiply(new BigDecimal("0.05"));
 					} else {
 						tmpTax = tmpTotal.multiply(new BigDecimal("0.13"));
-					}
+					}*/
+System.out.println("Product ID: "+p.getProductid()+", p.getTax(): "+p.getTax());
+					tmpTax = tmpTotal.multiply(new BigDecimal(p.getTax())).divide(new BigDecimal("100"));
 
 					subTotal = subTotal.add(tmpTotal);
 					tax = tax.add(tmpTax);
@@ -1140,6 +1566,15 @@ public class StoreAdminSale extends StoreBase {
 					total = total.add(tmpTax);
 					total = total.setScale(2, BigDecimal.ROUND_HALF_UP);
 				}
+			}
+			BigDecimal temp = total;
+			if(order != null && order.getDiscount() != null) {
+				total = temp.subtract(order.getDiscount());
+				total = total.setScale(2, BigDecimal.ROUND_HALF_UP);
+			}
+			if(order != null && order.getPromocode() != null) {
+				total = total.subtract(temp.multiply(new BigDecimal(order.getPromocode().getPercentage())).divide(new BigDecimal(100)));
+				total = total.setScale(2, BigDecimal.ROUND_HALF_UP);
 			}
 		}
 

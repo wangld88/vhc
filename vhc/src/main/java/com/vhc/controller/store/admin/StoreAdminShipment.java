@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +27,7 @@ import com.vhc.dto.ItemForm;
 import com.vhc.core.model.Address;
 import com.vhc.core.model.City;
 import com.vhc.core.model.Inventory;
+import com.vhc.core.model.InventoryHistory;
 import com.vhc.core.model.Item;
 import com.vhc.core.model.Location;
 import com.vhc.core.model.Product;
@@ -34,6 +35,7 @@ import com.vhc.core.model.Purchaseorder;
 import com.vhc.core.model.Region;
 import com.vhc.core.model.Shipment;
 import com.vhc.core.model.Size;
+import com.vhc.core.model.Staff;
 import com.vhc.core.model.Status;
 import com.vhc.core.model.Store;
 import com.vhc.core.model.Supplier;
@@ -58,14 +60,21 @@ public class StoreAdminShipment extends StoreBase {
 	public String dspSuppliers(ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
 		String rtn = "store/admin/suppliers";
 
 		List<Supplier> mfs = supplierService.getAll();
+
+		model.addAttribute("store", store);
 		model.addAttribute("suppliers", mfs);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
@@ -79,16 +88,22 @@ public class StoreAdminShipment extends StoreBase {
 	public String dspSupplier(ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
 		String rtn = "store/admin/supplier";
 
 		List<City> cities = cityService.getAll();
 
 		model.addAttribute("cities", cities);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "suppliers");
@@ -101,19 +116,26 @@ public class StoreAdminShipment extends StoreBase {
 	public String updateSupplier(ModelMap model, @PathVariable("supplierid") Long supplierid, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
 		String rtn = "store/admin/supplier";
 
 		long mfid = supplierid.longValue();
 		Supplier mf = supplierService.getById(mfid);
 
 		List<City> cities = cityService.getAll();
+
 		model.addAttribute("mf", mf);
 		model.addAttribute("cities", cities);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "suppliers");
@@ -126,11 +148,16 @@ public class StoreAdminShipment extends StoreBase {
 	public String doSupplier(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
 		String rtn = "suppliers";
 
 		logger.info("doSupplier is call!!!!!");
@@ -168,6 +195,8 @@ public class StoreAdminShipment extends StoreBase {
 		mf.setWebsite(website);
 		mf.setComments(comments);
 		supplierService.save(mf);
+
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "suppliers");
@@ -180,15 +209,22 @@ public class StoreAdminShipment extends StoreBase {
 	public String dspPurchaseOrders(ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
 		String rtn = "store/admin/purchorders";
 
 		List<Purchaseorder> orders = purchaseorderService.getAll();
+
 		model.addAttribute("orders", orders);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "purchorders");
@@ -201,11 +237,16 @@ public class StoreAdminShipment extends StoreBase {
 	public String dspPurchaseOrder(ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
 		String rtn = "store/admin/purchorder";
 
 		List<Supplier> suppliers = supplierService.getAll();
@@ -214,6 +255,7 @@ public class StoreAdminShipment extends StoreBase {
 
 		model.addAttribute("users", users);
 		model.addAttribute("suppliers", suppliers);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "purchorders");
@@ -225,11 +267,15 @@ public class StoreAdminShipment extends StoreBase {
 	public String updatePurchaseOrder(ModelMap model, @PathVariable("orderid") Long orderid, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
 		String rtn = "store/admin/purchorder";
 
 		long odrid = orderid.longValue();
@@ -240,10 +286,14 @@ public class StoreAdminShipment extends StoreBase {
 
 		List<User> users = userService.getByRolename("ADMIN");
 
+		List<Shipment> shipments = shipmentService.getByPO(order);
+
+		model.addAttribute("notShipped", shipments.isEmpty());
 		model.addAttribute("users", users);
 		model.addAttribute("items", items);
 		model.addAttribute("suppliers", suppliers);
 		model.addAttribute("purchorder", order);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "purchorders");
@@ -257,11 +307,15 @@ public class StoreAdminShipment extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
 		String rtn = "purchorders";
 
 		logger.info("doShipment is call!!!!! - " + loginUser.getUsername());
@@ -276,8 +330,6 @@ public class StoreAdminShipment extends StoreBase {
 		String sentdate = requestParams.get("sentdate");
 		String expectdate = requestParams.get("expectdate");
 		SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
-		Calendar expCal = Calendar.getInstance();
-		expCal.setTime(formatter.parse(expectdate));
 
 		Supplier supplier = supplierService.getById(Long.parseLong(supplierid));
 
@@ -287,7 +339,12 @@ public class StoreAdminShipment extends StoreBase {
 		}
 		order.setSupplier(supplier);
 		order.setCode(code);
-		order.setExpectdate(expCal);
+		if(expectdate != null && !expectdate.isEmpty()) {
+			Calendar expCal = Calendar.getInstance();
+			expCal.setTime(formatter.parse(expectdate));
+
+			order.setExpectdate(expCal);
+		}
 		order.setSentby(sentUser);
 		if(sentdate != null && !sentdate.isEmpty()) {
 			Calendar rcdCal = Calendar.getInstance();
@@ -300,8 +357,17 @@ public class StoreAdminShipment extends StoreBase {
 		order.setRecordedby(loginUser);
 		order.setRecorddate(cal);
 
-		purchaseorderService.save(order);
-
+		try {
+			purchaseorderService.save(order);
+		} catch(Exception e) {
+			e.printStackTrace();
+			if(orderid != null && !orderid.isEmpty()) {
+				return "redirect:puchorder/"+orderid;
+			} else {
+				return "redirect:purchorder";
+			}
+		}
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "purchorders");
@@ -314,15 +380,22 @@ public class StoreAdminShipment extends StoreBase {
 	public String dspShipments(ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
 		String rtn = "store/admin/shipments";
 
 		List<Shipment> mfs = shipmentService.getAll();
+
 		model.addAttribute("shipments", mfs);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "shipments");
@@ -333,20 +406,28 @@ public class StoreAdminShipment extends StoreBase {
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/shipment"})
 	public String dspShipment(ModelMap model, HttpSession httpSession) {
+		String rtn = "store/admin/shipment";
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
-		String rtn = "store/admin/shipment";
+		Store store = staff.getStore();
+
 
 		List<Purchaseorder> orders = purchaseorderService.getAll();
 		List<Supplier> suppliers = supplierService.getAll();
+		List<Staff> staffs = staffService.getByStore(store);
 
 		model.addAttribute("orders", orders);
+		model.addAttribute("staffs", staffs);
 		model.addAttribute("suppliers", suppliers);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "shipments");
@@ -359,16 +440,22 @@ public class StoreAdminShipment extends StoreBase {
 	public String loadShipment(ModelMap model, @PathVariable("supplierid") Long supplierid, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
 		String rtn = "store/admin/shipment";
 
 		long mfid = supplierid.longValue();
+		Supplier supplier = supplierService.getById(mfid);
 		//System.out.println("++++++++++++++++++");
-		List<Purchaseorder> orders = purchaseorderService.getUnusedOrdersBySupplierid(mfid);
+		List<Purchaseorder> orders = purchaseorderService.getAvailablePOsBySupplier(supplier);
 		//System.out.println("++++++++++++++++++");
 
 		List<Supplier> suppliers = supplierService.getAll();
@@ -376,11 +463,15 @@ public class StoreAdminShipment extends StoreBase {
 
 		//model.addAttribute("items", items);
 		Shipment shipment = new Shipment();
-		Supplier supplier = supplierService.getById(supplierid);
+
 		shipment.setSupplier(supplier);
+		List<Staff> staffs = staffService.getByStore(store);
+
+		model.addAttribute("staffs", staffs);
 		model.addAttribute("orders", orders);
 		model.addAttribute("suppliers", suppliers);
 		model.addAttribute("shipment", shipment);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "shipments");
@@ -393,26 +484,50 @@ public class StoreAdminShipment extends StoreBase {
 	public String updateShipment(ModelMap model, @PathVariable("shipmentid") Long shipmentid, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
 		String rtn = "store/admin/shipment";
 
 		long mfid = shipmentid.longValue();
-		Shipment mf = shipmentService.getById(mfid);
+		Shipment shipment = shipmentService.getById(mfid);
+		List<Item> orderitems = new ArrayList<>();
 
 		List<Supplier> suppliers = supplierService.getAll();
 		List<Item> items = itemService.getByShipment(mfid);
-		//System.out.println("++++++++++++++++++");
-		List<Purchaseorder> orders = purchaseorderService.getUnusedOrdersBySupplierid(mf.getSupplier().getSupplierid());
-		//System.out.println("++++++++++++++++++");
+
+		List<Purchaseorder> orders = purchaseorderService.getAvailablePOsBySupplier(shipment.getSupplier());
+
+		if(shipment.getPurchaseorder() != null) {
+			orders.add(shipment.getPurchaseorder());
+			orderitems = shipment.getPurchaseorder().getItems();
+		}
+
+		if(items != null && !items.isEmpty() && !orderitems.isEmpty()) {
+			orderitems = removeAdded(orderitems, items);
+		}
+
+		List<Staff> staffs = staffService.getByStore(store);
+
+		List<Location> locations = locationService.getByStore(store);
+
+		List<Inventory> inventories = inventoryService.getByShipment(shipment);
 
 		model.addAttribute("orders", orders);
-		model.addAttribute("items", items);
+		model.addAttribute("staffs", staffs);
+		model.addAttribute("inventories", inventories);
+		model.addAttribute("orderitems", orderitems);
 		model.addAttribute("suppliers", suppliers);
-		model.addAttribute("shipment", mf);
+		model.addAttribute("shipment", shipment);
+		model.addAttribute("locations", locations);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "shipments");
@@ -427,11 +542,16 @@ public class StoreAdminShipment extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
 		String rtn = "shipments";
 
 		logger.info("doShipment is call!!!!! - " + loginUser.getUsername());
@@ -440,13 +560,14 @@ public class StoreAdminShipment extends StoreBase {
 		String code = requestParams.get("code");
 		String supplierid = requestParams.get("supplierid");
 		long receivedby = Long.parseLong(requestParams.get("receivedby"));
+		String orderid = requestParams.get("orderid");
 		User recUser = userService.getById(receivedby);
-		Calendar cal = Calendar.getInstance();
-		String comments = requestParams.get("comments");
-		String receivedate = requestParams.get("receivedate");  //
 		SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+		Calendar rcvCal = Calendar.getInstance();
+		String receivedate = requestParams.get("receivedate");  //
+		rcvCal.setTime(formatter.parse(receivedate));
+		String comments = requestParams.get("comments");
 		Calendar rcdCal = Calendar.getInstance();
-		rcdCal.setTime(formatter.parse(receivedate));
 
 		Supplier supplier = supplierService.getById(Long.parseLong(supplierid));
 
@@ -454,40 +575,167 @@ public class StoreAdminShipment extends StoreBase {
 		if(mfid != null && !mfid.isEmpty()) {
 			mf.setShipmentid(Long.parseLong(mfid));
 		}
+		if(orderid != null && !orderid.isEmpty()) {
+			Purchaseorder purchaseorder = purchaseorderService.getById(Long.parseLong(orderid));
+			mf.setPurchaseorder(purchaseorder);
+		}
 		mf.setSupplier(supplier);
 		mf.setCode(code);
 		mf.setReceivedby(recUser);
-		mf.setReceivedate(rcdCal);
+		mf.setReceivedate(rcvCal);
 		mf.setComments(comments);
-		mf.setReceivedate(cal);
 		mf.setRecordedby(loginUser);
-		mf.setRecorddate(cal);
-		try {
-		shipmentService.save(mf);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+		mf.setRecorddate(rcdCal);
+
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "shipments");
 
+		try {
+			shipmentService.save(mf);
+		} catch(Exception e) {
+			e.printStackTrace();
+			if(mfid != null && !mfid.isEmpty()) {
+				return "redirect:shipment/"+mfid;
+			} else {
+				return "redirect:shipment";
+			}
+		}
+
 		return "redirect:" + rtn;
+	}
+
+
+	@RequestMapping(method={RequestMethod.POST}, value={"/shipment/inventory"})
+	public String addShipmentItem(@RequestParam Map<String,String> requestParams,
+			ModelMap model,
+			HttpSession httpSession) {
+		Object principal = getPrincipal();
+
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
+			return "redirect:/store/admin/logout";
+		}
+
+		String rtn = "/store/admin/shipment";
+
+		String shipmentid = requestParams.get("shipmentid");
+		String itemid = requestParams.get("itemid");
+		String sku = requestParams.get("sku");
+		Shipment shipment = shipmentService.getById(Long.parseLong(shipmentid));
+		Item item = itemService.getById(Long.parseLong(itemid));
+		item.setShipment(shipment);
+		item.setReceivedate(Calendar.getInstance());
+		item.setReceivedby(loginUser);
+
+		if(sku != null && !sku.isEmpty()) {
+			item.setSku(sku);
+		}
+
+		item = itemService.save(item);
+
+		Store store = staff.getStore();
+
+		String storeid = requestParams.get("storeid");
+		String statusid = requestParams.get("statusid");
+		String quantity = requestParams.get("quantity");
+		String locationid = requestParams.get("locationid");
+		String uinventoryid = requestParams.get("uinventoryid");
+		String inventoryid = requestParams.get("inventoryid");
+		String tstoreid = requestParams.get("tstoreid");
+
+		Inventory inventory = new Inventory();
+
+		if(uinventoryid != null) {
+			storeid = requestParams.get("ustoreid");
+			quantity = requestParams.get("uquantity");
+			locationid = requestParams.get("ulocationid");
+			inventory = inventoryService.getById(Long.parseLong(uinventoryid));
+		}
+
+		if(inventoryid != null) {
+			inventory = inventoryService.getById(Long.parseLong(inventoryid));
+		}
+
+		Calendar cal = Calendar.getInstance();
+		Status status = statusService.getById(Long.parseLong(statusid));
+
+		inventory.setItem(item);
+
+		if(storeid == null || storeid.isEmpty()) {
+			inventory.setStore(store);
+		} else if(inventory.getStore() == null || inventory.getStore().getStoreid() != Long.parseLong(storeid)) {
+			Store store1 = storeService.getById(Long.parseLong(storeid));
+			inventory.setStore(store1);
+		}
+
+		if(tstoreid != null && !tstoreid.isEmpty()) {
+			Store tstore = storeService.getById(Long.parseLong(tstoreid));
+			inventory.setDeststore(tstore);
+		}
+		inventory.setStatus(status);
+		if(inventory.getStatus().getStatusid() != status.getStatusid() && inventory.getStatus().getName().equals("Transferred")) {
+			inventory.setDeststore(null);
+			inventory.setLocation(null);
+		}
+		if(locationid != null && !locationid.isEmpty()) {
+			Location location = locationService.getById(Long.parseLong(locationid));
+			inventory.setLocation(location);
+		}
+		inventory.setQuantity(Long.parseLong(quantity));
+		inventory.setReceivedby(loginUser);
+		inventory.setReceivedate(cal);
+		//try {
+		inventory = inventoryService.save(inventory);
+		/*} catch(Exception e) {
+			e.
+		}*/
+
+		//List<Inventory> inventories = inventoryService.getByItem(item);
+		List<Inventory> inventories = inventoryService.getByShipment(shipment);
+		long sum = 0;
+		for(Inventory i: inventories) {
+			sum += i.getQuantity();
+		}
+
+		model.addAttribute("sum", sum);
+		model.addAttribute("inventories", inventories);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("store", store);
+		model.addAttribute("menu", "Inventories");
+		model.addAttribute("subMenu", "inventories");
+
+		if(requestParams.get("shipmentid") != null) {
+			return "redirect:/store/admin/shipment/" + requestParams.get("shipmentid");
+		}
+
+		return "redirect:" + rtn + "/" + shipmentid;
 	}
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/items"})
 	public String dspItems(ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
 		String rtn = "store/admin/items";
 
-		List<Item> items = itemService.getAll();
+		List<Item> items = itemService.getAllAvailables(); //getAll();
 
 		model.addAttribute("items", items);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "items");
@@ -502,12 +750,15 @@ public class StoreAdminShipment extends StoreBase {
 		logger.info("dspItem is called");
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
-		Store store = staffService.getByUser(loginUser).getStore();
+		Store store = staff.getStore();
 		String rtn = "store/admin/item";
 		String orderid = requestParams.get("orderid");
 		String shipmentid = requestParams.get("shipmentid");
@@ -515,6 +766,7 @@ public class StoreAdminShipment extends StoreBase {
 		List<Shipment> shipments = new ArrayList<>();
 		List<Product> products = new ArrayList<>();
 
+		System.out.println("Loaded orderid: "+orderid);
 		if(orderid != null && !orderid.isEmpty()) {
 			orders.add(purchaseorderService.getById(Long.parseLong(orderid)));
 		} else {
@@ -535,12 +787,13 @@ public class StoreAdminShipment extends StoreBase {
 
 		model.addAttribute("sizes", sizes);
 		model.addAttribute("orders", orders);
-		model.addAttribute("orderid", orderid);
+		model.addAttribute("porderid", orderid);
 		model.addAttribute("regions", regions);
 		model.addAttribute("products", products);
 		model.addAttribute("locations", locations);
 		model.addAttribute("shipments", shipments);
 		model.addAttribute("shipmentid", shipmentid);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "items");
@@ -551,16 +804,19 @@ public class StoreAdminShipment extends StoreBase {
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/item/{itemid}"})
 	public String updateItem(ModelMap model, @PathVariable("itemid") Long itemid, HttpSession httpSession) {
+		String rtn = "store/admin/item";
+
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
-		String rtn = "store/admin/item";
-
-		Store store = staffService.getByUser(loginUser).getStore();
+		Store store = staff.getStore();
 
 		long mfid = itemid.longValue();
 		Item item = itemService.getById(mfid);
@@ -572,7 +828,8 @@ public class StoreAdminShipment extends StoreBase {
 
 		List<Store> stores = new ArrayList<>();
 		stores.add(store);
-		//List<Store> stores = storeService.getAll();
+		List<Store> tstores = storeService.getAll();
+		tstores.remove(store);
 		List<Inventory> inventories = inventoryService.getByItem(item);
 		List<Purchaseorder> orders = purchaseorderService.getAll();
 		List<Location> locations = locationService.getByStore(store);
@@ -591,9 +848,11 @@ public class StoreAdminShipment extends StoreBase {
 		model.addAttribute("products", products);
 		model.addAttribute("item", item);
 		model.addAttribute("stores", stores);
+		model.addAttribute("tstores", tstores);
 		model.addAttribute("locations", locations);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("inventories", inventories);
+		model.addAttribute("store", store);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "items");
 
@@ -609,16 +868,18 @@ public class StoreAdminShipment extends StoreBase {
 		logger.info("++++++Update Item++++++++++");
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
-
-		Store store = staffService.getByUser(loginUser).getStore();
+		Store store = staff.getStore();
 		String rtn = "item";
 
-		logger.info("doShipment is call!!!!! - " + loginUser.getUsername());
+		logger.info("doItem is call!!!!! - " + loginUser.getUsername());
 
 		long qty = 0;
 		long itmid = 0;
@@ -629,7 +890,9 @@ public class StoreAdminShipment extends StoreBase {
 		String quantity = requestParams.get("quantity");
 		String cost = requestParams.get("cost");
 		String orderid = requestParams.get("orderid");
+		String ordercode = requestParams.get("ordercode");
 		String shipmentid = requestParams.get("shipmentid");
+		String shipmentcode = requestParams.get("shipmentcode");
 		String comments = requestParams.get("comments");
 		String locationid = requestParams.get("locationid");
 		String addInventory = requestParams.get("addInventory");
@@ -639,8 +902,14 @@ public class StoreAdminShipment extends StoreBase {
 		String rtn_shipmentid = requestParams.get("rtn_shipmentid");
 		Message msg = new Message();
 
+		System.out.println("orderid: "+orderid+", rtn_orderid: "+rtn_orderid);
 		logger.info("sizeid is: "+sizeid);
 		Calendar cal = Calendar.getInstance();
+
+		model.addAttribute("store", store);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("menu", "Inventories");
+		model.addAttribute("subMenu", "items");
 
 		if(productname == null || productname.isEmpty()) {
 			msg.setStatus(Message.ERROR);
@@ -668,6 +937,7 @@ public class StoreAdminShipment extends StoreBase {
 				if(itemid != null && !itemid.isEmpty()) {
 					itmid = Long.parseLong(itemid);
 				}
+				//field validation
 				if(quantity != null && !quantity.isEmpty()) {
 					qty = Long.parseLong(quantity);
 				}
@@ -680,17 +950,32 @@ public class StoreAdminShipment extends StoreBase {
 						item.setSize(size);
 						//item.setPrice(Double.parseDouble(price));
 						item.setProduct(product);
-						item.setReceivedby(loginUser);
+						item.setCreatedby(loginUser);
 						item.setComments(comments);
-						item.setReceivedate(cal);
+						item.setCreationdate(cal);
 
 						if(orderid != null && !orderid.isEmpty()) {
 							Purchaseorder purchorder = purchaseorderService.getById(Long.parseLong(orderid));
-							item.setPurchaseorder(purchorder);
+							if(purchorder != null) {
+								item.setPurchaseorder(purchorder);
+							}
+						} else if(ordercode != null && !ordercode.isEmpty()){
+							Purchaseorder purchorder = purchaseorderService.getByCode(ordercode);
+							if(purchorder != null) {
+								item.setPurchaseorder(purchorder);
+							}
 						}
+
 						if(shipmentid != null && !shipmentid.isEmpty()) {
 							Shipment shipment = shipmentService.getById(Long.parseLong(shipmentid));
-							item.setShipment(shipment);
+							if(shipment != null) {
+								item.setShipment(shipment);
+							}
+						} else if(shipmentcode != null && !shipmentcode.isEmpty()) {
+							Shipment shipment = shipmentService.getByCode(shipmentcode);
+							if(shipment != null) {
+								item.setShipment(shipment);
+							}
 						}
 
 						if(cost != null && !cost.isEmpty()) {
@@ -703,13 +988,13 @@ public class StoreAdminShipment extends StoreBase {
 
 						if(addInventory != null && !addInventory.isEmpty()) {
 							Inventory inv = new Inventory();
-							Status status = statusService.getById(1);
+							Status received = statusService.getByNameAndReftbl("Received", "inventories");
 
 							inv.setStore(store);
 							inv.setItem(item);
 							inv.setReceivedate(cal);
 							inv.setReceivedby(loginUser);
-							inv.setStatus(status);
+							inv.setStatus(received);
 							inv.setQuantity(1);
 
 							if(locationid != null && !locationid.isEmpty()) {
@@ -732,17 +1017,32 @@ public class StoreAdminShipment extends StoreBase {
 					item.setSize(size);
 					//item.setPrice(Double.parseDouble(price));
 					item.setProduct(product);
-					item.setReceivedby(loginUser);
+					item.setCreatedby(loginUser);
 					item.setComments(comments);
-					item.setReceivedate(cal);
+					item.setCreationdate(cal);
 
 					if(orderid != null && !orderid.isEmpty()) {
 						Purchaseorder purchorder = purchaseorderService.getById(Long.parseLong(orderid));
-						item.setPurchaseorder(purchorder);
+						if(purchorder != null) {
+							item.setPurchaseorder(purchorder);
+						}
+					} else if(ordercode != null && !ordercode.isEmpty()){
+						Purchaseorder purchorder = purchaseorderService.getByCode(ordercode);
+						if(purchorder != null) {
+							item.setPurchaseorder(purchorder);
+						}
 					}
+
 					if(shipmentid != null && !shipmentid.isEmpty()) {
 						Shipment shipment = shipmentService.getById(Long.parseLong(shipmentid));
-						item.setShipment(shipment);
+						if(shipment != null) {
+							item.setShipment(shipment);
+						}
+					} else if(shipmentcode != null && !shipmentcode.isEmpty()) {
+						Shipment shipment = shipmentService.getByCode(shipmentcode);
+						if(shipment != null) {
+							item.setShipment(shipment);
+						}
 					}
 
 					if(cost != null && !cost.isEmpty()) {
@@ -776,21 +1076,21 @@ public class StoreAdminShipment extends StoreBase {
 				msg.setStatus(Message.SUCCESS);
 				msg.setMessage("Item has been create/update successfully!");
 			}
+
 			if(rtn_orderid != null && !rtn_orderid.isEmpty()) {
 				rtn = "purchorder/" + rtn_orderid;
+				return "redirect:" + rtn;
 			}
 
 			if(rtn_shipmentid != null && !rtn_shipmentid.isEmpty()) {
 				rtn = "shipment/" + rtn_shipmentid;
+				return "redirect:" + rtn;
 			}
+
 			if(returnurl.equals("item")) {
 				return "redirect:item";
 			}
 		}
-
-		model.addAttribute("loginUser", loginUser);
-		model.addAttribute("menu", "Inventories");
-		model.addAttribute("subMenu", "items");
 
 		if(itmid == 0) {
 			return "store/admin/item";
@@ -800,20 +1100,37 @@ public class StoreAdminShipment extends StoreBase {
 	}
 
 
-	@RequestMapping(method={RequestMethod.GET}, value={"/inventorys"})
-	public String dspInventorys(ModelMap model, HttpSession httpSession) {
-		String rtn = "store/admin/inventorys";
+	@RequestMapping(method={RequestMethod.GET}, value={"/inventories"})
+	public String dspInventories(ModelMap model, HttpSession httpSession) {
+		String rtn = "store/admin/inventories";
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
 
-		List<Inventory> inventorys = inventoryService.getAll();
-		model.addAttribute("inventorys", inventorys);
+		Status received = statusService.getByNameAndReftbl("Received", "inventories");
+		Status returned = statusService.getByNameAndReftbl("Returned", "inventories");
+		Status transfered = statusService.getByNameAndReftbl("Transferred", "inventories");
+
+		List<Long> statuss = new ArrayList<>();
+		statuss.add(received.getStatusid());
+		statuss.add(returned.getStatusid());
+		statuss.add(transfered.getStatusid());
+
+		List<Inventory> inventories = inventoryService.getByStoreAvaiable(store.getStoreid(), statuss);
+		//List<Inventory> inventories1 = inventoryService.getByStoreid(store.getStoreid());
+//System.out.println("!!Inventories size1: "+inventories1.size()+", inventories: "+inventories.size());
+
+		model.addAttribute("store", store);
+		model.addAttribute("inventories", inventories);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "inventories");
@@ -826,13 +1143,16 @@ public class StoreAdminShipment extends StoreBase {
 	public String dspInventory(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
 
-		Store store = staffService.getByUser(loginUser).getStore();
 		List<Store> stores = new ArrayList<>();
 		stores.add(store);
 		//String rtn = "store/admin/inventory";
@@ -853,6 +1173,7 @@ public class StoreAdminShipment extends StoreBase {
 		model.addAttribute("items", items);
 		model.addAttribute("stores", stores);
 		model.addAttribute("status", status);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "inventories");
@@ -865,37 +1186,46 @@ public class StoreAdminShipment extends StoreBase {
 	public String updateInventory(@RequestParam Map<String,String> requestParams, ModelMap model, @PathVariable("inventoryid") Long inventoryid, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
 
-		String rtn = "redirect:item/";
+		String rtn = "store/admin/inventory"; //"redirect:item/";
 
-		//String itemid = requestParams.get("itemid");
-		//Item item = itemService.getById(Long.parseLong(itemid));
+		List<Store> stores = storeService.getAll();
+		stores.remove(store);
 
 		Inventory inv = inventoryService.getById(inventoryid);
-		//inventoryService.delete(inventoryid);
 		Item item = inv.getItem();
 
 		List<Inventory> inventories = inventoryService.getByItem(item);
 		long sum = 0;
+
 		for(Inventory i: inventories) {
 			sum += i.getQuantity();
 		}
 
+		List<Status> statuses = statusService.getByReftbl("inventories");
+		List<Location> locations = locationService.getByStore(store);
+
+		model.addAttribute("store", store);
+		model.addAttribute("stores", stores);
+		model.addAttribute("locations", locations);
+		model.addAttribute("statuses", statuses);
 		model.addAttribute("sum", sum);
 		model.addAttribute("inventories", inventories);
-		//Inventory inventory = inventoryService.getById(inventoryid);
-
-		//model.addAttribute("inventory", inventory);
+		model.addAttribute("inventory", inv);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "inventories");
 
-		return rtn + item.getItemid();
+		return rtn; //+ item.getItemid();
 	}
 
 
@@ -904,15 +1234,20 @@ public class StoreAdminShipment extends StoreBase {
 		throws Exception {
 
 		logger.info("!!!!! doInventory is called");
-		String rtn = "redirect:item/" ;
+
+		String rtn = "store/admin/inventories" ;
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
 
 		String itemid = requestParams.get("itemid");
 		String storeid = requestParams.get("storeid");
@@ -920,8 +1255,11 @@ public class StoreAdminShipment extends StoreBase {
 		String quantity = requestParams.get("quantity");
 		String locationid = requestParams.get("locationid");
 		String uinventoryid = requestParams.get("uinventoryid");
+		String inventoryid = requestParams.get("inventoryid");
+		String tstoreid = requestParams.get("tstoreid");
+
 		Inventory inventory = new Inventory();
-logger.info("uinventoryid: "+uinventoryid);
+
 		if(uinventoryid != null) {
 			storeid = requestParams.get("ustoreid");
 			quantity = requestParams.get("uquantity");
@@ -929,16 +1267,36 @@ logger.info("uinventoryid: "+uinventoryid);
 			inventory = inventoryService.getById(Long.parseLong(uinventoryid));
 		}
 
+		if(inventoryid != null) {
+			inventory = inventoryService.getById(Long.parseLong(inventoryid));
+		}
+
 		Calendar cal = Calendar.getInstance();
 		Item item = itemService.getById(Long.parseLong(itemid));
-		Store store = storeService.getById(Long.parseLong(storeid));
 		Status status = statusService.getById(Long.parseLong(statusid));
-		Location location = locationService.getById(Long.parseLong(locationid));
 
 		inventory.setItem(item);
-		inventory.setStore(store);
+
+		if(storeid == null || storeid.isEmpty()) {
+			inventory.setStore(store);
+		} else if(inventory.getStore() == null || inventory.getStore().getStoreid() != Long.parseLong(storeid)) {
+			Store store1 = storeService.getById(Long.parseLong(storeid));
+			inventory.setStore(store1);
+		}
+
+		if(tstoreid != null && !tstoreid.isEmpty()) {
+			Store tstore = storeService.getById(Long.parseLong(tstoreid));
+			inventory.setDeststore(tstore);
+		}
 		inventory.setStatus(status);
-		inventory.setLocation(location);
+		if(inventory.getStatus().getStatusid() != status.getStatusid() && inventory.getStatus().getName().equals("Transferred")) {
+			inventory.setDeststore(null);
+			inventory.setLocation(null);
+		}
+		if(locationid != null && !locationid.isEmpty()) {
+			Location location = locationService.getById(Long.parseLong(locationid));
+			inventory.setLocation(location);
+		}
 		inventory.setQuantity(Long.parseLong(quantity));
 		inventory.setReceivedby(loginUser);
 		inventory.setReceivedate(cal);
@@ -956,6 +1314,83 @@ logger.info("uinventoryid: "+uinventoryid);
 
 		model.addAttribute("sum", sum);
 		model.addAttribute("inventories", inventories);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("store", store);
+		model.addAttribute("menu", "Inventories");
+		model.addAttribute("subMenu", "inventories");
+
+		if(requestParams.get("shipmentid") != null) {
+			return "redirect:/store/admin/shipment/" + requestParams.get("shipmentid");
+		}
+
+		//rtn += itemid;
+
+		return rtn;
+	}
+
+	@RequestMapping(method={RequestMethod.POST}, value={"/inventory/transfer"})
+	public String doTransfer(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession)
+		throws Exception {
+
+		logger.info("!!!!! doTransfer is called");
+		String rtn = "redirect:/store/admin/item/" ;
+
+		Object principal = getPrincipal();
+
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
+			return "redirect:/store/admin/logout";
+		}
+
+		Store store = staff.getStore();
+
+		String itemid = requestParams.get("itemid");
+		String tstoreid = requestParams.get("tstoreid");
+		String statusid = requestParams.get("statusid");
+		String uinventoryid = requestParams.get("tinventoryid");
+
+logger.info("uinventoryid: "+uinventoryid);
+		if(uinventoryid == null) {
+			return rtn;
+		}
+
+		Inventory inventory = inventoryService.getById(Long.parseLong(uinventoryid));
+		Calendar cal = Calendar.getInstance();
+		Item item = itemService.getById(Long.parseLong(itemid));
+		Store deststore = storeService.getById(Long.parseLong(tstoreid));
+		Status transferred = statusService.getByNameAndReftbl("Transferred", "inventories");
+
+		InventoryHistory history = new InventoryHistory(inventory);
+
+		history = inventoryHistoryService.save(history);
+
+		inventory.setStore(store);
+		inventory.setStatus(transferred);
+		inventory.setSentby(loginUser);
+		inventory.setSenddate(cal);
+		inventory.setReceivedate(null);
+		inventory.setReceivedby(null);
+		inventory.setDeststore(deststore);
+		inventory.setLocation(null);
+
+		//try {
+		inventory = inventoryService.save(inventory);
+		/*} catch(Exception e) {
+			e.
+		}*/
+
+		List<Inventory> inventories = inventoryService.getByItem(item);
+		long sum = 0;
+		for(Inventory i: inventories) {
+			sum += i.getQuantity();
+		}
+
+		model.addAttribute("sum", sum);
+		model.addAttribute("inventories", inventories);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "inventories");
@@ -992,4 +1427,10 @@ logger.info("uinventoryid: "+uinventoryid);
 		}
 	}
 
+	private List<Item> removeAdded(List<Item> target, List<Item> saleList) {
+
+		List<Item> result = target.stream().filter(inv -> saleList.stream().allMatch(t -> inv.getItemid() != t.getItemid())).collect(Collectors.toList());
+
+		return result;
+	}
 }

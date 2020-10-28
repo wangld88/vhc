@@ -22,7 +22,7 @@
 				<div class="col-lg-12">
 					<div class="box">
 						<div class="box-header">
-							<h3 class="box-title">All Sizes</h3> <span size="width: 240px;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <a th:href="@{/store/admin/size}" title="Add New Size"><i class="fa fa-plus-square"></i></a>
+							<h3 class="box-title">All Sizes</h3> <span size="width: 240px;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <!-- <a th:href="@{/store/admin/size}" title="Add New Size"><i class="fa fa-plus-square"></i></a> -->
 						</div>
 						<div class="box-body">
 
@@ -37,7 +37,7 @@
 								</thead>
 								<tbody>
 									<tr th:each="size:${sizes}">
-										<td th:text="${size.region.name}"></td>
+										<td th:text="${size.region!=null?size.region.name:''}"></td>
 										<td th:text="${size.sizenum}"></td>
 										<td th:text="${size.type.name}"></td>
 										<!-- <td>

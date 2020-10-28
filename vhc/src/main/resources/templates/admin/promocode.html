@@ -34,7 +34,7 @@
 										<div class="form-group">
 										    <label for="amount" class="control-label col-lg-2">Percentage </label>
 										    <div class="col-lg-10">
-										        <input class=" form-control" id="percentage" name="percentage" th:value="${promocode==null or promocode.percentage==null?'':#numbers.formatDecimal(promocode.percentage, 0, 2)}" type="text" />
+										        <input class=" form-control" id="percentage" name="percentage" th:value="${promocode==null or promocode.percentage==null?'':#numbers.formatDecimal(promocode.percentage, 0, 0)}" type="text" />
 										    </div>
 										</div>
 										<div class="form-group">
@@ -46,13 +46,13 @@
 										<div class="form-group">
 										    <label for="startdate" class="control-label col-lg-2">Effective Date <span class="required">*</span></label>
 										    <div class="col-lg-10">
-										        <input class="form-control" id="startdate" name="startdate" th:value="${promocode==null?'':#calendars.format(promocode.startdate,'dd MMMM yyyy')}" type="text" />
+										        <input class="form-control" id="startdate" name="startdate" th:value="${promocode==null?'':#calendars.format(promocode.startdate,'dd/MM/yyyy')}" type="text" />
 										    </div>
 										</div>
 										<div class="form-group">
 										    <label for="enddate" class="control-label col-lg-2">Expiration Date <span class="required">*</span></label>
 										    <div class="col-lg-10">
-										        <input class="form-control" id="enddate" name="enddate" th:value="${promocode==null?'':#calendars.format(promocode.enddate,'dd MMMM yyyy')}" type="text" />
+										        <input class="form-control" id="enddate" name="enddate" th:value="${promocode==null?'':#calendars.format(promocode.enddate,'dd/MM/yyyy')}" type="text" />
 										    </div>
 										</div>
 										<div class="form-group">

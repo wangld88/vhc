@@ -18,12 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.vhc.controller.BaseController;
 import com.vhc.controller.store.StoreBase;
-import com.vhc.core.model.City;
 import com.vhc.core.model.Giftcard;
+import com.vhc.core.model.GiftcardHistory;
+import com.vhc.core.model.Staff;
 import com.vhc.core.model.Status;
 import com.vhc.core.model.Store;
+import com.vhc.core.model.Type;
 import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 
@@ -60,13 +61,15 @@ public class StoreAdminGiftcard extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
-
-		Store store = staffService.getByUser(loginUser).getStore();
+		Store store = staff.getStore();
 
 		//List<City> cities = cityService.getAll();
 
@@ -78,7 +81,7 @@ public class StoreAdminGiftcard extends StoreBase {
 		model.addAttribute("statuss", statuss);
 
 		model.addAttribute("stores", stores);
-		//model.addAttribute("cities", cities);
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Sales");
 
@@ -118,11 +121,15 @@ public class StoreAdminGiftcard extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
 
 		String cardid = requestParams.get("giftcardid");
 		String code = requestParams.get("code");
@@ -130,34 +137,79 @@ public class StoreAdminGiftcard extends StoreBase {
 		String amount = requestParams.get("amount");
 		String balance = requestParams.get("balance");
 		String storeid = requestParams.get("storeid");
+		String statusid = requestParams.get("statusid");
+		Status status = statusService.getById(Long.parseLong(statusid));
 
-		Giftcard giftcard = new Giftcard();
-		if(cardid != null && !cardid.isEmpty()) {
-			giftcard.setGiftcardid(Long.parseLong(cardid));
-		}
+		Giftcard old = giftcardService.getByCode(code);
 
-		if(storeid != null && !storeid.isEmpty()) {
-			Store store = storeService.getById(Long.parseLong(storeid));
-			giftcard.setStore(store);
-		}
+		if(old != null) {
+			String msg = "Card (" + code + ") already exists in system";
+			logger.warn(msg);
 
-		giftcard.setCode(code);
-		giftcard.setPin(pin);;
-		giftcard.setLoaddate(Calendar.getInstance());
-		giftcard.setLoadedby(loginUser);
-
-		if(amount != null && !amount.isEmpty()) {
+			Giftcard giftcard = new Giftcard();
+			giftcard.setCode(code);
 			giftcard.setAmount(new BigDecimal(amount));
-			if(cardid == null || cardid.isEmpty()) {
-				giftcard.setBalance(new BigDecimal(amount));
+			giftcard.setStore(store);
+			giftcard.setStatus(status);
+			List<Status> statuss = statusService.getByReftbl("giftcards");
+			List<Store> stores = new ArrayList<>();//storeService.getAll();
+			stores.add(store);
+
+			model.addAttribute("message", msg);
+			model.addAttribute("statuss", statuss);
+			model.addAttribute("giftcard", giftcard);
+			model.addAttribute("stores", stores);
+			model.addAttribute("store", store);
+			model.addAttribute("loginUser", loginUser);
+			model.addAttribute("menu", "Sales");
+
+			return "store/admin/giftcard";
+		} else {
+
+			Giftcard giftcard = new Giftcard();
+			GiftcardHistory gfHistory = new GiftcardHistory();
+
+			if(cardid != null && !cardid.isEmpty()) {
+				giftcard.setGiftcardid(Long.parseLong(cardid));
 			}
-		}
-		if(balance != null && !balance.isEmpty()) {
-			giftcard.setBalance(new BigDecimal(balance));
+
+			if(storeid != null && !storeid.isEmpty()) {
+				Store store1 = storeService.getById(Long.parseLong(storeid));
+				giftcard.setStore(store1);
+			}
+
+			if(pin != null && !pin.isEmpty()) {
+				giftcard.setPin(pin);
+			}
+
+			giftcard.setCode(code);
+			giftcard.setLoaddate(Calendar.getInstance());
+			giftcard.setLoadedby(loginUser);
+
+			if(amount != null && !amount.isEmpty()) {
+				giftcard.setAmount(new BigDecimal(amount));
+				gfHistory.setAmount(new BigDecimal(amount));
+				if(cardid == null || cardid.isEmpty()) {
+					giftcard.setBalance(new BigDecimal(amount));
+				}
+			}
+			if(balance != null && !balance.isEmpty()) {
+				giftcard.setBalance(new BigDecimal(balance));
+			}
+
+			giftcard = giftcardService.save(giftcard);
+
+			//History
+			Type type = typeService.getByNameReftbl("Create", "giftcards");
+			gfHistory.setType(type);
+			gfHistory.setGiftcard(giftcard);
+			gfHistory.setAmount(giftcard.getAmount());
+			gfHistory.setOperatedate(Calendar.getInstance());
+			gfHistory.setOperatedby(loginUser);
+			giftcardHistoryService.save(gfHistory);
 		}
 
-		giftcardService.save(giftcard);
-
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Sales");
 

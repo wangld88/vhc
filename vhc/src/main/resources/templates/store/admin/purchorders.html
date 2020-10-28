@@ -7,8 +7,8 @@
 
 		<section class="content-header">
 			<h1>
-				Inventory Management
-				<small>List Purchase Orders</small>
+				List Purchase Orders
+				<small>Inventory Management</small>
 			</h1>
 			<ol class="breadcrumb">
 				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -26,11 +26,13 @@
 						</div>
 						<div class="box-body">
 
-							<table id="mainTable" class="table table-striped" th:if="${orders != null}">
+							<table id="mainTable2" class="table table-striped" th:if="${orders != null}">
 								<thead>
 									<tr>
+										<th><i class="icon_contacts_alt"></i> Exp. Date</th>
 										<th><i class="icon_documents"></i> P.O. Number</th>
 										<th><i class="icon_calendar"></i> Supplier</th>
+										<th><i class="icon_contacts_alt"></i>Items</th>
 										<th><i class="icon_pin_alt"></i> Sent By</th>
 										<th><i class="icon_contacts_alt"></i> Sent Date</th>
 										<th><i class="icon_pin_alt"></i> Recorded By</th>
@@ -41,17 +43,19 @@
 								</thead>
 								<tbody>
 									<tr th:each="order:${orders}">
+										<td th:text="${order.expectdate!=null?#calendars.format(order.expectdate,'yyyy/MM/dd'):''}"></td>
 										<td th:text="${order.code}"></td>
 										<td th:text="${order.supplier.name}"></td>
-										<td th:text="${order.sentby.firstname}"></td>
+										<td th:text="${order.items!=null and !order.items.isEmpty()?'Yes':'No'}"></td>
+										<td th:text="${order.sentby.firstname+' '+order.sentby.lastname}"></td>
 										<td th:text="${#calendars.format(order.sentdate,'dd MMMM yyyy')}"></td>
-										<td th:text="${order.recordedby.firstname}"></td>
+										<td th:text="${order.recordedby.firstname+' '+order.recordedby.lastname}"></td>
 										<td th:text="${#calendars.format(order.recorddate,'dd MMMM yyyy')}"></td>
 										<td th:text="${order.comments}"></td>
 										<td>
 											<div class="btn-group">
 												<!-- <a class="btn btn-primary" th:href="@{/admin/shipment}" title="Add New Shipment"><i class="icon_plus_alt2"></i></a> -->
-												<a th:href="@{/store/admin/purchorder/}+${order.orderid}" title="Edit Purchase Order"><i class="fa fa-edit"></i></a>
+												<a th:href="@{/store/admin/purchorder/}+${order.poid}" title="Edit Purchase Order"><i class="fa fa-edit"></i></a>
 												<!-- <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a> -->
 											</div>
 										</td>
@@ -63,5 +67,7 @@
 				</div>
  			</div>
 		</section>
+		<script>
+		</script>
 	</div>
 </html>

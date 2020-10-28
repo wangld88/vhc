@@ -76,7 +76,7 @@ public class User implements Serializable {
 	@ApiObjectField(description="User's password", format="Not Null, maxlength = 60", required=true)
 	private String password;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=false)
 	@ApiObjectField(description="User's creationdate", format="Not Null", required=true)
 	private Calendar creationdate;
@@ -87,7 +87,7 @@ public class User implements Serializable {
 	@JsonBackReference
 	private User createdby;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=true)
 	@ApiObjectField(description="User's update date", required=false)
 	private Calendar updatedate;
@@ -220,17 +220,23 @@ public class User implements Serializable {
 	}
 
 	public String[] getRoles() {
-		String[] roleList = new String[userroles.size()];
-		for(int i = 0; i < userroles.size(); i++) {
-			roleList[i] = userroles.get(i).getRole().getName();
+		String[] roleList = new String[0];
+		if(userroles != null) {
+			roleList = new String[userroles.size()];
+			for(int i = 0; i < userroles.size(); i++) {
+				roleList[i] = userroles.get(i).getRole().getName();
+			}
 		}
+
 		return roleList;
 	}
 
 	public boolean hasRole(String role) {
-		for(int i = 0; i < userroles.size(); i++) {
-			if(userroles.get(i).getRole().getName().equals(role)) {
-				return true;
+		if(userroles != null) {
+			for(int i = 0; i < userroles.size(); i++) {
+				if(userroles.get(i).getRole().getName().equals(role)) {
+					return true;
+				}
 			}
 		}
 		return false;

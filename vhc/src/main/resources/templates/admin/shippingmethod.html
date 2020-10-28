@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html layout:decorator="admin/layout/layout">
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		$function() {
+		    $('#receivedate').datepicker({
+		        format: 'mm/dd/yyyy'
+		    });
+		}
+	    /*]]>*/
+	</script>
+
+	<div layout:fragment="content">
+
+		<section id="main-content">
+			<section class="wrapper">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Setting Management</h3>
+						<ol class="breadcrumb">
+							<li><i class="fa fa-home"></i><a th:href="@{/admin/home}">Home</a></li>
+							<li><i class="icon_document_alt"></i>Settings</li>
+							<li><i class="fa fa-file-text-o"></i><span th:text="${method==null?'New Shipment':'Modify Shipment'}"></span></li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+						<section class="panel">
+							<header class="panel-heading">
+								Shipping Method
+							</header>
+							<div class="panel-body">
+								<div class="form">
+									<form class="form-validate form-horizontal " id="method" name="method" method="post" th:action="@{/admin/shippingmethod}">
+										<div class="form-group">
+										    <label for="code" class="control-label col-lg-2">Name <span class="required">*</span></label>
+										    <div class="col-lg-10">
+										        <input class=" form-control" id="name" name="name" th:value="${method==null?'':method.name}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="description" class="control-label col-lg-2">Description <span class="required">*</span></label>
+										    <div class="col-lg-10">
+										        <input class=" form-control" id="description" name="description" th:value="${method==null?'':method.description}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="cost" class="control-label col-lg-2">Cost <span class="required">*</span></label>
+										    <div class="col-lg-10">
+										        <input class="form-control" id="cost" name="cost" th:value="${method==null?'':method.cost}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <div class="col-lg-offset-2 col-lg-10">
+										        <button class="btn btn-primary" type="submit"> Save </button>
+										        <button class="btn btn-default" type="button">Cancel</button>
+										        <input type="hidden" id="shipmethodid" name="shipmethodid" th:value="${method==null?'':method.shipmethodid}" />
+										    </div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</section>
+					</div>
+				</div>
+			</section>
+		</section>
+      <!--main content end-->
+	</div>
+
+</html>

@@ -27,19 +27,19 @@
 										<th><i class="fa fa-dashboard"></i> Region</th>
 										<th><i class="fa fa-dashboard"></i> Size Number</th>
 										<th><i class="fa fa-dashboard"></i> Type</th>
-										<!-- <th><i class="icon_cogs"></i> Action</th> -->
+										<th><i class="icon_cogs"></i> Action</th>
 									</tr>
 								</thead>
 								<tbody>
 									<tr th:each="size:${sizes}">
-										<td th:text="${size.region.name}"></td>
+										<td th:text="${size.region!=null?size.region.name:''}"></td>
 										<td th:text="${size.sizenum}"></td>
 										<td th:text="${size.type.name}"></td>
-										<!-- <td>
+										<td>
 											<div class="btn-group">
-												<a th:href="@{/store/admin/size/}+${size.sizeid}" title="Edit Size"><i class="fa fa-edit"></i></a>
+												<a th:href="@{/admin/size/}+${size.sizeid}" title="Edit Size"><i class="fa fa-edit"></i></a>
 											</div>
-										</td> -->
+										</td>
 									</tr>
 								</tbody>
 							</table>

@@ -266,7 +266,11 @@ public class AdminShipment extends BaseController {
 		order.setExpectdate(expCal);
 		order.setSentby(sentUser);
 		order.setSentdate(rcdCal);
-		order.setComments(comments);
+
+		if(comments != null && !comments.isEmpty()) {
+			order.setComments(comments);
+		}
+
 		order.setSentdate(cal);
 		order.setRecordedby(recordedby);
 		order.setRecorddate(cal);
@@ -398,8 +402,13 @@ public class AdminShipment extends BaseController {
 	public String dspItems(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/items";
 
+		//list all
+		//List<Item> allItems = itemService.getAll();
 
-		List<Item> items = itemService.getAll();
+		List<Item> items = itemService.getAllAvailables();
+
+		//System.out.println("All Items: "+allItems.size()+", available items: "+items.size());
+
 		model.addAttribute("items", items);
 		model.addAttribute("loginUser", getPrincipal());
 		model.addAttribute("adminmenu", "Inventories");
@@ -768,6 +777,7 @@ public class AdminShipment extends BaseController {
 		}
 
 		model.addAttribute("sum", sum);
+		model.addAttribute("loginUser", getPrincipal());
 		model.addAttribute("inventories", inventories);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "inventorys");

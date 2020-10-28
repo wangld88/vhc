@@ -32,4 +32,9 @@ public class PromocodeService {
 		this.promocodeRepository.save(promocode);
 	}
 
+	@Transactional(rollbackFor=Exception.class)
+	public void delete(long promocodeid) {
+		this.promocodeRepository.delete(promocodeid);
+	}
+
 }

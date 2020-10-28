@@ -7,8 +7,8 @@
 
 		<section class="content-header">
 			<h1>
-				Inventory Management
-				<small>List Shipments</small>
+				List Shipments
+				<small>Inventory Management</small>
 			</h1>
 			<ol class="breadcrumb">
 				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -26,27 +26,27 @@
 						</div>
 						<div class="box-body">
 
-							<table id="mainTable" class="table table-striped" th:if="${shipments != null}">
+							<table id="mainTable2" class="table table-striped" th:if="${shipments != null}">
 								<thead>
 									<tr>
+										<th><i class="icon_contacts_alt"></i> Receive Date</th>
 										<th><i class="icon_documents"></i> Shipment Code</th>
 										<th><i class="icon_calendar"></i> Supplier</th>
 										<th><i class="icon_pin_alt"></i> Received By</th>
-										<th><i class="icon_contacts_alt"></i> Receive Date</th>
-										<th><i class="icon_pin_alt"></i> Recorded By</th>
-										<th><i class="icon_contacts_alt"></i> Record Date</th>
+										<th><i class="icon_pin_alt"></i> P.O. #</th>
+										<!-- <th><i class="icon_contacts_alt"></i> Record Date</th> -->
 										<th><i class="icon_mail_alt"></i> Comments</th>
 										<th><i class="icon_cogs"></i> Action</th>
 									</tr>
 								</thead>
 								<tbody>
 									<tr th:each="shipment:${shipments}">
+										<td th:text="${#calendars.format(shipment.receivedate,'yyyy/MM/dd')}"></td>
 										<td th:text="${shipment.code}"></td>
 										<td th:text="${shipment.supplier.name}"></td>
-										<td th:text="${shipment.receivedby.firstname}"></td>
-										<td th:text="${#calendars.format(shipment.receivedate,'dd MMMM yyyy')}"></td>
-										<td th:text="${shipment.recordedby.firstname}"></td>
-										<td th:text="${#calendars.format(shipment.recorddate,'dd MMMM yyyy')}"></td>
+										<td th:text="${shipment.receivedby.firstname+' '+shipment.receivedby.lastname}"></td>
+										<td th:text="${shipment.purchaseorder!=null?shipment.purchaseorder.code:'N/A'}"></td>
+										<!-- <td th:text="${#calendars.format(shipment.recorddate,'dd MMMM yyyy')}"></td> -->
 										<td th:text="${shipment.comments}"></td>
 										<td>
 											<div class="btn-group">

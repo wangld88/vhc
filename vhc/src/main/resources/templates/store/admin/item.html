@@ -16,8 +16,8 @@
 
 		<section class="content-header">
 			<h1>
-				Inventory Management
-				<small>List Items</small>
+				Item Detail
+				<small>Inventory Management</small>
 			</h1>
 			<ol class="breadcrumb">
 				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -42,48 +42,44 @@
 									<div class="form-group">
 									    <label for="productid" class="control-label col-lg-2">Product </label>
 									    <div class="col-lg-10">
-											<!-- <select class="form-control" id="productid" name="productid">
-												<option th:each="product: ${products}" th:value="${product.productid}" th:text="${product.name}" th:selected="${item!=null and item.product!=null and item.product.productid==product.productid}"></option>
-											</select> -->
-											<input class="form-control" id="name" name="name" th:value="${item!=null?item.product.name:''}" />
+											<input class="form-control" id="name" name="name" th:value="${item!=null?item.product.name:''}" th:readonly="${item!=null and item.shipment!=null}" />
 											<input type="hidden" id="typeid" name="typeid" th:value="${item!=null?item.product.type.typeid:0}" />
 									    </div>
 									</div>
 									<div class="form-group ">
 									    <label for="sku" class="control-label col-lg-2">UPC </label><!-- SKU -->
 									    <div class="col-lg-10">
-									        <input class="form-control " id="sku" name="sku" th:value="${item==null?'':item.sku}" type="text" />
+									        <input class="form-control " id="sku" name="sku" th:value="${item==null?'':item.sku}" type="text" /> <!-- th:readonly="${item!=null and item.shipment!=null}" -->
 									    </div>
 									</div>
 									<div class="form-group">
 									    <label for="size" class="control-label col-lg-2">Size </label>
 									    <div class="col-lg-10">
-											<!-- <select class="form-control" id="sizeid" name="sizeid">
-												<option th:each="size: ${sizes}" th:value="${size.sizeid}" th:text="${size.region.name+' '+size.sizenum+' ('+size.type.name+')'}" th:selected="${item!=null and item.size!=null and item.size.sizeid==size.sizeid}"></option>
-											</select> -->
-											<input class="form-control" id="size" name="size" th:value="${item!=null?item.size.region.name+' '+item.size.sizenum+' ('+item.size.type.name+')':''}"  />
+											<input class="form-control" id="size" name="size" th:value="${item!=null?item.size.region.name+' '+item.size.sizenum+' ('+item.size.type.name+')':''}" /> <!--  th:readonly="${item!=null and item.shipment!=null}" -->
 											<input type="hidden" id="sizeid" name="sizeid" th:value="${item!=null?item.size.sizeid:0}" />
 									    </div>
 									</div>
 									<div class="form-group ">
 									    <label for="quantity" class="control-label col-lg-2">Quantity </label>
 									    <div class="col-lg-10">
-									        <input type="text" class="form-control " id="quantity" name="quantity" th:value="${item==null?'':item.quantity}" />
+									        <input type="text" class="form-control " id="quantity" name="quantity" th:value="${item==null?'':item.quantity}" th:readonly="${item!=null and item.shipment!=null}" />
 									    </div>
 									</div>
 									<div class="form-group">
 									    <label for="orderid" class="control-label col-lg-2">P.O. No. </label>
 									    <div class="col-lg-10">
-											<select class="form-control" id="orderid" name="orderid">
+									    	<input type="text" th:if="${item!=null and item.purchaseorder!=null}" class="form-control" id="ordercode" name="ordercode" th:readonly="${item!=null and item.purchaseorder!=null}" th:value="${item.purchaseorder!=null?item.purchaseorder.code:''}" />
+											<select class="form-control" id="orderid" name="orderid" th:if="${item==null or item.purchaseorder==null}">
 												<option value=""></option>
-												<option th:each="order: ${orders}" th:value="${order.poid}" th:text="${order.code}" th:selected="${item!=null and item.purchaseorder!=null and item.purchaseorder.poid==order.poid}"></option>
+												<option th:each="order: ${orders}" th:value="${order.poid}" th:text="${order.code}" th:selected="${(item!=null and item.purchaseorder!=null and item.purchaseorder.poid==order.poid) or (porderid!=null and order.poid==porderid)}"></option>
 											</select>
 									    </div>
 									</div>
 									<div class="form-group">
 									    <label for="shipmentid" class="control-label col-lg-2">Shipment </label>
 									    <div class="col-lg-10">
-											<select class="form-control" id="shipmentid" name="shipmentid">
+									    	<input type="text" th:if="${item!=null and item.shipment!=null}" class="form-control" id="shipmentcode" name="shipmentcode" th:readonly="${item!=null and item.shipment!=null}" th:value="${item.shipment!=null?item.shipment.code:''}" />
+											<select class="form-control" id="shipmentid" name="shipmentid" th:if="${item==null or item.shipment==null}">
 												<option value=""></option>
 												<option th:each="shipment: ${shipments}" th:value="${shipment.shipmentid}" th:text="${shipment.code}" th:selected="${item!=null and item.shipment!=null and item.shipment.shipmentid==shipment.shipmentid}"></option>
 											</select>
@@ -112,19 +108,20 @@
 									</div>
 									<div class="form-group">
 									    <div class="col-lg-offset-2 col-lg-10">
-									        <button class="btn btn-primary" type="submit"> Save </button>
+									        <button th:if="${item!=null}" class="btn btn-primary" type="submit"> Save </button>
 									        <a href="javascript: next()" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> New Item</a>
-									        <a th:href="@{/store/admin/items}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+									        <a th:if="${porderid==null}" th:href="@{/store/admin/items}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+									        <a th:if="${porderid!=null}" th:href="@{/store/admin/purchorder/}+${porderid}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
 									        <input type="hidden" id="itemid" name="itemid" th:value="${item==null?'':item.itemid}" />
 									        <input type="hidden" th:if="${shipmentid!=null}" id="rtn_shipmentid" name="rtn_shipmentid" th:value="${shipmentid}" />
-									        <input type="hidden" th:if="${orderid!=null}" id="rtn_orderid" name="rtn_orderid" th:value="${orderid}" />
+									        <input type="hidden" th:if="${porderid!=null}" id="rtn_orderid" name="rtn_orderid" th:value="${porderid}" />
 									        <input type="hidden" id="return" name="return" value="items" />
 									    </div>
 									</div>
 								</form>
 							</div>
 						</div>
-						<div th:if="${item!=null}">
+						<div th:if="${item!=null}" class="box-body">
 							<font size="4">Add Inventory</font>
 							<div class="form" th:if="${inventories==null or sum==null or item.quantity!=sum}">
 								<form class="form-validate form-horizontal " id="inventory" name="inventory" method="post" th:action="@{/store/admin/inventory}">
@@ -176,13 +173,15 @@
 										<tr th:each="inv:${inventories}" class="header" th:id="${inv.inventoryid}">
 											<td th:text="${inv.item.product.name}"></td>
 											<td th:text="${inv.store.name}"></td>
-											<td th:text="${inv.location!=null?inv.location.name:''}"></td>
-											<td th:text="${inv.status.name}"></td>
-											<td th:text="${inv.quantity}"></td>
-											<td th:text="${inv.receivedby.firstname}"></td>
-											<td>
+											<td th:if="${inv.store.name==store.name}" th:text="${inv.location!=null?inv.location.name:''}"></td>
+											<td th:if="${inv.store.name==store.name}" th:text="${inv.status!=null?inv.status.name:''}"></td>
+											<td th:if="${inv.store.name==store.name}" th:text="${inv.quantity}"></td>
+											<td th:if="${inv.store.name==store.name}" th:text="${inv.receivedby!=null?inv.receivedby.firstname:''}"></td>
+											<td th:if="${inv.store.name==store.name}">
 												<div class="btn-group">
-													<a id="edit" title="Edit Inventory"><i class="fa fa-edit"></i></a>
+													<!-- <a id="edit" title="Edit Inventory" th:name="${inv.inventoryid}"><i class="fa fa-edit"></i></a> -->
+													<a th:href="@{/store/admin/inventory/}+${inv.inventoryid}" title="Edit Inventory"><i class="fa fa-edit"></i></a>
+													<a id="transfer" title="Transfer" th:name="${inv.inventoryid}"><i class="fa fa-truck"></i></a>
 													<input type="hidden" th:id="'inventoryid'+${inv.inventoryid}" th:value="${inv.inventoryid}" />
 													<input type="hidden" th:id="'storeid'+${inv.inventoryid}" th:value="${inv.store.storeid}" />
 													<input type="hidden" th:id="'locationid'+${inv.inventoryid}" th:value="${inv.location!=null?inv.location.locationid:0}" />
@@ -190,7 +189,7 @@
 													<input type="hidden" th:id="'product'+${inv.inventoryid}" th:value="${inv.item.product.name}" />
 													<!-- <a th:href="@{/store/admin/inventory/}+${inv.inventoryid}" title="Edit Inventory"><i class="fa fa-edit"></i></a> -->
 													<!-- <a th:href="@{/store/admin/inventory/}+${inv.inventoryid}" title="Delete Inventory"><i class="fa fa-edit"></i></a> -->
-											</div>
+												</div>
 											</td>
 										</tr>
 									</tbody>
@@ -242,6 +241,34 @@
 			</form>
 		</div>
 
+		<div th:if="${item!=null}" id="transfer-dialog" class="form1" title="Transfer Inventory">
+			<p class="validateTips">All form fields are required.</p>
+
+			<form id="inventory2" name="inventory2" class="form-validate form-horizontal" method="post" th:action="@{/store/admin/inventory/transfer}">
+				<div class="form-group">
+				    <label for="ustoreid" class="control-label col-lg-5">Transfer From </label>
+				    <div class="col-lg-7">
+				    	<input type="text" class="form-control" th:value="${stores.get(0).name}" disabled="disabled" />
+				    </div>
+				</div>
+				<div class="form-group">
+				    <label for="ustoreid" class="control-label col-lg-5">Transfer To </label>
+				    <div class="col-lg-7">
+						<select class="form-control" id="tstoreid" name="tstoreid">
+							<option th:each="store: ${tstores}" th:value="${store.storeid}" th:text="${store.name}"></option>
+						</select>
+				    </div>
+				</div>
+				<div class="form-group">
+				    <div class="col-lg-offset-2 col-lg-10">
+				        <input type="hidden" id="tinventoryid" name="tinventoryid" th:value="${item.itemid}" />
+				        <input type="hidden" id="itemid" name="itemid" th:value="${item.itemid}" />
+				    	<input type="hidden" id="statusid" name="statusid" value="4" />
+				    </div>
+				</div>
+			</form>
+		</div>
+
 		<!--main content end-->
 		<script th:src="@{/js/jquery-1.10.2.min.js}"></script>
 		<script th:src="@{/js/jquery-ui-1.12.1.js}"></script>
@@ -250,8 +277,8 @@
 			$(document).ready(function() {
 			    var token = $("meta[name='_csrf']").attr("content");
 			    var header = $("meta[name='_csrf_header']").attr("content");
-			    var dialog, form;
-
+			    var dialog, dialog1, form;
+			    console.log($().jquery)
 				$( "#name" ).autocomplete({
 					source: function (request, response) {
 	                    $.ajax({
@@ -355,15 +382,62 @@
 					$("#storeid")[0].value = $("#stdnum"+this.id)[0].value;
 				}); */
 
-				$('.header').click(function(){
+				//$('.header').click(function(){
+				$('#edit').click(function(){
+					var id = this.name;
 
 				    dialog.dialog( "open" );
-					console.log("inventoryid: "+$("#locationid"+this.id)[0].value);
-				    $("#ulocationid")[0].value = $("#locationid"+this.id)[0].value;
-				    $("#uquantity")[0].value = $("#quantity"+this.id)[0].value;
-				    $("#uinventoryid")[0].value = $("#inventoryid"+this.id)[0].value;
-				    $("#ustoreid")[0].value = $("#storeid"+this.id)[0].value;
+					console.log("inventoryid: "+$("#locationid"+id)[0].value);
+				    $("#ulocationid")[0].value = $("#locationid"+id)[0].value;
+				    $("#uquantity")[0].value = $("#quantity"+id)[0].value;
+				    $("#uinventoryid")[0].value = $("#inventoryid"+id)[0].value;
+				    $("#ustoreid")[0].value = $("#storeid"+id)[0].value;
 				    //$("#detail")[0].value = $("#detail"+this.id)[0].value;
+				});
+
+				dialog1 = $( "#transfer-dialog" ).dialog({
+					dialogClass: 'dialogStyle',
+					autoOpen: false,
+					resizable: false,
+					height: 400,
+					width: 350,
+					modal: true,
+					buttons: {
+						"Complete": function() {
+							document.getElementById("inventory2").submit();},
+						Cancel: function() {
+							dialog1.dialog( "close" );
+						}
+					},
+					close: function() {
+						form[ 0 ].reset();
+						//allFields.removeClass( "ui-state-error" );
+					},
+					open: function (event, ui) {
+					    $('#transfer-dialog').css('overflow', 'hidden');
+					}
+				});
+
+				$('#transfer').click(function(){
+					var id = this.name;
+					/* out = '';
+					for(i in h) {
+						out += 'i: '+h[i]+'\n';
+					} */
+					console.log("ID: "+this.name);
+
+					console.log("inventoryid2: "+$("#inventoryid"+id)[0].value);
+				    dialog1.dialog( "open" );
+				    //$("#ulocationid")[0].value = $("#locationid"+this.id)[0].value;
+				    //$("#uquantity")[0].value = $("#quantity"+this.id)[0].value;
+				    $("#tinventoryid")[0].value = $("#inventoryid"+id)[0].value;
+				    //$("#tstoreid")[0].value = $("#tstoreid"+id)[0].value;
+				    //$("#detail")[0].value = $("#detail"+this.id)[0].value;
+				});
+
+				form1 = dialog1.find( "form" ).on( "submit", function( event ) {
+					event.preventDefault();
+					//addUser();
 				});
 
 				$('#addInventory').click(function() {

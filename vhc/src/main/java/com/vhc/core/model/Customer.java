@@ -40,7 +40,7 @@ public class Customer implements Serializable {
 	@ApiObjectField(description="Comment notes", format="maxlength = 600", required=false)
 	private String comments;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=false)
 	@ApiObjectField(description="User's creationdate", format="Not Null", required=true)
 	private Calendar creationdate;
@@ -50,7 +50,7 @@ public class Customer implements Serializable {
 	@ApiObjectField(description="Created User", required=true)
 	private User createdby;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=true)
 	@ApiObjectField(description="User's update date", required=false)
 	private Calendar updatedate;

@@ -193,7 +193,7 @@
 				border: 1px solid #3d3c3c;
 			    display: inline-block;
 			    cursor: pointer;
-			    width: 10%;
+			    width: 12%;
 			    height: 22px;
 			    vertical-align: middle;
 			}
@@ -240,11 +240,11 @@
 				border-color: #575657
 			}
 
-			.header {
+			/* .header {
 				background-color:#bce0ee;
 				color:#3d3c3c !important;
 				font-family: UniversCondensed, Arial, sans-serif !important;
-			}
+			} */
 		</style>
 
 		<section id="main-content">
@@ -267,10 +267,13 @@
 								Upload Gift Cards
 							</header>
 							<div class="panel-body">
+								<div th:if="${message!=null and message.status!=null}" class="col-lg-offset-2 col-lg-10" style="margin-top: 10px;margin-bottom: 20px;">
+									<span th:class="${message.status}" th:text="${message.message}"></span>
+								</div>
 								<div class="form">
 									<form class="form-validate form-horizontal" id="giftcardupload" name="giftcardupload" method="post" th:action="@{/admin/giftcardupload}" enctype="multipart/form-data">
 										<div class="form-group">
-										    <label for="code" class="control-label col-lg-4">Only Excel file is accepted, and make sure the columns are in right order. <span class="required">*</span></label>
+										    <label for="code" class="control-label col-lg-6">Only Excel file is accepted, and make sure the columns are in right order. <span class="required">*</span></label>
 										</div>
 
 										<!-- <div class="file-upload-wrapper">
@@ -278,9 +281,9 @@
 										</div> -->
 
 										<div class="form-group">
-											<div class="myLabel col-lg-offset-2 col-lg-2">
+											<div class="myLabel col-lg-offset-2 col-lg-4">
 												<input type="file" id="uploadBtn" name="file">
-												<span class="col-lg-4 col-md-4">+ Add File</span>
+												<span class="col-lg-6 col-md-6">+ Add File</span>
 											</div>
 											<div class="col-lg-8" style="height: 36px;vertical-align: middle;">
 												<span id="uploadFile"></span>

@@ -9,12 +9,14 @@ import com.vhc.core.model.Giftcard;
 
 public interface GiftcardRepository extends CrudRepository<Giftcard, Long> {
 
-	List<Giftcard> findAll();
+	List<Giftcard> findAllByOrderByCode();
 
 	Giftcard findByGiftcardid(long giftcardid);
 
 	Giftcard findByCode(String code);
 
 	Giftcard findByCodeAndPin(String code, String pin);
+
+	List<Giftcard> findByCodeContainingOrderByCode(String name);
 
 }

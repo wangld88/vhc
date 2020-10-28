@@ -7,8 +7,8 @@
 
 		<section class="content-header">
 			<h1>
-				Inventory Management
-				<small>List Shipments</small>
+				Shipment Detail
+				<small>Inventory Management</small>
 			</h1>
 			<ol class="breadcrumb">
 				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -37,9 +37,9 @@
 									    </div>
 									</div>
 									<div class="form-group">
-									    <label for="code" class="control-label col-lg-2">Shipping Code <span class="required">*</span></label>
+									    <label for="code" class="control-label col-lg-2">Order No. <span class="required">*</span></label>
 									    <div class="col-lg-10">
-									        <input class=" form-control" id="code" name="code" th:value="${shipment==null?'':shipment.code}" type="text" />
+									        <input type="text" class=" form-control" id="code" name="code" th:value="${shipment==null?'':shipment.code}" />
 									    </div>
 									</div>
 									<div class="form-group">
@@ -47,20 +47,23 @@
 									    <div class="col-lg-10">
 											<select class="form-control" id="orderid" name="orderid">
 												<option value=""></option>
-												<option th:each="order: ${orders}" th:value="${order.orderid}" th:text="${order.code}" th:selected="${item!=null and item.purchaseorder!=null and item.purchaseorder.orderid==order.orderid}"></option>
+												<option th:if="${orders!=null}" th:each="order: ${orders}" th:value="${order.poid}" th:text="${order.code}" th:selected="${shipment!=null and shipment.purchaseorder!=null and shipment.purchaseorder.poid==order.poid}"></option>
 											</select>
 									    </div>
 									</div>
 									<div class="form-group">
 									    <label for="receivedby" class="control-label col-lg-2">Received By <span class="required">*</span></label>
 									    <div class="col-lg-10">
-									        <input class=" form-control" id="receivedby" name="receivedby" th:value="${shipment==null or shipment.receivedby==null?'':shipment.receivedby.firstname}" type="text" />
+									    	<select id="receivedby" name="receivedby" class=" form-control">
+									    		<option th:each="staff:${staffs}" th:value="${staff.user.userid}" th:text="${staff.user.firstname+' '+staff.user.lastname}" th:selected="${shipment!=null and shipment.receivedby!=null and staff.user.userid==shipment.receivedby.userid}"></option>
+									    	</select>
+									        <!-- <input class=" form-control" th:value="${shipment==null or shipment.receivedby==null?'':shipment.receivedby.firstname}" type="text" /> -->
 									    </div>
 									</div>
 									<div class="form-group">
 									    <label for="receivedate" class="control-label col-lg-2">Received Date <span class="required">*</span></label>
 									    <div class="col-lg-10">
-									        <input class=" form-control" id="receivedate" name="receivedate" th:value="${shipment==null or shipment.receivedate==null?'':#calendars.format(shipment.receivedate,'dd MMMM yyyy')}" type="text" />
+									        <input class=" form-control" id="receivedate" name="receivedate" th:value="${shipment==null or shipment.receivedate==null?'':#calendars.format(shipment.receivedate,'MM/dd/yyyy')}" type="text" />
 									    </div>
 									</div>
 									<div class="form-group ">
@@ -79,43 +82,69 @@
 								</form>
 								<form id="orderForm" th:action="@{/store/admin/shipment/supplier}" method="get">
 								</form>
-
-								<div th:if="shipment!=null">
-									<font size="4">Add Item</font>  <span style="width: 240px;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <a th:href="@{/store/admin/item?shipmentid=}+${shipment==null?'':shipment.shipmentid}" title="Add New Item"><i class="icon_plus_alt2"></i></a>
-									<table th:if="${items!=null and !items.isEmpty()}" class="table table-striped table-advance table-hover">
+								<div th:if="${inventories != null and inventories.size() > 0}">
+									<font size="4">Item(s) Received in Shipment</font>
+									<table class="table table-striped table-advance table-hover">
+										<thead>
+										</thead>
+										<tbody>
+											<tr>
+												<th>Item</th>
+												<th><i class="icon_mail_alt"></i> SKU</th>
+												<th><i class="icon_mobile"></i> Size</th>
+												<th><i class="icon_mobile"></i> Inventory</th>
+												<th><i class="icon_cogs"></i>Location</th>
+											</tr>
+											<tr th:each="inv:${inventories}">
+												<td th:text="${inv.item.product.name}"></td>
+												<td th:text="${inv.item.sku}"></td>
+												<td th:text="${inv.item.size.region.code+' '+inv.item.size.sizenum}"></td>
+												<td th:text="${inv!=null?'Yes':'No'}"></td>
+												<td th:text="${inv!=null and inv.location!=null?inv.location.name:''}"></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div th:if="shipment!=null and shipment.purchaseorder!=null">
+									<font size="4">Item(s) from P.O.</font>  <span style="width: 240px;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <!-- <a th:href="@{/store/admin/item?shipmentid=}+${shipment==null?'':shipment.shipmentid}" title="Add New Item"><i class="fa fa-plus-square"></i></a> -->
+									<table th:if="${shipment!=null and orderitems!=null and !orderitems.isEmpty()}" class="table table-striped table-advance table-hover">
 										<tbody>
 											<tr>
 												<th><i class="icon_contacts_alt"></i> Product</th>
 												<th><i class="icon_mail_alt"></i> SKU</th>
 												<th><i class="icon_mobile"></i> Size</th>
-												<th><i class="icon_mobile"></i> Cost</th>
-												<th><i class="icon_mobile"></i> Price</th>
-												<th><i class="icon_mobile"></i> Quantity</th>
+												<!-- <th><i class="icon_mobile"></i> Cost</th>
+												<th><i class="icon_mobile"></i> Price</th> -->
+												<th><i class="icon_mobile"></i> Qty</th>
 												<th><i class="icon_mobile"></i> Shipment</th>
-												<th><i class="icon_pin_alt"></i> Received By</th>
-												<th><i class="icon_contacts_alt"></i> Received Date</th>
+												<!-- <th><i class="icon_pin_alt"></i> Received By</th> -->
+												<!-- <th><i class="icon_contacts_alt"></i> Received Date</th> -->
 												<th><i class="icon_cogs"></i> Action</th>
 											</tr>
-											<tr th:each="mf:${items}">
+											<tr th:each="mf:${orderitems}">
 												<td th:text="${mf.product.name}"></td>
 												<td th:text="${mf.sku}"></td>
-												<td th:text="${mf.size}"></td>
-												<td th:text="${mf.cost}"></td>
-												<td th:text="${mf.price}"></td>
+												<td th:text="${mf.size.region.code+' '+mf.size.sizenum}"></td>
+												<!-- <td th:text="${mf.cost}"></td>
+												<td th:text="${mf.price}"></td> -->
 												<td th:text="${mf.quantity}"></td>
-												<td th:text="${mf.shipment.code}"></td>
-												<td th:text="${mf.receivedby.firstname}"></td>
-												<td th:text="${#calendars.format(mf.receivedate,'dd MMMM yyyy')}"></td>
+												<td th:text="${mf.shipment!=null?mf.shipment.code:''}"></td>
+												<!-- <td th:text="${mf.receivedby.firstname}"></td> -->
+												<!-- <td th:text="${#calendars.format(mf.receivedate,'dd MMMM yyyy')}"></td> -->
 												<td>
-													<div class="btn-group">
-														<!-- <a class="btn btn-primary" th:href="@{/admin/item}" title="Add New Item"><i class="icon_plus_alt2"></i></a> -->
-														<a th:href="@{/admin/item/}+${mf.itemid}" title="Edit Item"><i class="fa fa-edit"></i></a>
-														<!-- <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a> -->
+													<div th:if="${mf.receivedate==null}" class="btn-group">
+														<!-- <a th:href="@{/store/admin/shipment/}+${shipment.shipmentid}+'/item/'+${mf.itemid}" title="Receive Item in Shipment"><i class="fa fa-plus-circle"></i></a> -->
+														<a onclick="addItem(this)" title="Add to Shipment and Set New Inventory" th:name="${mf.itemid+':'+mf.sku+':'+mf.product.name}" th:if="${mf.inventories==null or mf.inventories.isEmpty()}">
+															<i class="fa fa-plus-circle"></i>
+														</a>
 													</div>
 												</td>
 											</tr>
 										</tbody>
 									</table>
+									<div class="alert alert-success" th:if="${shipment!=null and (orderitems==null or orderitems.isEmpty())}">
+										<span>Completed: All PO Items have been received.</span>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -124,10 +153,60 @@
 			</div>
 		</section>
 
+		<div id="transfer-dialog" class="form" title="Update Inventory/Item">
+			<p class="validateTips">All form fields are required.</p>
+
+			<form id="inventory1" name="inventory1" class="form-validate form-horizontal" method="post" th:action="@{/store/admin/shipment/inventory}">
+				<div class="form-group ">
+				    <label for="sku" class="control-label col-lg-3">Item </label>
+				    <div class="col-lg-9">
+				        <input class="form-control" id="item" name="item" value="" type="text" readonly />
+				    </div>
+				</div>
+				<div class="form-group ">
+				    <label for="sku" class="control-label col-lg-3">UPC </label>
+				    <div class="col-lg-9">
+				        <input class="form-control" id="sku" name="sku" value="" type="text" />
+				    </div>
+				</div>
+				<div class="form-group">
+				    <label for="ustoreid" class="control-label col-lg-3">Store </label>
+				    <div class="col-lg-9">
+				    	<input type="text" class="form-control" id="storename" name="storename" th:value="${store.name}" readonly />
+				    	<input type="hidden" id="storeid" name="storeid" th:value="${store.storeid}" />
+				    </div>
+				</div>
+				<div class="form-group ">
+				    <label for="quantity" class="control-label col-lg-3">Quantity </label>
+				    <div class="col-lg-9">
+				        <input class="form-control" id="quantity" name="quantity" type="text" value="1" readonly />
+				    </div>
+				</div>
+				<div class="form-group">
+				    <label for="locationid" class="control-label col-lg-3">Location </label>
+				    <div class="col-lg-9">
+						<select class="form-control" id="locationid" name="locationid">
+							<option th:each="location: ${locations}" th:value="${location.locationid}" th:text="${location.name}"></option>
+						</select>
+				    </div>
+				</div>
+				<div class="form-group">
+				    <div class="col-lg-offset-2 col-lg-10">
+				        <!-- <input type="hidden" id="uinventoryid" name="uinventoryid" value="" /> -->
+				        <input type="hidden" id="itemid" name="itemid" value="0" />
+				    	<input type="hidden" id="statusid" name="statusid" value="1" />
+				    	<input type="hidden" id="shipmentid" name="shipmentid" th:value="${shipment!=null?shipment.shipmentid:''}" />
+				    </div>
+				</div>
+			</form>
+		</div>
+
 		<!--main content end-->
+		<script th:src="@{/js/jquery-1.10.2.min.js}"></script>
+		<script th:src="@{/js/jquery-ui-1.12.1.js}"></script>
 		<script th:inline="javascript">
 			/*<![CDATA[*/
-			$(function() {
+		    $(function() {
 			    $('#receivedate').datepicker({
 			        format: 'mm/dd/yyyy'
 			    })
@@ -138,7 +217,69 @@
 				form.action=form.action+"/"+elmt.value;
 				form.submit();
 			}
+		    var dialog, form;
 
+			$(document).ready(function() {
+			    var token = $("meta[name='_csrf']").attr("content");
+			    var header = $("meta[name='_csrf_header']").attr("content");
+
+				dialog = $( "#transfer-dialog" ).dialog({
+					dialogClass: 'dialogStyle',
+					autoOpen: false,
+					resizable: false,
+					height: 400,
+					width: 350,
+					modal: true,
+					buttons: {
+						"Complete": function() {
+							document.getElementById("inventory1").submit();},
+						Cancel: function() {
+							dialog.dialog( "close" );
+						}
+					},
+					close: function() {
+						form[ 0 ].reset();
+					},
+					open: function (event, ui) {
+					    $('#transfer-dialog').css('overflow', 'hidden');
+					}
+				});
+
+				$('#transfer').click(function(){
+
+					var id = this.name;
+					out = '';
+					for(i in this.style) {
+						out += 'i: '+this.style[i]+'\n';
+					}
+					console.log("Out: "+out);
+					console.log("ID: "+this.style.getPropertyValue('sku'));
+
+					console.log("itemid: "+$("#itemid")[0].value);
+				    dialog.dialog( "open" );
+				    str = this.name.split(":");
+				    $("#itemid")[0].value = str[0];
+				    $("#sku")[0].value = str[1];
+				    $("#item")[0].value = str[2];
+				});
+
+				form = dialog.find( "form" ).on( "submit", function( event ) {
+					event.preventDefault();
+					//addUser();
+				});
+
+			});
+			function addItem(item) {
+			    dialog.dialog("open");
+			    str = item.name.split(":");
+			    $("#itemid")[0].value = str[0];
+			    $("#sku")[0].value = str[1];
+			    $("#item")[0].value = str[2];
+
+			    //$("#itemid")[0].value = itemid;
+			    //$("#sku")[0].value = sku;
+			    //$("#item")[0].value = item.name;
+			}
 			/*]]>*/
 		</script>
 

@@ -239,11 +239,11 @@
 				border-color: #575657
 			}
 
-			.header {
+			/* .header {
 				background-color:#bce0ee;
 				color:#3d3c3c !important;
 				font-family: UniversCondensed, Arial, sans-serif !important;
-			}
+			} */
 		</style>
 
 		<section id="main-content">
@@ -266,6 +266,9 @@
 								Gift Card
 							</header>
 							<div class="panel-body">
+								<div th:if="${message!=null and message.status!=null}" class="col-lg-offset-2 col-lg-10" style="margin-top: 10px;margin-bottom: 20px;">
+									<span th:class="${message.status}" th:text="${message.message}"></span>
+								</div>
 								<div class="form">
 									<form class="form-validate form-horizontal" id="giftcard" name="giftcard" method="post" th:action="@{/admin/giftcard}">
 										<div class="form-group">
@@ -274,12 +277,12 @@
 										        <input class=" form-control" id="code" name="code" th:value="${giftcard==null?'':giftcard.code}" type="text" />
 										    </div>
 										</div>
-										<!-- <div class="form-group">
+										<div class="form-group">
 										    <label for="pin" class="control-label col-lg-2">Pin Number </label>
 										    <div class="col-lg-10">
 										        <input class=" form-control" id="pin" name="pin" th:value="${giftcard==null?'':giftcard.pin}" type="password" />
 										    </div>
-										</div> -->
+										</div>
 										<div class="form-group">
 										    <label for="amount" class="control-label col-lg-2">Initial Amount </label>
 										    <div class="col-lg-10">
@@ -307,6 +310,12 @@
 										    		<option th:each="status : ${statuss}" th:value="${status.statusid}" th:text="${status.name}" th:selected="${giftcard!=null and giftcard.status!=null and giftcard.status.statusid==status.statusid}"></option>
 										    	</select>
 										        <!-- <input class=" form-control" id="statusid" name="statusid" th:value="${giftcard==null?'':giftcard.status.statusid}" type="text" /> -->
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="comments" class="control-label col-lg-2">Comments </label>
+										    <div class="col-lg-10">
+										        <textarea class="form-control " id="comments" name="comments" th:value="${giftcard!=null?giftcard.comments:''}" ></textarea>
 										    </div>
 										</div>
 										<div class="form-group">

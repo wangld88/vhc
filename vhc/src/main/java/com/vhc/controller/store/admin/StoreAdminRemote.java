@@ -12,23 +12,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.vhc.controller.store.StoreBase;
+import com.vhc.dto.CustomerDTO;
+import com.vhc.dto.InventoryDTO;
 import com.vhc.dto.OrderDTO;
-import com.vhc.core.model.Category;
+import com.vhc.core.model.Account;
+import com.vhc.core.model.Address;
+import com.vhc.core.model.City;
 import com.vhc.core.model.Customer;
 import com.vhc.core.model.Giftcard;
+import com.vhc.core.model.Inventory;
 import com.vhc.core.model.Order;
 import com.vhc.core.model.Product;
 import com.vhc.core.model.Promocode;
+import com.vhc.core.model.Role;
 import com.vhc.core.model.Size;
+import com.vhc.core.model.Staff;
+import com.vhc.core.model.Status;
+import com.vhc.core.model.Store;
 import com.vhc.core.model.User;
-import com.vhc.util.Message;
+import com.vhc.core.model.Userrole;
 
 
 @RestController
@@ -73,7 +82,7 @@ public class StoreAdminRemote extends StoreBase {
 
 
 	@RequestMapping(method=RequestMethod.POST, value="/searchCustomers")
-	public List<Customer> getCustomers(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
+	public List<CustomerDTO> getCustomers(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		logger.info("AJAX Customer search is called");
 
 		String lastname = requestParams.get("lastname");
@@ -83,8 +92,6 @@ public class StoreAdminRemote extends StoreBase {
 		List<Customer> customers = new ArrayList<>();
 
 		if(lastname == null || lastname.isEmpty()) {
-			//msg.setStatus(Message.ERROR);
-			//msg.setMessage("Please enter search criteria to narrow down the search!");
 			customers = customerService.getAll();
 		} else {
 			User user = new User();
@@ -93,25 +100,166 @@ public class StoreAdminRemote extends StoreBase {
 
 			customers = customerService.getByLastnamePhone(user);
 		}
-		System.out.println("customers: "+customers.size());
-		logger.debug("customers: "+customers.size());
-		//model.addAttribute("customers", customers);
-		//model.addAttribute("message", msg);
 
+		List<CustomerDTO> dto = new ArrayList<CustomerDTO> ();
+		for(Customer c : customers) {
+			dto.add(new CustomerDTO(c));
+		}
 		logger.info("Size autocomplete Search Result: " + customers.size());
 
-		return customers;
+		return dto;
 	}
 
 
-	@RequestMapping(method=RequestMethod.GET, value="/customerHistory/{customerid}")
+	@RequestMapping(method=RequestMethod.POST, value="/customerHistory/{customerid}")
 	public List<OrderDTO> getCustomerHistory(@PathVariable Long customerid, ModelMap model, HttpSession httpSession) {
 
+		//Customer customer = customerService.getById(customerid);
 		List<Order> orders = orderService.getByCustomer(customerid);
 
-		return null;//orders.stream().forEach(action);;
+		List<OrderDTO> dtos = new ArrayList<>();
+
+		for(Order order: orders) {
+			OrderDTO dto = new OrderDTO(order);
+			dtos.add(dto);
+		}
+
+		return dtos;//orders.stream().forEach(action);;
 	}
 
+
+	@PostMapping("/addCustomer")
+	public Customer addCustomer(@RequestParam Map<String,String> requestParams,
+			ModelMap model, HttpSession httpSession) {
+		// create customer
+		Customer customer = new Customer();
+
+		// create user
+		String username = requestParams.get("username");
+		String firstname = requestParams.get("firstname");
+		String lastname = requestParams.get("lastname");
+		String gender = requestParams.get("gender");
+		String phone = requestParams.get("phone");
+		String cell = requestParams.get("cell");
+		String street = requestParams.get("street");
+		String cityid = requestParams.get("cityid");
+		String postalcode = requestParams.get("postalcode");
+		String createdby = requestParams.get("createdby");
+		Calendar cal = Calendar.getInstance();
+		//String email = requestParams.get("email");
+		//String password = requestParams.get("password");
+		//String confpswd = requestParams.get("confpswd");
+
+		// create address
+		Address ads = new Address();
+		City city = cityService.getById(Long.parseLong(cityid));
+		ads.setCity(city);
+		ads.setStreet(street);
+		ads.setPostalcode(postalcode);
+//System.out.println("createdby: "+createdby);
+		User createUser = userService.getById(Long.parseLong(createdby));
+
+		if(username == null || username.isEmpty()) {
+			username = cell;
+		}
+
+		User user = userService.getByUsername(username);
+
+		if(user != null && user.getUserid() != 0) {
+			logger.error("Username ({}) already exists, please try a different one", username);
+			customer.setComments("The email already exists, please try again.");
+		} else {
+			user = new User();
+
+			user.setUsername(username);
+			user.setFirstname(firstname);
+			user.setLastname(lastname);
+			if(gender != null && !gender.isEmpty()) {
+				user.setGender(gender);
+			}
+			user.setEmail(username);
+			if(phone != null && !phone.isEmpty()) {
+				user.setPhone(phone);
+			} else {
+				user.setPhone(cell);
+			}
+			user.setCell(cell);
+			user.setCreationdate(cal);
+
+			try {
+				logger.info("Customer doSignup");
+
+				/*if(!password.isEmpty() && confpswd != null && !confpswd.isEmpty() && password.equals(confpswd)) {
+					user.setPassword(bCryptPasswordEncoder.encode(password));
+				} else {
+					msg.setStatus(Message.ERROR);
+					msg.setMessage("An error occurred which you sign up, root cause: the entered passwords do not match each other.");
+				}*/
+
+				customer.setUser(user);
+				user = userService.save(user);
+
+				user.setCreatedby(createUser);
+				user = userService.save(user);
+				logger.debug("[Store adm] Saved User: "+user.getUserid());
+
+				Role role = roleService.getByName("CUSTOMER");
+				Userrole ur = new Userrole();
+				ur.setUser(user);
+				ur.setRole(role);
+				ur = userroleService.save(ur);
+				user = userService.getById(user.getUserid());
+
+				ads = addressService.save(ads);
+
+				System.out.println("Saved User: "+user.getUserid());
+				customer.setAddress(ads);
+				customer.setUser(user);
+				customer.setCreatedby(createUser);
+				customer.setCreationdate(cal);
+				customer.setUpdatedate(cal);
+				customer.setUpdatedby(user);
+				//customer.setComments(comments);
+
+				customer = customerService.save(customer);
+
+				// create account
+				Account acct = new Account();
+				Status status = statusService.getByName("Active");
+
+				acct.setCustomer(customer);
+				acct.setStatus(status);
+				acct.setCreatedby(user);
+				acct.setCreationdate(cal);
+
+				acct = accountService.save(acct);
+
+			} catch(Exception e) {
+				e.printStackTrace();
+				customer.setComments("Error occurred when adding new customer, please check with system admin.");
+				Throwable cause = e.getCause();
+				String message = cause.getMessage();
+				while(cause != null && cause.getMessage() != null && !cause.getMessage().isEmpty()) {
+					message = cause.getMessage();
+					cause = cause.getCause();
+				}
+				logger.error("Error occurred when adding new customer: {}", e.getMessage());
+				//msg.setStatus(Message.ERROR);
+				//msg.setMessage("An error occurred which you sign up, root cause: " + message);
+			}
+
+		}
+		return customer;
+	}
+	/**
+	 *
+	 * @param requestParams
+	 * @param model
+	 * @param httpSession
+	 * @return percentage of the promotion code,
+	 * 			0 - promotion code expired
+	 * 			-1 - no such promotion code
+	 */
 	@RequestMapping(method=RequestMethod.POST, value="/promocode")
 	public long getPromotion(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		long rtn = 0;
@@ -121,9 +269,12 @@ public class StoreAdminRemote extends StoreBase {
 		Promocode p = promocodeService.getByCode(code);
 		Calendar cal = Calendar.getInstance();
 
-		if(p != null && cal.after(p.getStartdate()) && cal.before(p.getEnddate())) {
+		if(p == null) {
+			rtn = -1;
+		} else if( cal.after(p.getStartdate()) && cal.before(p.getEnddate())) {
 			rtn = p.getPercentage();
 		}
+
 		return rtn;
 	}
 
@@ -155,8 +306,34 @@ public class StoreAdminRemote extends StoreBase {
 	}
 
 
-	/*@RequestMapping(method=RequestMethod.POST, value="/categoryImage")
-	public Category addImage(ModelMap model, @RequestParam("picture") MultipartFile picture, HttpSession httpSession) {
+	@RequestMapping(method=RequestMethod.POST, value="/sales/add")
+	public InventoryDTO addSale(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 
-	}*/
+		logger.info("Product sales add is called");
+
+		String staffid = requestParams.get("staffid");
+		Staff staff = staffService.getById(Long.parseLong(staffid));
+		Store store = staff.getStore();
+		Status received = statusService.getByNameAndReftbl("Received", "inventories");
+		Status returned = statusService.getByNameAndReftbl("Returned", "inventories");
+
+		requestParams.forEach((k, v) -> System.out.println(k + " : " + (v)));
+
+		String sku = requestParams.get("sku");
+
+		List<Status> statuss = new ArrayList<>();
+		statuss.add(received);
+		statuss.add(returned);
+
+		System.out.println("sku: "+sku+", storeid: "+store.getStoreid()+", status: "+received.getStatusid());
+		List<Inventory> inventories = inventoryService.getByStoreAvaiableUPC(sku, store.getStoreid(), statuss); //received);
+
+		if(inventories != null && !inventories.isEmpty()) {
+			System.out.println("!!!!!!inventories: "+inventories.get(0).getItem().getItemid());
+			return new InventoryDTO(inventories.get(0));
+		}
+
+		return null;
+	}
+
 }

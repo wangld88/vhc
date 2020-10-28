@@ -15,6 +15,26 @@
 			horz-form {
 
 			}
+			ul {
+				list-style-type: none;
+				margin-left: 18px;
+				padding: 0;
+			}
+			.form-control1 {
+			    border-radius: 0;
+			    box-shadow: none;
+			    border-color: #d2d6de;
+			    display: block;
+			    height: 26px;
+			    padding: 5px 12px;
+			    font-size: 14px;
+			    line-height: 1.42857143;
+			    color: #555;
+			    background-color: #fff;
+			    background-image: none;
+			    border: 1px solid #ccc;
+			    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+			}
 		</style>
 
 		<section class="content-header">
@@ -48,30 +68,31 @@
 										<div style="padding: 5px;background-color:#DEEFF5;">
 											<table width="100%">
 												<tr>
-													<td><label style="width:16%">Name:</label> <span th:text="${customer==null or customer.user==null?'':customer.user.firstname+' '+customer.user.lastname}"></span></td>
-													<td><label style="width:16%">Home Phone:</label> <span th:text="${customer==null or customer.user==null?'':customer.user.phone}"></span></td>
+													<td><label style="width:20%">Name:</label> <span id="fullname" th:text="${customer==null or customer.user==null?'':customer.user.firstname+' '+customer.user.lastname}"></span></td>
+													<td><label style="width:20%">Home Phone:</label> <span id="phone" th:text="${customer==null or customer.user==null?'':customer.user.phone}"></span></td>
 												</tr>
 												<tr>
-													<td><label style="width:16%">Address:</label> <span th:text="${customer==null or customer.user==null?'':customer.address.street}"></span></td>
-													<td><label style="width:16%">Mobile:</label> <span th:text="${customer==null or customer.user==null?'':customer.user.cell}"></span></td>
+													<td><label style="width:20%">Address:</label> <span id="address" th:text="${customer==null or customer.user==null?'':customer.address.street}"></span></td>
+													<td><label style="width:20%">Mobile:</label> <span id="cellnum" th:text="${customer==null or customer.user==null?'':customer.user.cell}"></span></td>
 												</tr>
 												<tr>
-													<td><label style="width:16%">City/Province:</label> <span th:text="${customer==null or customer.user==null?'':customer.address.city.name+', '+customer.address.city.province.name}"></span></td>
-													<td><label style="width:16%">Email:</label> <span th:text="${customer==null or customer.user==null?'':customer.user.email}"></span></td>
+													<td><label style="width:20%">City/Province:</label> <span id="city" th:text="${customer==null or customer.user==null?'':customer.address.city.name+', '+customer.address.city.province.name}"></span></td>
+													<td><label style="width:20%">Email:</label> <span id="email" th:text="${customer==null or customer.user==null?'':customer.user.email}"></span></td>
 												</tr>
 												<tr>
-													<td><label style="width:16%">Postal Code:</label> <span th:text="${customer==null or customer.user==null?'':customer.address.postalcode}"></span></td>
-													<td><label style="width:16%">Start From:</label> <span th:text="${customer==null or customer.user==null?'':#dates.format(customer.user.creationdate, 'MMMM dd, yyyy')}"></span></td>
+													<td><label style="width:20%">Postal Code:</label> <span id="postal" th:text="${customer==null or customer.user==null?'':customer.address.postalcode}"></span></td>
+													<td><label style="width:20%">Start From:</label> <span id="creationdate" th:text="${customer==null or customer.user==null?'':#dates.format(customer.user.creationdate, 'MMMM dd, yyyy')}"></span></td>
 												</tr>
 											</table>
 										</div>
 									</div>
-									<div style="width: 12%; border-left-style:double;border-left-width: 3px;border-left-color: lightgrey;float: left; height: 100%; padding-bottom: 1500px;margin-bottom: -1500px;">
-										<div style="margin: auto; width: 66%;padding: 3px;">
-											<button type="button" class="btn btn-xs btn-primary" id="find" > Find Customer</button><!-- onclick="findCustomer()" -->
+									<div style="width: 12%; border-left-style:double;border-left-width: 3px;border-left-color: lightgrey;float: left; height: 100%; padding-top: 15px; padding-right: 28px; padding-bottom: 100px;margin-bottom: -100px;">
+										<div style="margin: auto; width: 66%; padding: 3px;">
+											<!-- <button type="button" class="btn btn-ctl btn-primary" id="find">Find Customer</button> -->
+											<button type="button" class="btn btn-ctl btn-primary" data-toggle="modal" data-target="#findModal" id="find">Find Customer</button>
 										</div>
 										<div style="margin: auto; width: 66%;padding: 3px;">
-											<button type="button"  class="btn btn-xs btn-primary" onclick="addCustomer()"> Add  Customer</button>
+											<button type="button" class="btn btn-ctl btn-primary" data-toggle="modal" data-target="#addModal">Add Customer</button>
 										</div>
 
 									</div>
@@ -92,8 +113,8 @@
 												<th>Total</th>
 											</tr>
 										</thead>
-										<tbody>
-											<tr style="height:20px;">
+										<tbody id="records">
+											<!-- <tr style="height:20px;">
 												<td>1/1/2017</td>
 												<td>Victoria</td>
 												<td></td>
@@ -103,347 +124,619 @@
 												<td></td>
 												<td></td>
 												<td></td>
-											</tr>
-											<tr>
-												<td>6/23/2017</td>
-												<td>Victoria</td>
-												<td></td>
-												<td></td>
-												<td></td>
-												<td></td>
-												<td></td>
-												<td></td>
-												<td></td>
-											</tr>
+											</tr> -->
 										</tbody>
 									</table>
 								</div>
 								<!-- Current Sale -->
 								<div style="background-color:#DEEFF5; position: relative;">
 									<div style="padding: 5px; width: 100%">
-										<form>
-										Rep:
-										<select style="width: 10%" class="">
-											<option value=""></option>
-											<option value="">Jason</option>
-										</select>
-										Item:<input type="text" id="" />
-										Qty:
-										<select>
-											<option value="">1</option>
-											<option value="">2</option>
-											<option value="">3</option>
-											<option value="">4</option>
-											<option value="">5</option>
-											<option value="">6</option>
-										</select>
-										Size:
-										<select>
-											<option value="">35</option>
-											<option value="">36</option>
-											<option value="">37</option>
-											<option value="">38</option>
-											<option value="">39</option>
-											<option value="">40</option>
-										</select>
-										Discount:
-										<select>
-											<option value="">10%</option>
-											<option value="">20%</option>
-											<option value="">30%</option>
-											<option value="">40%</option>
-											<option value="">50%</option>
-											<option value="">60%</option>
-										</select>
-										Tx Type:
-										<select>
-											<option value=""></option>
-											<option value="Sale">Sale</option>
-											<option value="Exchange">Exchange</option>
-											<option value="Return">Return</option>
-										</select>
-										<buttn type="button" class="btn btn-xs btn-primary"> Add </buttn>
+										<form id="lookup" name="lookup" th:action="@{/store/admin/sales/add}" method="get">
+											<label>Rep:</label>
+											<select style="width: 10%" class="" id="staffid" name="staffid">
+												<option value="0"></option>
+												<option th:each="staff:${staffs}" th:value="${staff.staffid}" th:text="${staff.user.firstname}"></option>
+											</select>
+											<label>Item No.:</label>
+											<input type="text" id="sku" name="sku" style="height: 20px;" />
+											<!-- Qty:
+											<select>
+												<option value="">1</option>
+												<option value="">2</option>
+												<option value="">3</option>
+												<option value="">4</option>
+												<option value="">5</option>
+												<option value="">6</option>
+											</select>
+											Size:
+											<select>
+												<option value="">35</option>
+												<option value="">36</option>
+												<option value="">37</option>
+												<option value="">38</option>
+												<option value="">39</option>
+												<option value="">40</option>
+											</select> -->
+											<!-- Discount:
+											<select>
+												<option value="">10%</option>
+												<option value="">20%</option>
+												<option value="">30%</option>
+												<option value="">40%</option>
+												<option value="">50%</option>
+												<option value="">60%</option>
+											</select> -->
+											<label>Transaction Type:</label>
+											<select id="typeid" name="typeid">
+												<option value=""></option>
+												<option th:each="type:${types}" th:value="${type.typeid}" th:text="${type.name}">Sale</option>
+											</select>
+											<button type="button" class="btn btn-xs btn-primary" id="addItem"> Add </button>
 										</form>
 									</div>
+
+								<form id="sale"  name="sale" th:action="@{/store/admin/itemsale}" method="post" ><!-- th:if="${saleList!=null and saleList.size()>0}" -->
 									<div style="padding: 5px; height: 200px;">
 										<table style="width: 100%; background-color: white; border: solid 1px lightgrey;">
-											<tr style="border-bottom: 1px solid lightgrey;">
-												<th>Sales Rep</th>
-												<th>Item</th>
-												<th>Qty</th>
-												<th>Size</th>
-												<th>Discount</th>
-												<th>Price</th>
-												<th>Cur</th>
-												<th>Sell</th>
-												<th>Total</th>
-												<th>Action</th>
-											</tr>
-											<tr>
-												<td>Jason</td>
-												<td></td>
-												<td></td>
-												<td></td>
-												<td></td>
-												<td></td>
-												<td></td>
-												<td></td>
-												<td></td>
-												<td><i class="fa fa-edit"></i>  <i class="fa fa-trash-o"></i></td>
-											</tr>
+											<thead>
+												<tr style="border-bottom: 1px solid lightgrey;">
+													<th>UPC</th>
+													<th>Item</th>
+													<th>Model</th>
+													<th>Qty</th>
+													<th>Size</th>
+													<th>Discount</th>
+													<th>Price</th>
+													<th>Sell</th>
+													<th>Total</th>
+													<th>Action</th>
+												</tr>
+											</thead>
+											<tbody id="inventories">
+											</tbody>
 										</table>
 									</div>
 									<div style="position: absolute;right: 10px;bottom:0px;">
-										<button type="button" class="btn btn-app btn-primary" ><i class="fa fa-credit-card"></i>Pay Request</button>
-										<button type="button" class="btn btn-app btn-primary" ><i class="fa fa-file-text"></i>Print Invoice</button>
-									</div>
-								</div>
-							</div>
-							<!-- <div class="form">
-								<form class="form-validate form-horizontal " id="brand" name="brand" method="post" th:action="@{/admin/brand}">
-									<div class="form-group">
-									    <label for="name" class="control-label col-lg-2">Name <span class="required">*</span></label>
-									    <div class="col-lg-10">
-									        <input class=" form-control" id="name" name="name" th:value="${brand==null?'':brand.name}" type="text" />
-									    </div>
-									</div>
-									<div class="form-group">
-									    <label for="description" class="control-label col-lg-2">Description </label>
-									    <div class="col-lg-10">
-									        <input class=" form-control" id="description" name="description" th:value="${brand==null?'':brand.description}" type="text" />
-									    </div>
-									</div>
-									<div class="form-group">
-									    <label for="street" class="control-label col-lg-2">Address </label>
-									    <div class="col-lg-10">
-									        <input class=" form-control" id="street" name="street" th:value="${mf==null?'':brand.address.street}" type="text" />
-									    </div>
-									</div>
-									<div class="form-group">
-									    <label for="cityid" class="control-label col-lg-2">City </label>
-									    <div class="col-lg-10">
-											<select class="form-control" id="cityid" name="cityid">
-												<option th:each="city: ${cities}" th:value="${city.cityid}" th:text="${city.name}" th:selected="${brand==null?'':(brand.address.city.cityid.equals(city.cityid)?'Selected':'')}"></option>
-											</select>
-									    </div>
-									</div>
-									<div class="form-group ">
-									    <label for="postalcode" class="control-label col-lg-2">Postal Code </label>
-									    <div class="col-lg-10">
-									        <input class="form-control " id="postalcode" name="postalcode" th:value="${brand==null?'':brand.address.postalcode}" type="text" />
-									    </div>
-									</div>
-									<div class="form-group ">
-									    <label for="contact" class="control-label col-lg-2">Contact </label>
-									    <div class="col-lg-10">
-									        <input class="form-control " id="contact" name="contact" th:value="${brand==null?'':brand.contact}" type="text" />
-									    </div>
-									</div>
-									<div class="form-group ">
-									    <label for="phone" class="control-label col-lg-2">Phone </label>
-									    <div class="col-lg-10">
-									        <input type="text" class="form-control" id="phone" name="phone" th:value="${brand==null?'':brand.phone}" />
-									    </div>
-									</div>
-									<div class="form-group ">
-									    <label for="email" class="control-label col-lg-2">Email </label>
-									    <div class="col-lg-10">
-									        <input class="form-control " id="email" name="email" type="email" th:value="${brand==null?'':brand.email}" />
-									    </div>
-									</div>
-									<div class="form-group ">
-									    <label for="website" class="control-label col-lg-2">Web Site </label>
-									    <div class="col-lg-10">
-									        <input class="form-control " id="website" name="website" type="url" th:value="${brand==null?'':brand.website}" />
-									    </div>
-									</div>
-									<div class="form-group ">
-									    <label for="comments" class="control-label col-lg-2">Comments </label>
-									    <div class="col-lg-10">
-									        <textarea class="form-control " id="comments" name="comments" th:value="${brand==null?'':brand.comments}" ></textarea>
-									    </div>
-									</div>
-									<div class="form-group">
-									    <div class="col-lg-offset-2 col-lg-10">
-									        <button class="btn btn-primary" type="submit"> Save </button>
-									        <button class="btn btn-default" type="button">Cancel</button>
-									        <input type="hidden" id="brandid" name="brandid" th:value="${brand==null?'':brand.brandid}" />
-									    </div>
+										<button id="payment" type="button" class="btn btn-app btn-primary" ><i class="fa fa-credit-card"></i>Pay Request</button>
+										<button id="print" type="button" class="btn btn-app btn-primary" style="display: none"><i class="fa fa-file-text"></i>Print Invoice</button>
 									</div>
 								</form>
-							</div> -->
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</section>
 
-		<!-- <div id="dialog-form" class="form" title="Gift Card Balance">
-			<form id="giftcard" name="giftcard" method="post" th:action="@{/store/giftcard}">
-				<div class="form-group row">
-				    <label for="cardnum" class="control-label col-lg-4">Card Number<span class="required">*</span>:</label>
-				    <div class="col-lg-8">
-				        <input class="form-control" id="cardnum" name="cardnum" th:value="${giftcard==null?'':giftcard.code}" type="text" />
-				    </div>
-				</div>
-
-				<div class="form-group row">
-					<label for="balance" class="control-label col-lg-4">Current Balance: </label>
-					<div class="col-lg-8">
-						<span id="balance" th:text="${giftcard==null?'':giftcard.balance}"></span>
-					</div>
-				</div>
-			</form>
-		</div> -->
-
-		<div id="SearchCustomer" class="form" title="Search Customer">
-			<form>
-				<div class="SearchTitle">
-					<div class="SearchTitleText">Search Content</div>
-					<div class="SearchTitleFilterButton">
-						<span>Filter:</span>
-						<input type="text" id="lastname" name="lastname" class="SearchFilter" />
-						<button class="SearchButtonClose" ></button>
-					</div>
-					<div class="SearchClear"></div>
-				</div>
-				<div class="SearchContent"></div>
-			</form>
-
-			<!-- <div class="panel-body">
-				<div class="form" style="overflow:hidden;">
-					<form id="customer" name="customer" th:action="@{/store/admin/searchCustomer}" method="get">
-						<div style="float:left">
-							<label for="lastname">Last Name: </label>
-							<input type="text" name="lastname" id="lastname" value="" />
-						</div>
-						<div style="float:left">
-							<label for="phone">Phone No.: </label>
-							<input type="text" name="phone" id="phone" value="" />
-						</div>
-						<div style="float:left">
-							<button class="btn btn-sm btn-primary" type="submit">Search</button>
-						</div>
-					</form>
-				</div>
-			</div> -->
-			<!-- <div th:if="${customers != null and customers.size() > 0}">
-				<table>
-					<thead>
-						<tr>
-							<th>Customer</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="customer:${customers}">
-							<td><span th:text="${customer.user.firstname+' '+customer.user.lastname}"></span></td>
-							<td><button class="btn btn-xs btn-primary" th:onclick="${'selectCustomer('+customer.customerid+')'}">Select</button></td>
-						</tr>
-					</tbody>
-				</table>
-			</div> -->
+		<!-- Modal -->
+		<div class="modal fade" id="msgModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <!-- <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5> -->
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		        The item you are look for is not available
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+		        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+		      </div>
+		    </div>
+		  </div>
 		</div>
 
+		<div id="pay" class="form" title="Payment" th:if="${methods!=null}">
+			<form id="paymethod" name="paymethod" method="post" th:action="@{/store/admin/itemsale}" style="padding-left: 20px; width: 99%; height: 99%;overflow-x: hidden;">
+				<div class="form-group row">
+					<label>Payment Amount: </label>
+					<span id="orderamount">$ 222.00</span> <!-- th:text="' $'+${total}" -->
+					<input type="hidden" id="amount" /> <!--  th:value="${total}" -->
+				</div>
+				<div class="form-group row">
+					<div class="col-lg-4">
+						<label>Promotion Code: </label>
+					</div>
+					<div class="col-lg-6">
+						<input type="text" id="promocode" name="promocode" value="" style="width: 50%; padding-left: 12px;" placeholder="Promotion Code" />
+						<a id="checkpcode" class="btn btn-default btn-sm">Apply</a>
+						<input type="hidden" id="save" value="0" />
+						<span id="percentage"></span>
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="col-lg-4">
+						<label>Store Discount: </label>
+					</div>
+					<div class="col-lg-6">
+						<input type="text" id="discount" name="discount" value="" style="width: 50%; padding-left: 12px;" placeholder="Discount Amount" />
+					</div>
+				</div>
+				<div class="form-group row">
+					<label>Payment Method: </label>
+					<ul>
+						<li>
+							<div class="form-group row">
+								<div style="width: 26%; float:left;">
+									<input type="checkbox" id="Credit Card" name="methodid" value="1" />
+									<label>Credit Card</label>
+								</div>
+								<div id="method1" style="width: 70%; display: none; float:left;">
+									<div class="form-group row">
+										<input type="text" id="amount1" name="creditamount" value="" class="form-control1 col-lg-5" placeholder="Credit Payment Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+									</div>
+									<!-- <div id="creditcard-button-container"> -->
+									<div class="form-group row">
+										<div class="form-group row">
+											<input type="text" id="cardnum" name="cardnum" class="form-control1 col-lg-5" placeholder="Card No.(Last 4 digits)" oninput="this.value = this.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');" maxlength="19" />
+											<!-- <label>Name as shown on card</label><br> -->
+											<input type="text" id="printname" name="printname" class="form-control1 col-lg-5" placeholder="Name on Card" value="" style="display: none;" />
+											<span class="col-lg-1"></span>
+											<!-- <label for="cardnum">Credit Card Number</label><br> -->
+										</div>
+										<div class="form-group row" style="display: none;">
+											<select id="expmonth" name="expmonth" class="form-control1 col-lg-3">
+												<option value="1">Month</option>
+												<!-- <option>Month</option>
+												<option th:each="n : ${#numbers.sequence(1,12)}" th:text="${n}"></option> -->
+											</select>
+											<span class="col-lg-1">/</span>
+											<select id="expyear" name="expyear" class="form-control1 col-lg-3">
+												<option value="1900"></option>
+												<!-- <option>Year</option>
+												<option th:each="n : ${#numbers.sequence(2019,2025)}" th:text="${n}"></option> -->
+											</select>
+											<span class="col-lg-1"></span>
+											<input type="text" id="cvv" name="cvv" size="3" class="form-control1 col-lg-3" value="" placeholder="cvv" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div class="form-group row">
+								<div style="width: 26%; float:left;">
+									<input type="checkbox" id="Debit" name="methodid" value="2" />
+									<label>Debit</label>
+								</div>
+								<div id="method2" style="width: 70%; display: none; float:left;">
+									<div class="form-group row">
+										<input type="text" id="amount2" name="debitamount" value="" class="form-control1 col-lg-5" placeholder="Debit Payment Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+									</div>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div class="form-group row">
+								<div style="width: 26%; float:left;">
+									<input type="checkbox" id="Gift Card" name="methodid" value="3" />
+									<label>Gift Card</label>
+								</div>
+								<div id="method3" style="width: 70%; display: none; float:left;">
+									<div class="form-group row">
+										<input type="text" id="cardcode" name="cardcode" th:value="${giftcard==null?'':giftcard.code}" class="form-control1 col-lg-5" placeholder="Card Number" />
+										<span class="col-lg-1"></span>
+										<!-- <input type="password" id="pin" name='pin' placeholder="Pin" class="form-control1 col-lg-2" /> -->
+										<span class="col-lg-1"></span>
+										<a id="chkbalance" class="btn btn-default btn-sm">Check</a><br />
+										<span id="giftbalance" style="padding-left: 2px;"></span>
+										<input type="hidden" id="availamount" name="availamount" />
+										<input type="text" id="amount3" name="giftamount" style="display: none; width: 12%; padding-left: 4px;" placeholder="Payment" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+									</div>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div class="form-group row">
+								<div style="width: 26%; float:left;">
+									<input type="checkbox" id="Cash" name="methodid" value="4" />
+									<label>Cash</label>
+								</div>
+								<div id="method4" style="width: 70%; display: none; float:left;">
+									<div class="form-group row">
+										<input type="text" id="amount4" name="cashamount" value="" class="form-control1 col-lg-5" placeholder="Cash Payment Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+				<div class="form-group row">
+					<div>
+						<label style="width: 24%;">Balance: </label> <span id="total"></span>
+					</div>
+					<div id="changediv" style="display: none;">
+						<label style="width: 24%;">Change: </label> <span id="cashchange"></span>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<div class="modal fade" id="findModal" tabindex="-1" role="dialog" aria-labelledby="findModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header" style="background-color: lightblue;">
+						<div class="col-sm-4">
+							<h4 class="modal-title" id="findModalLabel">Search Customer</h4>
+						</div>
+						<div class="SearchTitleFilterButton col-sm-7">
+							<span>Filter:</span>
+							<input type="text" id="searchFilter" name="lastname1" class="SearchFilter" />
+							<!-- <button class="SearchButtonClose" ></button> -->
+						</div>
+						<button type="button" class="close col-sm-1" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+					</div>
+					<!-- <div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" id="addCustomer">Submit</button>
+					</div> -->
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header" style="background-color: lightblue;">
+						<div class="col-sm-11">
+							<h4 class="modal-title" id="addModalLabel">New Customer</h4>
+						</div>
+						<button type="button" class="close col-sm-1" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="alert alert-danger" role="alert">
+							<span id="error"></span>
+						</div>
+						<form id="newcustomer" method="post" th:action="@{/store/admin/addCustomer}">
+							<div class="form-group">
+							    <label for="firstname" class="control-label">First Name <span class="required">*</span> </label>
+							    <div>
+							        <input class=" form-control" id="firstname" name="firstname" th:value="${customer.user==null?'':customer.user.firstname}" type="text" required="required" />
+							    </div>
+							</div>
+							<div class="form-group">
+							    <label for="lastname" class="control-label">Last Name <span class="required">*</span> </label>
+							    <div>
+							        <input class=" form-control" id="lastname" name="lastname" th:value="${customer.user==null?'':customer.user.lastname}" type="text" required="required" />
+							    </div>
+							</div>
+							<div class="form-group">
+							    <label for="street" class="control-label">Address <span class="required">*</span> </label>
+							    <div>
+							        <input class=" form-control" id="street" name="street" th:value="${customer.address==null?'':customer.address.street}" type="text" required="required" />
+							    </div>
+							</div>
+							<div class="form-group">
+							    <label for="cityid" class="control-label">City </label>
+							    <div>
+									<select class="form-control" id="cityid" name="cityid">
+										<option th:each="city: ${cities}" th:value="${city.cityid}" th:text="${city.name+' ('+city.province.name+', '+city.province.country.code+')'}" th:selected="${customer.address==null?'':(customer.address.city.cityid.equals(city.cityid)?'Selected':'')}"></option>
+									</select>
+							    </div>
+							</div>
+							<div class="form-group ">
+							    <label for="postalcode" class="control-label">Postal Code <span class="required">*</span> </label>
+							    <div>
+							        <input class="form-control " id="postalcode" name="postalcode" th:value="${customer.address==null?'':customer.address.postalcode}" type="text" required="required" />
+							    </div>
+							</div>
+							<div class="form-group ">
+							    <label for="phone" class="control-label">Phone <span class="required">*</span></label>
+							    <div>
+							        <input type="text" class="form-control" id="cell" name="cell" th:value="${customer.user==null?'':customer.user.phone}" required="required" />
+							    </div>
+							</div>
+							<div class="form-group ">
+							    <label for="cell" class="control-label">Mobile </label>
+							    <div>
+							        <input class="form-control " id="phone" name="phone" type="text" th:value="${customer.user==null?'':customer.user.cell}" />
+							    </div>
+							</div>
+							<div class="form-group">
+							    <label for="fullname" class="control-label">Email <!-- <span class="required">*</span> --></label>
+							    <div>
+							        <input class=" form-control" id="username" name="username" th:value="${customer.user==null?'':customer.user.username}" type="email" autocomplete="off" required="required" />
+							    </div>
+							</div>
+							<!-- <div class="form-group">
+							    <label for="password" class="control-label">Password <span class="required">*</span></label>
+							    <div>
+							        <input class=" form-control" id="password" name="password" value="" type="password" autocomplete="off" required="required" />
+							    </div>
+							</div>
+							<div class="form-group">
+							    <label for="password" class="control-label">Confirm Password <span class="required">*</span></label>
+							    <div>
+							        <input class=" form-control" id="confpswd" name="confpswd" value="" type="password" autocomplete="off" required="required" />
+							    </div>
+							</div> -->
+							<input type="hidden" id="createdby" name="createdby" th:value="${loginUser.userid}">
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" id="addCustomer">Submit</button>
+					</div>
+				</div>
+			</div>
+		</div>
 		<!--main content end-->
 		<script th:src="@{/js/jquery-1.10.2.min.js}"></script>
 		<script th:src="@{/js/jquery-ui-1.12.1.js}"></script>
 		<script th:src="@{/js/jquery.autocomplete.min.js}"></script>
 		<script>
-			/* $(document).ready(function() {
-			    var token = $("meta[name='_csrf']").attr("content");
-			    var header = $("meta[name='_csrf_header']").attr("content");
+		    var token = $("meta[name='_csrf']").attr("content");
+		    var header = $("meta[name='_csrf_header']").attr("content");
+
+		    $(".alert").hide();
+
+			$(document).ready(function() {
 			    var dialog, form;
 
-				dialog1 = $( "#SearchCustomer" ).dialog({
-					dialogClass: 'dialogStyle',
+				dialog = $( "#pay" ).dialog({
+					dialogClass: 'payDialog',
 					autoOpen: false,
 					resizable: false,
-					height: 400,
-					width: 350,
+					minHeight: 'auto',
+					width: 600,
 					modal: true,
 					buttons: {
+						"Pay": function() {
+							form = dialog.find( "form" );
+							var postData = form.serializeArray();
+							var formURL = form.attr("action");
+
+							console.log("URL: " + formURL);
+
+							$.ajax({
+								url: formURL,
+								type: "POST",
+								data: postData,
+				                beforeSend:function(xhr) {
+				                	xhr.setRequestHeader(header, token);
+				                },
+								success: function(data, textStatus, jqXHR) {
+									//console.log("URL: "+data);
+									alert("Payment completed successfully!")
+									//$('#pay #balance').html(data);
+									//return true;
+									$("#payment").hide();
+									$("#print").show();
+									$("#newsale").show();
+									$("a[id=rmvBtn]").hide();
+									dialog.dialog( "close" );
+								},
+								error: function(jqXHR, status, error) {
+									console.log(status + ": " + error);
+								}
+							});
+						},
 						Cancel: function() {
 							dialog.dialog( "close" );
 						}
 					},
 					close: function() {
-						form[ 0 ].reset();
+						//alert("close")
+						//document.getElementById("giftcard").reset();
 						//allFields.removeClass( "ui-state-error" );
 					},
 					open: function (event, ui) {
-					    $('#SearchCustomer').css('overflow', 'hidden');
+					    $('#payment').css('overflow', 'hidden');
 					}
 				});
 
-				/* form = dialog.find( "form" ).on( "submit", function( event ) {
-					alert("DDD")
-					event.preventDefault();
-					document.getElementById("customer").submit();
+				$('#payment').click(function(){
+				    dialog.dialog( "open" );
+				    calTotal();
 				});
 
-				$('#find').click(function(){
-				    dialog1.dialog( "open" );
+				//form = dialog.find( "form" ).on( "submit", function( event ) {
+				$( "#chkbalance" ).click( function() {
+					/* if($("#pin").val().trim() == "") {
+						alert("Please enter your pin!");
+						return false;
+					} else { */
+					if($("#cardcode").val().trim() == "") {
+						alert("Please enter your gift card number!");
+						return false;
+					} else {
+						form = dialog.find( "form" );
+						var postData = form.serializeArray();
+						event.preventDefault();
+						console.log("postData: " + postData);
+						$.ajax({
+							url: "/vhc/store/admin/checkgiftcard",
+							type: "POST",
+							data: postData,
+			                beforeSend:function(xhr) {
+			                	xhr.setRequestHeader(header, token);
+			                },
+							success: function(data, textStatus, jqXHR) {
+								console.log("URL: "+data);
+								if(data > 0) {
+									$('#amount3').show();
+									$("#giftbalance").html("Available Amount: $"+data+".  Enter Payment: ");
+									$('#availamount').val(data);
+									$("#Gift Card").prop( "checked", true );
+								} else {
+									$("#giftbalance").html("Gift card has 0 balance"); // or pin is not correct
+								}
+								console.log("SSSSSSSSSSSSS")
+								calTotal();
+								return false;
+							},
+							error: function(jqXHR, status, error) {
+								console.log(status + ": " + error);
+							}
+						});
+					}
 				});
 
+				//Payment Methods
+				$("input[type=checkbox]").on("click", function() {
+					//i = $("input[type=radio]:checked").val();
+
+					$("input[type=checkbox]").each(function() {
+
+						i = $(this).val();
+						console.log("i = "+i );
+
+						if($(this).is(':checked')) {
+							$("#method"+i).show();
+						} else {
+							$("#method"+i).hide();
+							console.log("amount for i : "+ $("#amount"+i).val());
+							$("#amount"+i).val("");
+							calTotal(i);
+						}
+					});
+				});
+
+
+				$("#checkpcode").click(function() {
+					if($("#promocode").val().trim() == "") {
+						alert("Please provide the Promotion Code");
+						return false;
+					} else {
+
+						form = dialog.find( "form" );
+						var postData = form.serializeArray();
+
+						$.ajax({
+							url: "/vhc/store/admin/promocode",
+							type: "POST",
+							data: postData,
+			                beforeSend:function(xhr) {
+			                	xhr.setRequestHeader(header, token);
+			                },
+							success: function(data, textStatus, jqXHR) {
+								console.log("returned value: "+data);
+								if(data == -1) {
+									$('#pay #percentage').html("<br> Promotion code is not valid.");
+								} else if(data == 0) {
+									$('#pay #percentage').html("<br> Promotion code is already expired.");
+								} else {
+									total = ($("#amount").val() * (100 - data) / 100).toFixed(2);
+									save = ($("#amount").val() * data / 100).toFixed(2);
+									console.log("Total: "+total+ ", save: "+save);
+									$("#save").val(save);
+									$('#pay #percentage').html("<br> Promotion Discount: "+data+"%, Saved: "+save);
+									$("#total").html("$" + total);
+								}
+
+								return false;
+							},
+							error: function(jqXHR, status, error) {
+								console.log(status + ": " + error);
+							}
+						});
+					}
+				});
+
+				$("#discount").keyup(function() {
+					console.log("discount")
+					calTotal(0);
+				});
+				$("#amount1").keyup(function() {
+					console.log("S1")
+					calTotal(1);
+				});
+				$("#amount2").keyup(function() {
+					console.log("SS2")
+					calTotal(2);
+				});
+				$("#amount3").keyup(function() {
+					console.log("SSS3")
+					if($("#availamount").val() < $("#amount3").val()) {
+						alert("Please make sure you entered a correct amount!");
+						return false;
+					}
+					calTotal(3);
+				});
+				$("#amount4").keyup(function() {
+					console.log("SSSS4")
+					calTotal(4);
+				});
+
+				function calTotal(type) {
+					console.log("Original Balance: "+$("#amount").val()+", save: "+$("#save").val()+", 1: "+$("#amount1").val()+", 3: "+$("#amount3").val())
+					balance = ($("#amount").val() - $("#discount").val() - $("#save").val() - $("#amount1").val() - $("#amount2").val() - $("#amount3").val() - $("#amount4").val()).toFixed(2);
+console.log("balance: "+balance);
+					var btns = $('.payDialog'+' .ui-dialog-buttonpane button');
+					var btn = null;
+console.log('button number: '+btns.length)
+					for(var i=0; i<btns.length; ++i) {
+						tmp = $(btns[i]);
+						console.log('button name: '+tmp.text())
+						if(tmp.text() == 'Pay') {
+							btn = tmp;
+						}
+					}
+
+					if(btn) {
+						if(balance > 0) {
+							btn.attr('disabled', true).addClass('ui-state-disabled');
+						} else {
+							btn.attr('disabled', false).removeClass('ui-state-disabled');
+						}
+					} else {
+						console.log('button not found');
+					}
+
+					if(balance < 0) {
+						change = 0 - balance;
+						balance = 0.00;
+						$("#changediv").show();
+						if(type == 4) {
+							$("#cashchange").html("$"+change);
+						} else {
+							$("#total").html("$"+balance);
+							$("#cashchange").html("Make sure your charge the right amount!");
+							btn.attr('disabled', true).addClass('ui-state-disabled');
+							return false;
+						}
+
+					} else {
+						console.log("call:"+balance)
+						$("#changediv").hide();
+						$("#cashchange").html("");
+					}
+
+					$("#total").html("$"+balance);
+
+				}
+
+				$("#print").click(function() {
+					window.open("printinvoice");
+					return false;
+				});
 			});
 
-		    function findCustomer() {
-				window.open("findCustomer");
-			}
-			function addCustomer() {
-				window.open("addCustomer");
-			}
-			function selectCustomer(id) {
-				//alert("main: " +id)
-				location.href="searchCustomer/" + id;
-			} */
+		</script>
+		<script>
 
 		//new code
+		    var token = $("meta[name='_csrf']").attr("content");
+		    var header = $("meta[name='_csrf_header']").attr("content");
 		    $(document).ready(function(){
-			    var token = $("meta[name='_csrf']").attr("content");
-			    var header = $("meta[name='_csrf_header']").attr("content");
-			    var friends = [];
-		    	dialog = $('#SearchCustomer').dialog({
-    				width: 500,
-    				autoOpen: false,
-    	            create: function () {
-    	                //Get a reference to jquery ui generated element
+			    var customers = [];
 
-    	                var widget = $(this).dialog('widget');
-    	                //Get a reference to content div
-    	                var dialog = $(this);
-    	                //Delete the default jquery ui title bar
-    	                widget.find('.ui-dialog-titlebar').remove();
+                //Create an event for the search input
+                $('#searchFilter').keyup(function() {
+                	console.log("Search Filter: "+customers);
 
-    	                //Remove the default padding values for the popup
-    	                widget.css('padding', 0).find('.ui-dialog-content').css('padding', 0);
-
-    	                //Use jquery ui styling for our new titlebar
-    	                $('.SearchTitle',dialog).addClass('ui-widget-header');
-
-    	                //Position title elements
-    	                $('.SearchTitleText',dialog).css('float','left');
-    	                $('.SearchTitleFilterButton',dialog).css('float','right');
-    	                $('.SearchClear',dialog).css('clear','both');
-
-    	                //Create an event for the search input
-    	                $('.SearchFilter',dialog).keyup(function(){
-    	                	ShowResults($(this).val(),friends);
-    	                });
-
-    	                //Create a close button and allow it to close the popup
-    	                $('.SearchButtonClose',dialog).button({
-    	                    icons: { primary: 'ui-icon-close' },
-    	                    text: false
-    	                }).css('width', 12).css('height', 24)
-
-    	                .click(function () {
-    	                    dialog.dialog('close');
-    	                });
-						console.log("Here it is!")
-    	                //ShowResults('', friends);
-    	            }
-	    		});
+                	ShowResults($(this).val(), customers);
+                });
 
 		    	$('#find').click(function(){
 		    		$.ajax({
@@ -457,17 +750,9 @@
                         },
                         success: function (data) {
                         	console.log("customer: "+data);
-                        	friends = data;
+                        	customers = data;
 
-                        	/* output = "";
-                        	for(i in data[0]) {
-                        		output += i + ": "+data[0][i]+"\n";
-                        	}
-                        	console.log(output) */
-                            /* response($.map(data, function (item) {
-        		                return { value: item.name, data: item.productid };
-                            })) */
-                        	ShowResults('', friends);
+                        	ShowResults('', customers);
                         },
                         error: function (response) {
                         	console.log(response);
@@ -477,38 +762,257 @@
                             alert(response.responseText);
                         }
                     });
-		    		dialog.dialog( "open" );
 				});
+
+		    	// Add new customer into the system
+		    	$("#addCustomer").click(function() {
+					msg = "";
+					$(".alert").slideUp(400);
+
+					if($("#firstname").val().trim() == "") {
+						$("#firstname").addClass("has-error");
+						msg = "First Name";
+					} else {
+						$("#firstname").removeClass("has-error");
+					}
+
+					if($("#lastname").val().trim() == "") {
+						$("#lastname").addClass("has-error");
+						if(msg == "") {
+							msg = "Last Name";
+						} else {
+							msg += ", Last Name";
+						}
+					} else {
+						$("#lastname").removeClass("has-error");
+					}
+
+					if($("#street").val().trim() == "") {
+						$("#street").addClass("has-error");
+						if(msg == "") {
+							msg = "Address";
+						} else {
+							msg += ", Address";
+						}
+					} else {
+						$("#street").removeClass("has-error");
+					}
+
+					if($("#postalcode").val().trim() == "") {
+						$("#postalcode").addClass("has-error");
+						if(msg == "") {
+							msg = "Postal Code";
+						} else {
+							msg += ", Postal Code";
+						}
+					} else {
+						$("#postalcode").removeClass("has-error");
+					}
+
+					if($("#cell").val().trim() == "") {
+						$("#cell").addClass("has-error");
+						if(msg == "") {
+							msg = "Phone";
+						} else {
+							msg += ", Phone";
+						}
+					} else {
+						$("#cell").removeClass("has-error");
+					}
+
+					/* if($("#username").val().trim() == "") {
+						$("#username").addClass("has-error");
+						if(msg == "") {
+							msg = "Email";
+						} else {
+							msg += ", Email";
+						}
+					} else {
+						$("#username").removeClass("has-error");
+					} */
+
+					if(msg.trim() != "") {
+						msg += " fields are required."
+						$("#error").text(msg);
+						$(".alert").slideDown(400);
+						return false;
+					}
+
+					$("#addCustomer").prop("disabled", true);
+
+					form = $("#newcustomer");
+					var postData = $("#newcustomer").serializeArray();
+					var formURL = $("#newcustomer").attr("action");
+
+					$.ajax({
+						url: formURL,
+						type: "POST",
+						data: postData,
+		                beforeSend:function(xhr) {
+		                	xhr.setRequestHeader(header, token);
+		                },
+						success: function(data) {
+							console.log("newcustomer Form has been submitted successfully")
+							/* output = "";
+                        	for(i in data) {
+                        		output += i + ": "+data[i]+"\n";
+                        	}
+							console.log("web service output: " + output); */
+
+							if(data.customerid == null || data.customerid == 0) {
+
+								$("#error").text(data.comments);
+								$(".alert").slideDown(400);
+								$("#addCustomer").prop("disabled", false);
+
+							} else {
+
+								$("#fullname").text(data.user.firstname + " " + data.user.lastname);
+								$("#phone").text(data.user.phone);
+								$("#address").text(data.address.street);
+								$("#cell").text(data.user.cell);
+								$("#city").text(data.address.city.name + ", " + data.address.city.province.name);
+								$("#email").text(data.user.email);
+								$("#postalcode").text(data.address.postalcode);
+								$("#creationdate").text(data.user.creationdate);
+
+				            	$("#addModal").modal('hide');
+							}
+
+						},
+						error: function(jqXHR, status, error) {
+							console.log(status + ": " + error);
+							$("#addCustomer").prop("disabled", false);
+						}
+			    	});
+		    	});
+
+
+		    	$("#addItem").click(function() {
+					console.log("addItem is called");
+					form = $("#lookup");
+					var postData = $("#lookup").serializeArray();
+					var formURL = $("#lookup").attr("action");
+
+					$.ajax({
+						url: formURL,
+						type: "POST",
+						data: postData,
+		                beforeSend:function(xhr) {
+		                	xhr.setRequestHeader(header, token);
+		                },
+						success: function(data) {
+							console.log("Form has been submitted successfully")
+							output = "";
+                        	for(i in data) {
+                        		output += i + ": "+data[i]+"\n";
+                        	}
+
+                        	console.log("web service output: " + output);
+
+    						total = 0;
+                        	if(data == '') {
+                        		$('#msgModal').modal('show');
+                        	} else {
+                            	tbody = document.getElementById("inventories");
+                            	console.log("We are here!!!"+data["itemid"])
+    							//each order
+    							//$(".staffid")
+    							var newRow = tbody.insertRow();
+    							var cell0 = newRow.insertCell(0);
+    							var text0 = document.createTextNode('Jasmine');
+    							cell0.appendChild(text0);
+    							var cell1 = newRow.insertCell(1);
+    							var text1 = document.createTextNode(data["productname"]);
+    							cell1.appendChild(text1);
+    							var cell2 = newRow.insertCell(2);
+    							var text2 = document.createTextNode(data["modelnum"]);
+    							cell2.appendChild(text2);
+    							var cell3 = newRow.insertCell(3);
+    							var text3 = document.createTextNode(data["quantity"]);
+    							cell3.appendChild(text3);
+    							var cell4 = newRow.insertCell(4);
+    							var text4 = document.createTextNode(data["size"]);
+    							cell4.appendChild(text4);
+    							var cell5 = newRow.insertCell(5);
+    							var text5 = document.createTextNode('');
+    							cell5.appendChild(text5);
+    							var cell6 = newRow.insertCell(6);
+    							var text6 = document.createTextNode(data["retail"]);
+    							cell6.appendChild(text6);
+    							var cell7 = newRow.insertCell(7);
+    							var text7 = document.createTextNode(data["finalprice"]);
+    							cell7.appendChild(text7);
+    							var cell8 = newRow.insertCell(8);
+    							var text8 = document.createTextNode('');
+    							cell8.appendChild(text8);
+    							var cell9 = newRow.insertCell(9);
+								var a = document.createElement('a');
+    							a.innerHTML='<i class="fa fa-trash-o"></i>';
+    							a.setAttribute('id', "rmvBtn");
+    							a.setAttribute('onclick', "removeInv("+data["inventoryid"]+")");
+    							cell9.appendChild(a);
+
+    							subtotal = data["finalprice"];
+    							tax = data["tax"];
+    							total = (subtotal + subtotal * tax /100).toFixed(2);
+    							console.log("total : "+total);
+    							$("#amount").val(total);
+    							console.log("total 2: "+total);
+    							$("#orderamount").text("$"+total);
+                        	}
+						},
+						error: function(jqXHR, status, error) {
+							console.log(status + ": " + error);
+						}
+			    	});
+		    	});
 
 	    	});
 
 
-		    function ShowResults(filterText,dataSource) {
+		    function ShowResults(filterText, dataSource) {
 		    	var html = ''
 
-		    	$.each(dataSource,function(index,value){
+		    	console.log("filterText: "+filterText);
 
-		    		if(filterText.length < 1 || value.toLowerCase().indexOf(filterText)!=-1)
-		    		{
-		    			html += '<li><a href="#" onClick="SelectResult(this,'+value.customerid+')">'+value.user.firstname+' '+value.user.lastname+'</a></li>';
-		    		}
-
+		    	$.each(dataSource, function(index, value){
+					console.log("index: "+index+", value: "+value);
+	    			if(value.userid != null) {
+	    				//search on user's phone number
+			    		if(filterText.length < 1 || value.phone.toLowerCase().indexOf(filterText) != -1) {
+		    				html += "<li class='row'><a href='#' onClick='SelectResult("+JSON.stringify(value)+")'>"
+		    						+'<span class="col-md-1">'+value.customerid+'</span>'
+		    						+'<span class="col-md-4">'+value.firstname+' '+value.lastname+'</span>'
+		    						+'<span class="col-md-3">'+value.phone+'</span>'
+		    						+'<span class="col-md-4">'+value.email+'</span></a></li>';
+			    		}
+	    			} else {
+	    				console.log("Customer ID: " + value.customerid + " does not have a user profile.");
+	    			}
 		    	});
 
-		    	$('#SearchCustomer .SearchContent').html(html==''?'No Results':'<ul class="SearchResults">'+html+'</ul>');
+		    	//$('#SearchCustomer .SearchContent').html(html==''?'No Results':'<ul class="SearchResults">'+html+'</ul>');
+		    	$('#findModal .modal-body').html(html==''?'No Results':'<ul class="SearchResults">'+html+'</ul>');
 
 		    }
 
-		    function SelectResult(element, customerid) {
-		    	/* output = "";
-            	for(i in element) {
-            		output += i + ": "+element[i]+"\n";
-            	}
-            	console.log(output) */
-		    	alert('Hello, I am ' + $(element).text()+", customer ID: "+customerid)
+		    //Call customer's order history
+		    function SelectResult(customer) {
+		    	console.log("customer ID: "+customer.customerid+", user: "+JSON.stringify(customer));
+
+				$("#fullname").text(customer.fullname);
+				$("#phone").text(customer.phone);
+				$("#address").text(customer.street);
+				$("#cellnum").text(customer.cell);
+				$("#city").text(customer.city + ", " + customer.province);
+				$("#email").text(customer.email);
+				$("#postal").text(customer.postalcode);
+				$("#creationdate").text(customer.creationdate);
+
 		    	//load shopping history
 				$.ajax({
-					url: 'customerHistory?',
+					url: 'customerHistory/'+customer.customerid,
 					//data: "{ 'prefix': '" + request.term + "'}",
 					dataType: "json",
 					type: "POST",
@@ -517,9 +1021,94 @@
 						xhr.setRequestHeader(header, token);
 					},
 					success: function (data) {
-						console.log("customer: "+data);
-						friends = data;
-						ShowResults('', friends);
+		            	console.log("Data length: "+data.length);
+						tbody = document.getElementById("records");
+		            	for(i=0; i<data.length; i++) {
+							/* if(i==0) {
+								console.log("firstname: "+data[i].customer.user.firstname);
+								$("#fullname").text(data[i].customer.user.firstname + " " + data[i].customer.user.lastname);
+								$("#phone").text(data[i].customer.user.phone);
+								$("#address").text(data[i].customer.address.street);
+								$("#cellnum").text(data[i].customer.user.cell);
+								$("#city").text(data[i].customer.address.city.name + ", " + data[i].customer.address.city.province.name);
+								$("#email").text(data[i].customer.user.email);
+								$("#postal").text(data[i].customer.address.postalcode);
+								$("#creationdate").text(data[i].customer.user.creationdate);
+							} */
+							//each order & items
+							items = data[i]["orderitems"]
+							if(items.length > 0) {
+								for(j in items) {
+
+									var newRow = tbody.insertRow();
+									var cell0 = newRow.insertCell(0);
+									var text0 = document.createTextNode('0');
+									cell0.appendChild(text0);
+									var cell1 = newRow.insertCell(1);
+									var text1 = document.createTextNode(data[i]["store"]["name"]);
+									cell1.appendChild(text1);
+									var cell2 = newRow.insertCell(2);
+									var text2 = document.createTextNode(data[i]["staff"]["user"]["firstname"]);
+									cell2.appendChild(text2);
+									var cell3 = newRow.insertCell(3);
+									var text3 = document.createTextNode(items[j]["item"]["product"]["name"]);
+									cell3.appendChild(text3);
+									var cell4 = newRow.insertCell(4);
+									var text4 = document.createTextNode(items[j]["item"]["product"]["modelnum"]);
+									cell4.appendChild(text4);
+									var cell5 = newRow.insertCell(5);
+									var text5 = document.createTextNode(items[j]["item"]["size"]["sizenum"]);
+									cell5.appendChild(text5);
+									var cell6 = newRow.insertCell(6);
+									var text6 = document.createTextNode(items[j]["item"]["quantity"]);
+									cell6.appendChild(text6);
+									var cell7 = newRow.insertCell(7);
+									var text7 = document.createTextNode(items[j]["item"]["product"]["finalprice"]);
+									cell7.appendChild(text7);
+									var cell8 = newRow.insertCell(8);
+									var text8 = document.createTextNode(data[i]["invoices"][0]["amount"]);
+									cell8.appendChild(text8);
+									/* var cell9 = newRow.insertCell(9);
+									var text9 = document.createTextNode();
+									cell9.appendChild(text9); */
+
+								}
+							} else {
+
+								var newRow = tbody.insertRow();
+								var cell0 = newRow.insertCell(0);
+								var text0 = document.createTextNode('0');
+								cell0.appendChild(text0);
+								var cell1 = newRow.insertCell(1);
+								var text1 = document.createTextNode(data[i]["store"]["name"]);
+								cell1.appendChild(text1);
+								var cell2 = newRow.insertCell(2);
+								var text2 = document.createTextNode(data[i]["staff"]["user"]["firstname"]);
+								cell2.appendChild(text2);
+								var cell3 = newRow.insertCell(3);
+								var text3 = document.createTextNode('-');
+								cell3.appendChild(text3);
+								var cell4 = newRow.insertCell(4);
+								var text4 = document.createTextNode('-');
+								cell4.appendChild(text4);
+								var cell5 = newRow.insertCell(5);
+								var text5 = document.createTextNode('-');
+								cell5.appendChild(text5);
+								var cell6 = newRow.insertCell(6);
+								var text6 = document.createTextNode('-');
+								cell6.appendChild(text6);
+								var cell7 = newRow.insertCell(7);
+								var text7 = document.createTextNode('-');
+								cell7.appendChild(text7);
+								var cell8 = newRow.insertCell(8);
+								var text8 = document.createTextNode(data[i]["invoices"][0]["amount"]);
+								cell8.appendChild(text8);
+								/* var cell9 = newRow.insertCell(9);
+								var text9 = document.createTextNode();
+								cell9.appendChild(text9); */
+							}
+						}
+		            	$("#findModal").modal('hide');
 					},
 					error: function (response) {
 						console.log(response);

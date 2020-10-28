@@ -98,8 +98,8 @@
 
 		<section class="content-header">
 			<h1>
-				Product Management
-				<small>List Brands</small>
+				Brand Detail
+				<small>Product Management</small>
 			</h1>
 			<ol class="breadcrumb">
 				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -179,6 +179,12 @@
 									    <label for="comments" class="control-label col-lg-2">Comments </label>
 									    <div class="col-lg-10">
 									        <textarea class="form-control " id="comments" name="comments" th:value="${brand==null?'':brand.comments}" ></textarea>
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="display" class="control-label col-lg-2">Show on Web </label>
+									    <div class="col-lg-10">
+									        <input type="checkbox" id="display" name="display" value="1" th:checked="${(brand!=null and brand.display=='1')}" /> Display this brand on website
 									    </div>
 									</div>
 									<div class="form-group">

@@ -17,6 +17,8 @@ import javax.persistence.Table;
 
 import org.jsondoc.core.annotation.ApiObjectField;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 
 @Entity
 @Table(name="ORDER_ITEMS")
@@ -55,6 +57,7 @@ public class Orderitem implements Serializable {
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="orderid")
 	@ApiObjectField(description="Unique Order", required=true)
+	@JsonBackReference
 	private Order order;
 
 	@ManyToOne(fetch=FetchType.EAGER)

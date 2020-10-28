@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="store/admin/layout/layout">
+
+	<head>
+		<link rel="stylesheet" th:href="@{/css/autocomplete.css}" />
+	</head>
+
+	<div layout:fragment="content">
+		<section class="content-header">
+			<h1>
+				Inventory Detail
+				<small>Inventory Management</small>
+			</h1>
+			<ol class="breadcrumb">
+				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
+				<li><a th:href="@{/store/admin/pos}"><i class="fa fa-cubes"></i>Inventories</a></li>
+				<li><i class="fa fa-file-text-o"></i><span th:text="${inventory==null?'':'Modify Inventory'}"></span></li>
+			</ol>
+		</section>
+
+		<section class="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="box">
+						<div class="box-header">
+							<h3 class="box-title" th:text="${inventory==null?'':'Modify Inventory'}"></h3>
+						</div>
+						<div th:if="${message!=null}" class="col-lg-offset-2 col-lg-10" style="margin-bottom: 20px;">
+							<span th:if="${message!=null}" th:class="${message.status}" th:text="${message.message}"></span>
+						</div>
+						<div class="box-body">
+							<div class="form" th:if="${inventory!=null or sum!=null}">
+								<!-- Sold items -->
+								<form th:if="${inventory.status!=null and inventory.status.name=='Delivered'}" class="form-validate form-horizontal " id="inventory" name="inventory" method="post" th:action="@{/store/admin/inventory}">
+									<div class="form-group">
+										<label class="col-lg-offset-2 col-lg-12">This item already delivered to customer.</label>
+									</div>
+									<div class="form-group">
+									    <label for="itemid" class="control-label col-lg-2">Item </label>
+									    <div class="col-lg-10">
+											<span th:text="${inventory.item.product.name}" class="form-control"></span>
+											<input type="hidden" id="itemid" name="itemid" th:value="${inventory.item.itemid}">
+									    </div>
+									</div>
+									<div class="form-group">
+										<label for="sendby" class="control-label col-lg-2">Sold By </label>
+										<div class="col-lg-10">
+											<span th:text="${inventory.store.name}" class="form-control"></span>
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="senddate" class="control-label col-lg-2">Delivered Date </label>
+										<div class="col-lg-10">
+											<span th:text="${inventory.senddate!=null?#calendars.format(inventory.senddate,'dd MMM yyyy'):''}" class="form-control"></span>
+										</div>
+									</div>
+									<div class="form-group">
+									    <label for="locationid" class="control-label col-lg-2">Status </label>
+									    <div class="col-lg-10">
+									    	<span th:text="${inventory.status.name}" class="form-control"></span>
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="quantity" class="control-label col-lg-2">Quantity </label>
+									    <div class="col-lg-10">
+									        <span class="form-control" th:text="${inventory.quantity}"></span>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="locationid" class="control-label col-lg-2">Location </label>
+									    <div class="col-lg-10">
+											<span class="form-control" th:text="${inventory.location!=null?inventory.location.name:''}"></span>
+									    </div>
+									</div>
+								</form>
+
+								<!-- Transferred item From -->
+								<form th:if="${inventory.status!=null and inventory.status.name=='Transferred' and inventory.store.storeid==store.storeid}" class="form-validate form-horizontal" id="inventory" name="inventory" method="post" th:action="@{/store/admin/inventory}">
+									<div class="form-group">
+									    <label for="itemid" class="control-label col-lg-2">Item </label>
+									    <div class="col-lg-10">
+											<span th:text="${inventory.item.product.name}" class="form-control"></span>
+											<input type="hidden" id="itemid" name="itemid" th:value="${inventory.item.itemid}">
+									    </div>
+									</div>
+									<div class="form-group">
+										<label for="dstoreid" class="control-label col-lg-2">Transfer To </label>
+										<div class="col-lg-10">
+											<span th:text="${inventory.deststore!=null?inventory.deststore.name:''}" class="form-control"></span>
+										</div>
+									</div>
+									<div class="form-group ">
+									    <label for="quantity" class="control-label col-lg-2">Quantity </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="quantity" name="quantity" type="text" th:value="${inventory.quantity}" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="locationid" class="control-label col-lg-2">Location </label>
+									    <div class="col-lg-10">
+											<span class="form-control" th:text="${inventory.location!=null?inventory.location.name:''}"></span>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="statusid" class="control-label col-lg-2">Status </label>
+									    <div class="col-lg-10">
+									    	<span th:text="${inventory.status.name}" class="form-control"></span>
+									    </div>
+									</div>
+									<div class="form-group">
+										<label for="senddate" class="control-label col-lg-2">Transfer Date </label>
+										<div class="col-lg-10">
+											<span th:text="${inventory.senddate!=null?#calendars.format(inventory.senddate,'dd MMM yyyy'):''}" class="form-control"></span>
+										</div>
+									</div>
+									<div class="form-group">
+									    <div class="col-lg-offset-2 col-lg-10">
+									    </div>
+									</div>
+								</form>
+
+								<!-- Transfer Item To -->
+								<form th:if="${inventory.status!=null and inventory.status.name=='Transferred'and inventory.deststore != null and inventory.deststore.storeid==store.storeid}" class="form-validate form-horizontal" id="inventory" name="inventory" method="post" th:action="@{/store/admin/inventory}">
+									<div class="form-group">
+									    <label for="itemid" class="control-label col-lg-2">Item </label>
+									    <div class="col-lg-10">
+											<span th:text="${inventory.item.product.name}" class="form-control"></span>
+											<input type="hidden" id="itemid" name="itemid" th:value="${inventory.item.itemid}">
+									    </div>
+									</div>
+									<div class="form-group">
+										<label for="storeid" class="control-label col-lg-2">Transfer From </label>
+										<div class="col-lg-10">
+											<input type="hidden" id="storeid" name="storeid" th:value="${inventory.deststore.storeid}">
+											<span th:text="${inventory.store.name}" class="form-control"></span>
+										</div>
+									</div>
+									<div class="form-group ">
+									    <label for="quantity" class="control-label col-lg-2">Quantity </label>
+									    <div class="col-lg-10">
+									        <input class="form-control " id="quantity" name="quantity" type="text" th:value="${inventory.quantity}" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="locationid" class="control-label col-lg-2">Location </label>
+									    <div class="col-lg-10">
+											<select class="form-control" id="locationid" name="locationid">
+												<option th:each="location: ${locations}" th:value="${location.locationid}" th:text="${location.name}"></option>
+											</select>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="statusid" class="control-label col-lg-2">Status </label>
+									    <div class="col-lg-10">
+									    	<select id="statusid" name="statusid" class="form-control">
+									    		<option th:each="status:${statuses}" th:text="${status.name}" th:value="${status.statusid}" th:selected="${inventory.status.statusid==status.statusid}"></option>
+									    	</select>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <div class="col-lg-offset-2 col-lg-10">
+									        <button class="btn btn-primary" type="submit"> Receive </button>
+									        <a th:href="@{/store/admin/inventories}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+									        <input type="hidden" id="inventoryid" name="inventoryid" th:value="${inventory.inventoryid}" />
+									    </div>
+									</div>
+								</form>
+
+								<!-- Available item -->
+								<form th:if="${(inventory.status!=null and (inventory.status.name=='Received' or inventory.status.name=='Returned')) and inventory.store.storeid==store.storeid}" class="form-validate form-horizontal" id="inventory" name="inventory" method="post" th:action="@{/store/admin/inventory}">
+									<div class="form-group">
+									    <label for="itemid" class="control-label col-lg-2">Item </label>
+									    <div class="col-lg-10">
+											<span th:text="${inventory.item.product.name}" class="form-control"></span>
+											<input type="hidden" id="itemid" name="itemid" th:value="${inventory.item.itemid}">
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="itemid" class="control-label col-lg-2">Model </label>
+									    <div class="col-lg-10">
+											<span th:text="${inventory.item.product.modelnum}" class="form-control"></span>
+											<input type="hidden" id="modelnum" name="modelnum" th:value="${inventory.item.product.modelnum}">
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="sizeid" class="control-label col-lg-2">Size </label>
+									    <div class="col-lg-10">
+											<span th:text="${inventory.item.size.sizenum + '(' + inventory.item.size.region.name +'-'+inventory.item.size.type.name + ')'}" class="form-control"></span>
+											<input type="hidden" id="sizeid" name="sizid" th:value="${inventory.item.size.sizeid}">
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="quantity" class="control-label col-lg-2">Quantity </label>
+									    <div class="col-lg-10">
+									    	<span th:text="${inventory.quantity}" class="form-control"></span>
+									        <input type="hidden" id="quantity" name="quantity" th:value="${inventory.quantity}" />
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="locationid" class="control-label col-lg-2">Location </label>
+									    <div class="col-lg-10">
+											<select class="form-control" id="locationid" name="locationid">
+												<option th:each="location: ${locations}" th:value="${location.locationid}" th:text="${location.name}" th:selected="${inventory.location!=null and location.locationid==inventory.location.locationid}"></option>
+											</select>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="statusid" class="control-label col-lg-2">Status </label>
+									    <div class="col-lg-10">
+									    	<select id="statusid" name="statusid" onchange="selectStatus(this)" class="form-control">
+									    		<option th:each="status:${statuses}" th:text="${status.name}" th:value="${status.statusid}" th:selected="${inventory.status.statusid==status.statusid}" class="form-control"></option>
+									    	</select>
+									    </div>
+									</div>
+									<div id="deststore" class="form-group" style="display: none;">
+									    <label for="deststoreid" class="control-label col-lg-2">Transfer To </label>
+									    <div class="col-lg-10">
+											<select class="form-control" id="tstoreid" name="tstoreid">
+												<option th:each="store: ${stores}" th:value="${store.storeid}" th:text="${store.name}"></option>
+											</select>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <div class="col-lg-offset-2 col-lg-10">
+									        <button class="btn btn-primary" type="submit"> Save </button>
+									        <a th:href="@{/store/admin/inventory/}+${inventory.inventoryid}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+									        <input type="hidden" id="inventoryid" name="inventoryid" th:value="${inventory.inventoryid}" />
+									        <input type="hidden" id="storeid" name="storeid" th:value="${inventory.store.storeid}" />
+									    </div>
+									</div>
+								</form>
+								<form th:if="${(inventory.status!=null and (inventory.status.name=='Received' or inventory.status.name=='Returned')) and inventory.store.storeid!=store.storeid}" class="form-validate form-horizontal" id="inventory" name="inventory" method="post" th:action="@{/store/admin/inventory}">
+									<div class="form-group">
+									    <label for="itemid" class="control-label col-lg-2">Item </label>
+									    <div class="col-lg-10">
+											<span th:text="${inventory.item.product.name}" class="form-control"></span>
+											<input type="hidden" id="itemid" name="itemid" th:value="${inventory.item.itemid}">
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="storeid" class="control-label col-lg-2">Store </label>
+									    <div class="col-lg-10">
+											<span th:text="${inventory.store.name}" class="form-control"></span>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="statusid" class="control-label col-lg-2">Status </label>
+									    <div class="col-lg-10">
+									    	<span th:text="${inventory.status.name}" class="form-control"></span>
+									    </div>
+									</div>
+									<div class="form-group ">
+									    <label for="quantity" class="control-label col-lg-2">Quantity </label>
+									    <div class="col-lg-10">
+									        <span class="form-control" th:text="${inventory.quantity}"></span>
+									    </div>
+									</div>
+									<div class="form-group">
+									    <label for="locationid" class="control-label col-lg-2">Location </label>
+									    <div class="col-lg-10">
+											<span class="form-control" th:text="${inventory.location!=null?inventory.location.name:''}"></span>
+									    </div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<script type="text/javascript">
+			function selectStatus(elemt) {
+				var dest = document.getElementById("deststore");
+				if(elemt.options[elemt.selectedIndex].text == "Transferred") {
+					dest.style.display = "";
+				} else {
+					dest.style.display = none;
+				}
+				console.log(elemt.options[elemt.selectedIndex].text)
+			}
+		</script>
+	</div>
+</html>

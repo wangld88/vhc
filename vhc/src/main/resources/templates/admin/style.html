@@ -31,6 +31,14 @@
 										        <input class=" form-control" id="name" name="name" th:value="${style==null?'':style.name}" type="text" />
 										    </div>
 										</div>
+										<div class="form-group ">
+										    <label for="seqnum" class="control-label col-lg-2">Display Sequence </label>
+										    <div class="col-lg-10">
+										        <select class="form-control" id="seqnum" name="seqnum">
+										        	<option th:each="i:${#numbers.sequence(1, 9)}" th:value="${i}" th:text="${i}" th:selected="${style!=null and style.seqnum==(''+i)}"></option>
+										        </select>
+										    </div>
+										</div>
 										<div class="form-group">
 										    <div class="col-lg-offset-2 col-lg-10">
 										        <button class="btn btn-primary" type="submit"> Save </button>

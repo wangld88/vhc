@@ -11,6 +11,8 @@ public interface ShippingmethodRepository extends CrudRepository<Shippingmethod,
 
 	Shippingmethod findByShipmethodid(long shipmethodid);
 
+	List<Shippingmethod> findByNameIgnoreCaseLike(String name);
+
 	List<Shippingmethod> findAll();
 
 }

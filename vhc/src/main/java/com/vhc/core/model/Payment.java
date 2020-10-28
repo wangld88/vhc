@@ -47,7 +47,7 @@ public class Payment implements Serializable {
 	@ApiObjectField(description="Payment amount", format="Not Null", required=true)
 	private BigDecimal amount;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=false)
 	@ApiObjectField(description="Payment's creation date", format="Not Null", required=true)
 	private Calendar creationdate;
@@ -64,6 +64,11 @@ public class Payment implements Serializable {
 
 	@OneToMany(cascade={javax.persistence.CascadeType.ALL}, mappedBy="payment", fetch=FetchType.LAZY)
 	private List<Paymentdetail> paymentdetails;
+
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="statusid")
+	@ApiObjectField(description="Payment Status", required=true)
+	private Status status;
 
 	/*@Column(name="creditamount", precision=13, scale=2)
 	@ApiObjectField(description="Payment through credit card", required=false)
@@ -154,6 +159,16 @@ public class Payment implements Serializable {
 
 	public void setPaymentdetails(List<Paymentdetail> paymentdetails) {
 		this.paymentdetails = paymentdetails;
+	}
+
+
+	public Status getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 
 

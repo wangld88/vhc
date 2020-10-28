@@ -35,7 +35,7 @@ public class Inventory implements Serializable {
 	@ApiObjectField(description="Quantity", required=false)
 	private long quantity;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="receivedby")
 	@ApiObjectField(description="Received by User", required=true)
 	private User receivedby;
@@ -44,7 +44,7 @@ public class Inventory implements Serializable {
 	@ApiObjectField(description="Receiving date", required=false)
 	private Calendar receivedate;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="sentby")
 	@ApiObjectField(description="Sent by User", required=true)
 	private User sentby;
@@ -58,26 +58,30 @@ public class Inventory implements Serializable {
 	@ApiObjectField(description="Comment notes", format="maxlength = 600", required=false)
 	private String comments;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="storeid")
 	@ApiObjectField(description="Unique Store", required=true)
 	private Store store;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="itemid")
 	@ApiObjectField(description="Unique Item", required=true)
 	private Item item;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="statusid")
 	@ApiObjectField(description="Unique Status", required=true)
 	private Status status;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="locationid")
 	@ApiObjectField(description="Unique Location", required=true)
 	private Location location;
 
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="deststoreid")
+	@ApiObjectField(description="Unique Store", required=false)
+	private Store deststore;
 
 	public Inventory() {
 
@@ -169,6 +173,14 @@ public class Inventory implements Serializable {
 
 	public void setLocation(Location location) {
 		this.location = location;
+	}
+
+	public Store getDeststore() {
+		return deststore;
+	}
+
+	public void setDeststore(Store deststore) {
+		this.deststore = deststore;
 	}
 
 }

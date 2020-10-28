@@ -28,37 +28,37 @@ public class Store implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "storeid", updatable = false, nullable = false)
 	private long storeid;
-	
+
 	@Column(nullable=false, unique=true, length=200)
 	@Size(max=200)
 	@ApiObjectField(description="Store's Name", format="Not Null, maxlength = 200", required=true)
 	private String name;
-	
+
 	@Column(nullable=false, unique=true, length=20)
 	@Size(max=20)
 	@ApiObjectField(description="Store's Name", format="Not Null, maxlength = 20", required=true)
 	private String code;
-	
+
 	@Column(nullable=true, length=50)
 	@Size(max=50)
 	@ApiObjectField(description="Store's Contact Name", format="maxlength = 50", required=false)
 	private String contact;
-	
+
 	@Column(nullable=true, length=30)
 	@Size(max=30)
 	@ApiObjectField(description="Phone Number", format="maxlength = 30", required=false)
 	private String phone;
-	
+
 	@Column(nullable=true, length=30)
 	@Size(max=30)
 	@ApiObjectField(description="Mobile Number", format="maxlength = 30", required=false)
 	private String mobile;
-	
+
 	@Column(nullable=true, length=50)
 	@Size(max=50)
 	@ApiObjectField(description="Email Address", format="maxlength = 50", required=false)
 	private String email;
-	
+
 	@Column(nullable=true, length=100)
 	@Size(max=100)
 	@ApiObjectField(description="Web Site", format="maxlength = 100", required=false)
@@ -68,12 +68,12 @@ public class Store implements Serializable {
 	@Size(max=100)
 	@ApiObjectField(description="Facebook", format="maxlength = 100", required=false)
 	private String facebook;
-	
+
 	@Column(nullable=true, length=100)
 	@Size(max=100)
 	@ApiObjectField(description="Facebook", format="maxlength = 100", required=false)
 	private String google;
-	
+
 	@Column(nullable=true, length=100)
 	@Size(max=100)
 	@ApiObjectField(description="Facebook", format="maxlength = 100", required=false)
@@ -84,16 +84,16 @@ public class Store implements Serializable {
 	@ApiObjectField(description="Web Site", format="maxlength = 600", required=false)
 	private String comments;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="addressid")
 	@ApiObjectField(description="Unique Address", format="Not Null", required=false)
 	private Address address;
 
-	
+
 	public Store() {
-		
+
 	}
-	
+
 	public long getStoreid() {
 		return storeid;
 	}

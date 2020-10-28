@@ -64,7 +64,7 @@ public class Recipient implements Serializable {
 	@ApiObjectField(description="Recipient's Cell", format="Not Null, maxlength = 20", required=true)
 	private String cell;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=false)
 	@ApiObjectField(description="Recipient's creationdate", format="Not Null", required=true)
 	private Calendar creationdate;
@@ -74,7 +74,7 @@ public class Recipient implements Serializable {
 	@ApiObjectField(description="Created Recipient", required=true)
 	private Customer createdby;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=true)
 	@ApiObjectField(description="Recipient's update date", required=false)
 	private Calendar updatedate;

@@ -32,6 +32,11 @@ public class Style implements Serializable {
 	@ApiObjectField(description="Unique name", format="Not Null, maxlength = 100", required=false)
 	private String name;
 
+	@Column(nullable=true, length=1)
+	@Size(max=1)
+	@ApiObjectField(description="Sequence number", format="maxlength = 1", required=false)
+	private String seqnum;
+
 
 	public Style() {
 
@@ -53,4 +58,11 @@ public class Style implements Serializable {
 		this.name = name;
 	}
 
+	public String getSeqnum() {
+		return seqnum;
+	}
+
+	public void setSeqnum(String seqnum) {
+		this.seqnum = seqnum;
+	}
 }

@@ -67,7 +67,7 @@ public class Brand implements Serializable {
 	@ApiObjectField(description="Comment notes", format="maxlength = 600", required=false)
 	private String comments;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="addressid")
 	@ApiObjectField(description="Unique Address", format="Not Null", required=false)
 	private Address address;
@@ -75,6 +75,11 @@ public class Brand implements Serializable {
 	@Column(nullable=true)
 	@Lob
 	private Blob image;
+
+	@Column(nullable=true, length=1)
+	@Size(max=1)
+	@ApiObjectField(description="Flag of website display", format="maxlength = 1", required=false)
+	private String display;
 
 
 	public Brand() {
@@ -159,6 +164,14 @@ public class Brand implements Serializable {
 
 	public void setImage(Blob image) {
 		this.image = image;
+	}
+
+	public String getDisplay() {
+		return display;
+	}
+
+	public void setDisplay(String display) {
+		this.display = display;
 	}
 
 }

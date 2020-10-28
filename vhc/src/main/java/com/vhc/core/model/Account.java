@@ -33,7 +33,7 @@ public class Account implements Serializable {
 	@Column(name = "accountid", updatable = false, nullable = false)
 	private long accountid;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=false)
 	@ApiObjectField(description="User's creationdate", format="Not Null", required=true)
 	private Calendar creationdate;

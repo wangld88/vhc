@@ -2,18 +2,27 @@ package com.vhc.core.repository;
 
 import java.util.List;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
+import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
+import org.springframework.data.jpa.datatables.repository.DataTablesRepository;
+import org.springframework.data.jpa.repository.Query;
+//import org.springframework.data.repository.CrudRepository;
 
 import com.vhc.core.model.Item;
 
 
-public interface ItemRepository extends CrudRepository<Item, Long> {
+public interface ItemRepository extends DataTablesRepository<Item, Long> {
 
 	public Item findByItemid(long itemid);
 
-	public List<Item> findAllByOrderByItemidDesc();
+	public DataTablesOutput<Item> findAll(DataTablesInput input);
 
 	public List<Item> findAll();
+
+	public List<Item> findAllByOrderByItemidDesc();
+
+	@Query("SELECT i FROM Item i RIGHT OUTER JOIN i.inventories iv WHERE iv.status.statusid != 3 Order By i.itemid Desc")
+	public List<Item> findAllAvailables();
 
 	public List<Item> findByProduct_nameIgnoreCaseLikeOrderByItemidDesc(String name);
 

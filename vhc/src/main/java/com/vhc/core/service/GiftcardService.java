@@ -24,12 +24,17 @@ public class GiftcardService {
 
 	@Transactional(readOnly=true)
 	public List<Giftcard> getAll() {
-		return giftcardRepository.findAll();
+		return giftcardRepository.findAllByOrderByCode();
 	}
 
 	@Transactional(readOnly=true)
 	public Giftcard getByCode(String code) {
 		return giftcardRepository.findByCode(code);
+	}
+
+	@Transactional(readOnly=true)
+	public List<Giftcard> getByCodeContain(String code) {
+		return giftcardRepository.findByCodeContainingOrderByCode(code);
 	}
 
 	@Transactional(readOnly=true)

@@ -30,6 +30,13 @@ public class ShippingmethodService {
 	}
 
 
+	public List<Shippingmethod> getByName(String name) {
+
+		return shippingmethodRepository.findByNameIgnoreCaseLike(name);
+
+	}
+
+
 	@Transactional(rollbackFor=Exception.class)
 	public Shippingmethod save(Shippingmethod shippingmethod) {
 

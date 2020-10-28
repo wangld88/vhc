@@ -42,82 +42,91 @@ public class Product implements Serializable {
 	@Column(name = "productid", updatable = false, nullable = false)
 	private long productid;
 
-	@Column(nullable=false, unique=true, length=200)
+	@Column(name="name", nullable=false, unique=true, length=200)
 	@Size(max=200)
 	@ApiObjectField(description="Manufacture's Name", format="Not Null, maxlength = 200", required=true)
 	private String name;
 
-	@Column(nullable=true, length=40)
+	@Column(name="modelnum", nullable=true, length=40)
 	@Size(max=40)
 	@ApiObjectField(description="Model Number", format="maxlength = 40", required=false)
 	private String modelnum;
 
-	@Column(nullable=true, length=50)
+	@Column(name="upc", nullable=true, length=50)
 	@Size(max=50)
 	@ApiObjectField(description="Universal Product Code", format="maxlength = 50", required=false)
 	private String upc;
 
-	@Column(nullable=true, length=400)
+	@Column(name="description", nullable=true, length=400)
 	@Size(max=400)
 	@ApiObjectField(description="Description", format="maxlength = 400", required=false)
 	private String description;
 
-	@Column(nullable=true, length=10, columnDefinition="Decimal(6,2)")
+	@Column(name="wholesale", nullable=true, length=10, columnDefinition="Decimal(6,2)")
 	@ApiObjectField(description="Wholesale price", format="maxlength = 10", required=false)
 	private BigDecimal wholesale;
 
-	@Column(nullable=true, length=10, columnDefinition="Decimal(6,2)")
+	@Column(name="retail", nullable=true, length=10, columnDefinition="Decimal(6,2)")
 	@ApiObjectField(description="Retail price", format="maxlength = 10", required=false)
 	private BigDecimal retail;
 
-	@Column(nullable=true, length=10, columnDefinition="Decimal(6,2)")
+	@Column(name="clinic", nullable=true, length=10, columnDefinition="Decimal(6,2)")
 	@ApiObjectField(description="Clinic price", format="maxlength = 10", required=false)
 	private BigDecimal clinic;
 
-	@Column(nullable=true, length=10, columnDefinition="Decimal(6,2)")
+	@Column(name="onsale", nullable=true, length=10, columnDefinition="Decimal(6,2)")
 	@ApiObjectField(description="On Sale price", format="maxlength = 10", required=false)
 	private BigDecimal onsale;
 
-	@Column(nullable=true)
+	@Column(name="points", nullable=true)
 	@ApiObjectField(description="Bonus points", required=false)
 	private Long points;
 
-	@Column(nullable=true, length=80)
+	@Column(name="material", nullable=true, length=80)
 	@Size(max=80)
 	@ApiObjectField(description="Material", format="maxlength = 80", required=false)
 	private String material;
 
-	@Column(nullable=true, length=1)
+	@Column(name="storefront", nullable=true, length=1)
 	@Size(max=1)
 	@ApiObjectField(description="Flag of Store Front", format="maxlength = 1", required=false)
 	private String storefront;
 
-	@Column(nullable=true, length=1)
+	@Column(name="display", nullable=true, length=1)
 	@Size(max=1)
 	@ApiObjectField(description="Flag of website display", format="maxlength = 1", required=false)
 	private String display;
 
-	@Column(nullable=true, length=600)
+	@Column(name = "comments", nullable=true, length=600)
 	@Size(max=600)
 	@ApiObjectField(description="Commnents", format="maxlength = 600", required=false)
 	private String comments;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@Column(name = "tax",nullable=true)
+	@ApiObjectField(description="Tax", required=false)
+	private Long tax;
+
+	@Column(name="seqnum", nullable=true, length=1)
+	@Size(max=1)
+	@ApiObjectField(description="Sequence number", format="maxlength = 1", required=false)
+	private String seqnum;
+
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="brandid")
 	@ApiObjectField(description="Unique Brand", required=true)
 	private Brand brand;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="typeid")
 	@ApiObjectField(description="Product Type", required=true)
 	private Type type;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="colorid")
 	@ApiObjectField(description="Product Color", required=true)
 	private Color color;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="styleid")
 	@ApiObjectField(description="Style", required=false)
 	private Style style;
@@ -287,6 +296,22 @@ public class Product implements Serializable {
 
 	public void setDisplay(String display) {
 		this.display = display;
+	}
+
+	public Long getTax() {
+		return tax;
+	}
+
+	public void setTax(Long tax) {
+		this.tax = tax;
+	}
+
+	public String getSeqnum() {
+		return seqnum;
+	}
+
+	public void setSeqnum(String seqnum) {
+		this.seqnum = seqnum;
 	}
 
 	public List<Category> getCategories() {

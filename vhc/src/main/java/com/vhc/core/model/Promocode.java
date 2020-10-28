@@ -46,12 +46,12 @@ public class Promocode implements Serializable {
 	@ApiObjectField(description="Promotion description", format="maxlength = 200", required=false)
 	private String description;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=false)
 	@ApiObjectField(description="Promotion start date", format="Not Null", required=true)
 	private Calendar startdate;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=false)
 	@ApiObjectField(description="Promotion code expiration date", format="Not Null", required=true)
 	private Calendar enddate;

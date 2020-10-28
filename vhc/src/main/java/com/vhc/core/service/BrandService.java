@@ -32,6 +32,11 @@ public class BrandService {
 	}
 
 	@Transactional(readOnly=true)
+	public List<Brand> getAllDisplay() {
+		return brandRepository.findAllByDisplayNotNullOrderByName();
+	}
+
+	@Transactional(readOnly=true)
 	public List<Brand> getByName(String name) {
 		return brandRepository.findByNameIgnoreCaseLikeOrderByName(name);
 	}

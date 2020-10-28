@@ -107,8 +107,10 @@ public class PrintEngine implements Printable {
 				subTotal = subTotal.add(p.getRetail());
 				g.drawString(getSpace(p.getName(),"$"+p.getRetail().toPlainString(),fontMetrics), 0, line);
 				line += 20;
+				tax = tax.add(p.getRetail().multiply(new BigDecimal(p.getTax())).divide(new BigDecimal("100")));
 			}
-			tax = tax.add(subTotal).multiply(new BigDecimal("0.13"));
+
+			//tax = tax.add(subTotal).multiply(new BigDecimal(p.getProduct().getTax()));
 			tax = tax.setScale(2, BigDecimal.ROUND_HALF_UP);
 			total = total.add(subTotal).add(tax);
 			g.drawString(getSpace("Sub-Total:","$"+subTotal.toPlainString(),fontMetrics), 0, line);

@@ -43,7 +43,7 @@ public class Giftcard implements Serializable {
 	@ApiObjectField(description="Card's pin", format="maxlength = 20", required=false)
 	private String pin;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=false)
 	@ApiObjectField(description="Card's load date", format="Not Null", required=true)
 	private Calendar loaddate;
@@ -70,6 +70,11 @@ public class Giftcard implements Serializable {
 	@JoinColumn(name="statusid")
 	@ApiObjectField(description="Gift card Status", required=true)
 	private Status status;
+
+	@Column(nullable=true, length=800)
+	@Size(max=800)
+	@ApiObjectField(description="Comment notes", format="maxlength = 800", required=false)
+	private String comments;
 
 
 	public Giftcard() {
@@ -146,6 +151,14 @@ public class Giftcard implements Serializable {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	public String getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = comments;
 	}
 
 }

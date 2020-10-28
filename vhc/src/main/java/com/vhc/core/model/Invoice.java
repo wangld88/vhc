@@ -50,7 +50,7 @@ public class Invoice implements Serializable {
 	@ApiObjectField(description="Invoice Order", required=true)
 	private Order order;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=false)
 	@ApiObjectField(description="Invoice's creation date", format="Not Null", required=true)
 	private Calendar creationdate;

@@ -72,10 +72,15 @@ public class Paymentdetail implements Serializable {
 	@ApiObjectField(description="Payment transaction result/no.", format="maxlength = 100", required=false)
 	private String trxnum;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=false)
 	@ApiObjectField(description="Payment date", format="Not Null", required=true)
 	private Calendar paydate;
+
+	@Column(nullable=true, length=4000)
+	@Size(max=4000)
+	@ApiObjectField(description="Payment transaction response content", format="maxlength = 4000", required=false)
+	private String content;
 
 
 	public Paymentdetail() {
@@ -162,5 +167,12 @@ public class Paymentdetail implements Serializable {
 		this.backchange = backchange;
 	}
 
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
 
 }

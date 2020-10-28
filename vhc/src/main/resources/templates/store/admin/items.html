@@ -25,8 +25,8 @@
 
 		<section class="content-header">
 			<h1>
-				Inventory Management
-				<small>List Items</small>
+				List Items
+				<small>Inventory Management</small>
 			</h1>
 			<ol class="breadcrumb">
 				<li><a th:href="@{/store/admin/home}"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -40,7 +40,7 @@
 				<div class="col-lg-12">
 					<div class="box">
 						<div class="box-header">
-							<h3 class="box-title">All Items</h3> <span style="width: 240px;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <a th:href="@{/store/admin/item}" title="Add New Item"><i class="fa fa-plus-square"></i></a>
+							<h3 class="box-title">All Items</h3> <span style="width: 240px;">&nbsp;&nbsp;&nbsp;&nbsp;<!-- </span> <a th:href="@{/store/admin/item}" title="Add New Item"><i class="fa fa-plus-square"></i></a> -->
 						</div>
 						<div class="box-body" id="top">
 
@@ -61,11 +61,11 @@
 										<th><i class="icon_pin_alt"></i> Received By</th> -->
 										<th><i class="icon_contacts_alt"></i> Received Date</th>
 										<th> Inventory</th>
-										<th> Location</th>
+										<!-- <th> Location</th> -->
 									</tr>
 								</thead>
 								<tbody>
-									<tr th:each="mf:${items}" th:if="${mf.inventories!=null and mf.inventories.size()>0 and mf.inventories.get(0).status.statusid!=3}">
+									<tr th:each="mf:${items}" th:if="${mf.inventories!=null and mf.inventories.size()>0 and mf.inventories.get(0).status!=null and mf.inventories.get(0).status.statusid!=3}">
 										<td>
 											<div class="btn-group">
 												<!-- <a class="btn btn-primary" th:href="@{/admin/item}" title="Add New Item"><i class="icon_plus_alt2"></i></a> -->
@@ -84,9 +84,9 @@
 										<!-- <td th:text="${mf.purchaseorder!=null?mf.purchaseorder.code:''}"></td>
 										<td th:text="${mf.shipment!=null?mf.shipment.code:''}"></td>
 										<td th:text="${mf.receivedby!=null?mf.receivedby.firstname+' '+mf.receivedby.lastname:''}"></td> -->
-										<td th:text="${#calendars.format(mf.receivedate,'dd MMM yyyy')}"></td>
-										<td th:text="${mf.inventories!=null and mf.inventories.size()>0?'Y':'N'}"></td>
-										<td th:text="${mf.inventories!=null and mf.inventories.size()>0 and mf.inventories.get(0).location!=null?mf.inventories.get(0).location.name:''}"></td>
+										<td th:text="${mf.creationdate!=null?#calendars.format(mf.creationdate,'dd MMM yyyy'):''}"></td>
+										<td th:text="${mf.inventories!=null and mf.inventories.size()>0?mf.inventories.get(0).store.name:'N'}"></td>
+										<!-- <td th:text="${mf.inventories!=null and mf.inventories.size()>0 and mf.inventories.get(0).location!=null?mf.inventories.get(0).location.name:''}"></td> -->
 									</tr>
 								</tbody>
 							</table>

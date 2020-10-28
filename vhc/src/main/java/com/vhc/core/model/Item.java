@@ -20,6 +20,11 @@ import javax.validation.constraints.Size;
 
 import org.jsondoc.core.annotation.ApiObjectField;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 @Entity
 @Table(name="ITEMS")
@@ -31,7 +36,7 @@ public class Item implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "itemid", updatable = false, nullable = false)
-	private long itemid;
+	private Long itemid;
 
 	@Column(nullable=true, length=20)
 	@Size(max=20)
@@ -39,12 +44,10 @@ public class Item implements Serializable {
 	private String sku;
 
 	@Column(nullable=true, length=10, columnDefinition="Decimal(6,2)")
-	//@Size(max=10)
 	@ApiObjectField(description="cost", format="maxlength = 10", required=false)
 	private double cost;
 
 	@Column(nullable=true, length=10, columnDefinition="Decimal(6,2)")
-	//@Size(max=10)
 	@ApiObjectField(description="price", format="maxlength = 10", required=false)
 	private double price;
 
@@ -52,23 +55,23 @@ public class Item implements Serializable {
 	@ApiObjectField(description="Quantity", required=false)
 	private long quantity;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="receivedby")
-	@ApiObjectField(description="Receive User", required=true)
+	@ApiObjectField(description="Received by User", required=true)
+	@JsonManagedReference
 	private User receivedby;
 
 	@Column(nullable=true, length=10)
-	//@Size(max=10)
 	@ApiObjectField(description="receivedate", format="maxlength = 10", required=false)
 	private Calendar receivedate;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="sentby")
-	@ApiObjectField(description="Sent User", required=true)
+	@ApiObjectField(description="Sent by User", required=true)
+	@JsonManagedReference
 	private User sentby;
 
 	@Column(nullable=true, length=10)
-	//@Size(max=10)
 	@ApiObjectField(description="senddate", format="maxlength = 10", required=false)
 	private Calendar senddate;
 
@@ -77,28 +80,43 @@ public class Item implements Serializable {
 	@ApiObjectField(description="Web Site", format="maxlength = 600", required=false)
 	private String comments;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="productid")
 	@ApiObjectField(description="Unique Product", required=true)
+	@JsonManagedReference
 	private Product product;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="sizeid")
 	@ApiObjectField(description="Product Size", required=true)
+	@JsonManagedReference
 	private com.vhc.core.model.Size size;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="shipmentid")
 	@ApiObjectField(description="Unique Shipment", required=true)
+	@JsonManagedReference
 	private Shipment shipment;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="poid")
 	@ApiObjectField(description="Unique Purchase Order", required=true)
+	@JsonManagedReference
 	private Purchaseorder purchaseorder;
 
+	@JsonIgnore
 	@OneToMany(cascade={javax.persistence.CascadeType.ALL}, mappedBy="item", fetch=FetchType.LAZY)
 	private List<Inventory> inventories = new ArrayList<>();
+
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="createdby")
+	@ApiObjectField(description="Created by User", required=true)
+	@JsonManagedReference
+	private User createdby;
+
+	@Column(nullable=true, length=10)
+	@ApiObjectField(description="creationdate", format="maxlength = 10", required=false)
+	private Calendar creationdate;
 
 	/*@OneToOne(targetEntity = Orderitem.class, fetch=FetchType.EAGER)
 	@JoinColumn(nullable = false, name="orderitemid")
@@ -108,11 +126,11 @@ public class Item implements Serializable {
 	public Item() {
 	}
 
-	public long getItemid() {
+	public Long getItemid() {
 		return itemid;
 	}
 
-	public void setItemid(long itemid) {
+	public void setItemid(Long itemid) {
 		this.itemid = itemid;
 	}
 
@@ -227,6 +245,22 @@ public class Item implements Serializable {
 
 	public void setInventories(List<Inventory> inventories) {
 		this.inventories = inventories;
+	}
+
+	public User getCreatedby() {
+		return createdby;
+	}
+
+	public void setCreatedby(User createdby) {
+		this.createdby = createdby;
+	}
+
+	public Calendar getCreationdate() {
+		return creationdate;
+	}
+
+	public void setCreationdate(Calendar creationdate) {
+		this.creationdate = creationdate;
 	}
 
 	/*public Orderitem getOrderitem() {

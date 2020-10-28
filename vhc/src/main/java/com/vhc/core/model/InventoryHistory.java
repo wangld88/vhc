@@ -83,9 +83,29 @@ public class InventoryHistory implements Serializable {
 	@ApiObjectField(description="Unique Location", required=true)
 	private Location location;
 
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="deststoreid")
+	@ApiObjectField(description="Unique Store", required=false)
+	private Store deststore;
+
 
 	public InventoryHistory() {
 
+	}
+
+	public InventoryHistory(Inventory inventory) {
+		this.inventory = inventory;
+		this.item = inventory.getItem();
+		this.store = inventory.getStore();
+		this.location = inventory.getLocation();
+		this.status = inventory.getStatus();
+		this.quantity = inventory.getQuantity();
+		this.sentby = inventory.getSentby();
+		this.senddate = inventory.getSenddate();
+		this.receivedby = inventory.getReceivedby();
+		this.receivedate = inventory.getReceivedate();
+		this.comments = inventory.getComments();
+		this.deststore = inventory.getDeststore();
 	}
 
 	public Inventory getInventory() {
@@ -182,6 +202,14 @@ public class InventoryHistory implements Serializable {
 
 	public void setHistoryid(long historyid) {
 		this.historyid = historyid;
+	}
+
+	public Store getDeststore() {
+		return deststore;
+	}
+
+	public void setDeststore(Store deststore) {
+		this.deststore = deststore;
 	}
 
 }

@@ -1,7 +1,9 @@
 package com.vhc.core.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,10 +14,15 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import org.jsondoc.core.annotation.ApiObjectField;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
 @Entity
@@ -67,6 +74,9 @@ public class Purchaseorder implements Serializable {
 	@ApiObjectField(description="Unique Supplier", required=true)
 	private Supplier supplier;
 
+	@OneToMany(cascade={javax.persistence.CascadeType.ALL}, mappedBy="purchaseorder", fetch=FetchType.LAZY)
+	@JsonBackReference
+	private List<Item> items = new ArrayList<>();
 
 	public Purchaseorder() {
 
@@ -144,6 +154,14 @@ public class Purchaseorder implements Serializable {
 
 	public void setExpectdate(Calendar expectdate) {
 		this.expectdate = expectdate;
+	}
+
+	public List<Item> getItems() {
+		return items;
+	}
+
+	public void setItems(List<Item> items) {
+		this.items = items;
 	}
 
 }

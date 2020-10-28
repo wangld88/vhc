@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.vhc.core.model;
 
@@ -33,11 +33,11 @@ public class Size implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "sizeid", updatable = false, nullable = false)
 	private long sizeid;
-	
+
 	@Column(nullable=false, unique=true, length=20)
 	@ApiObjectField(description="size num", format="Not Null, maxlength = 20", required=true)
 	private String sizenum;
-	
+
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="typeid")
 	@ApiObjectField(description="Product Type", required=true)
@@ -48,11 +48,11 @@ public class Size implements Serializable {
 	@ApiObjectField(description="Region", required=true)
 	private Region region;
 
-	
+
 	public Size() {
-		
+
 	}
-	
+
 	public long getSizeid() {
 		return sizeid;
 	}

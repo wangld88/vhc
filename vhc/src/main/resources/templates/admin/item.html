@@ -91,7 +91,8 @@
 										    <label for="shipmentid" class="control-label col-lg-2">Shipment </label>
 										    <div class="col-lg-10">
 												<select class="form-control" id="shipmentid" name="shipmentid">
-													<option th:each="shipment: ${shipments}" th:value="${shipment.shipmentid}" th:text="${shipment.code}" th:selected="${item==null?'':(item.shipment.shipmentid.equals(shipment.shipmentid)?'Selected':'')}"></option>
+													<option value="0"></option>
+													<option th:each="shipment: ${shipments}" th:value="${shipment.shipmentid}" th:text="${shipment.code}" th:selected="${item==null or item.shipment==null?'':(item.shipment.shipmentid.equals(shipment.shipmentid)?'Selected':'')}"></option>
 												</select>
 										    </div>
 										</div>
@@ -104,7 +105,7 @@
 										<div class="form-group">
 										    <div class="col-lg-offset-2 col-lg-10">
 										        <button class="btn btn-primary" type="submit"> Save </button>
-										        <button class="btn btn-default" type="button"></button>
+										        <button class="btn btn-default" type="button">Cancel</button>
 										        <input type="hidden" id="itemid" name="itemid" th:value="${item==null?'':item.itemid}" />
 										        <input type="hidden" th:if="${shipments!=null} and ${shipments.size()}==1" id="rtn_shipmentid" name="rtn_shipmentid" th:value="${shipments.get(0).shipmentid}" />
 										    </div>
@@ -186,10 +187,12 @@
 			    var token = $("meta[name='_csrf']").attr("content");
 			    var header = $("meta[name='_csrf_header']").attr("content");
 			    var dialog, form;
+				console.log($().jquery)
+				//console.log(jQ3().jquery)
 
 				$( "#prodname" ).autocomplete({
 					source: function (request, response) {
-	                    $.ajax({
+						$.ajax({
 	                        url: 'products?name='+document.getElementById("prodname").value,
 	                        dataType: "json",
 	                        type: "POST",
@@ -213,11 +216,12 @@
 	                    });
 	                },
 	                select: function(v,u) {
-	                	/* out = "";
+	                	out = "";
 	                	for(i in u.item) {
 	                		out += i + ":" +u.item[i]+"\n"
 	                	}
-	                	console.log(out); */
+	                	console.log(out);
+
 	                	$("#typeid")[0].value = u.item.type;
 	                }
 				});

@@ -23,6 +23,8 @@ import javax.validation.constraints.Size;
 
 import org.jsondoc.core.annotation.ApiObjectField;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name="ORDERS")
@@ -36,27 +38,27 @@ public class Order implements Serializable {
 	@Column(name = "orderid", updatable = false, nullable = false)
 	private long orderid;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="customerid")
 	@ApiObjectField(description="Unique Status", required=true)
 	private Customer customer;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="storeid")
 	@ApiObjectField(description="Unique Store", required=true)
 	private Store store;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="staffid")
 	@ApiObjectField(description="Staff on this order", required=true)
 	private Staff staff;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=false)
 	@ApiObjectField(description="User's creationdate", format="Not Null", required=true)
 	private Calendar creationdate;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="createdby")
 	@ApiObjectField(description="Created User", required=true)
 	private User createdby;
@@ -73,22 +75,32 @@ public class Order implements Serializable {
 	@OneToMany(cascade={CascadeType.ALL}, mappedBy="order", fetch=FetchType.LAZY)
 	private List<Orderitem> orderitems;
 
+	@JsonIgnore
 	@OneToMany(cascade={CascadeType.ALL}, mappedBy="order", fetch=FetchType.LAZY)
 	private List<Invoice> invoices;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = true, name = "shipmethodid")
 	private Shippingmethod shippingmethod;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="recipientid")
 	@ApiObjectField(description="Unique Recipient", format="Not Null", required=false)
 	private Recipient recipient;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="statusid")
 	@ApiObjectField(description="Order Status", required=true)
 	private Status status;
+
+	@Column(name="discount", precision=13, scale=2)
+	@ApiObjectField(description="Order discount", format="Not Null", required=true)
+	private BigDecimal discount;
+
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="promocodeid")
+	@ApiObjectField(description="Promotion code", required=false)
+	private Promocode promocode;
 
 
 	public Order() {
@@ -197,6 +209,22 @@ public class Order implements Serializable {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	public BigDecimal getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(BigDecimal discount) {
+		this.discount = discount;
+	}
+
+	public Promocode getPromocode() {
+		return promocode;
+	}
+
+	public void setPromocode(Promocode promocode) {
+		this.promocode = promocode;
 	}
 
 }

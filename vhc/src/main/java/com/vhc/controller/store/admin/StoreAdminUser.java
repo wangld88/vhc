@@ -107,8 +107,8 @@ public class StoreAdminUser extends StoreBase {
 		return "store/admin/addCustomer";
 	}
 
-	@RequestMapping(method={RequestMethod.POST}, value={"/addCustomer"})
-	public String doCustomer(@RequestParam Map<String,String> requestParams,
+	@RequestMapping(method={RequestMethod.POST}, value={"/addCustomer1"})
+	public String doCustomer1(@RequestParam Map<String,String> requestParams,
 						ModelMap model,
 						RedirectAttributes attributes,
 						HttpSession httpSession) {

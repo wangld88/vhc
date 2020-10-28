@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html layout:decorator="admin/layout/layout">
+	<div layout:fragment="content">
+
+		<section id="main-content">
+			<section class="wrapper">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Setting Management</h3>
+						<ol class="breadcrumb">
+							<li><i class="fa fa-home"></i><a th:href="@{/admin/home}">Home</a></li>
+							<li><i class="icon_document_alt"></i>Settings</li>
+							<li><i class="fa fa-file-text-o"></i><span th:text="${size==null?'New Size':'Modify Size'}"></span></li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+						<section class="panel">
+							<header class="panel-heading">
+								Style
+							</header>
+
+							<div class="panel-body">
+								<div class="form">
+									<form class="form-validate form-horizontal " id="size" name="size" method="post" th:action="@{/admin/size}">
+										<div class="form-group">
+										    <label for="name" class="control-label col-lg-2">Number <span class="required">*</span></label>
+										    <div class="col-lg-10">
+										        <input class=" form-control" id="sizenum" name="sizenum" th:value="${size==null?'':size.sizenum}" type="text" />
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="typeid" class="control-label col-lg-2">Type </label>
+										    <div class="col-lg-10">
+										        <select class="form-control" id="typeid" name="typeid">
+										        	<option th:each="type:${types}" th:value="${type.typeid}" th:text="${type.name}" th:selected="${size!=null and size.type.typeid==type.typeid}"></option>
+										        </select>
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="regionid" class="control-label col-lg-2">Region </label>
+										    <div class="col-lg-10">
+										        <select class="form-control" id="regionid" name="regionid">
+										        	<option th:each="region:${regions}" th:value="${region.regionid}" th:text="${region.name}" th:selected="${size!=null and size.region.regionid==region.regionid}"></option>
+										        </select>
+										    </div>
+										</div>
+										<div class="form-group">
+										    <div class="col-lg-offset-2 col-lg-10">
+										        <button class="btn btn-primary" type="submit"> Save </button>
+										        <a th:href="@{/admin/sizes}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+										        <input type="hidden" id="sizeid" name="sizeid" th:value="${size==null?'':size.sizeid}" />
+										    </div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</section>
+					</div>
+				</div>
+			</section>
+		</section>
+      <!--main content end-->
+	</div>
+</html>

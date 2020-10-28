@@ -38,7 +38,7 @@ public class Passwordtoken implements Serializable {
 	@Column(name = "passwordtokenid", updatable = false, nullable = false)
 	private long passwordtokenid;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date expirydate;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html layout:decorator="admin/layout/layout">
+	<div layout:fragment="content">
+
+		<section id="main-content">
+			<section class="wrapper">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Resource Management</h3>
+						<ol class="breadcrumb">
+							<li><i class="fa fa-home"></i><a th:href="@{/admin/home}">Home</a></li>
+							<li><i class="icon_document_alt"></i>Resources</li>
+							<li><i class="fa fa-file-text-o"></i><span th:text="${template==null?'New Template':'Modify Template'}"></span></li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+						<section class="panel">
+							<header class="panel-heading">
+								Email Template
+							</header>
+
+							<div class="panel-body">
+								<div class="form">
+									<p>The field with (*) is mandatory.</p>
+
+									<div class="col-lg-8 col-sm-4" th:if="${message != null and #strings.length(message.message) != 0}" th:class="${message.status}">
+										<font style="font-size: 12px;"><span th:utext="${message.message}" th:remove="tag" /></font>
+									</div>
+
+									<form class="form-horizontal" id="org" th:action="@{/admin/template}" method="post" th:object="${templateForm}">
+										<div class="form-group">
+											<label for="subject" class="control-label col-lg-2">Subject <span class="required">*</span></label>
+											<div class="col-lg-8 col-sm-4">
+												<input type="text" th:field="*{subject}" class="form-control" placeholder="Template Subject" data-toggle="tooltip" data-placement="bottom" title="Tooltip for Template subject" autocomplete="off" />
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="description" class="control-label col-lg-2">Description <span class="required">*</span></label>
+											<div class="col-lg-8 col-sm-4">
+												<input type="text" th:field="*{description}" class="form-control" placeholder="Template Description" data-toggle="tooltip" data-placement="bottom" title="Tooltip for Template description" autocomplete="off" />
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="sender" class="control-label col-lg-2">Sender <span class="required">*</span></label>
+											<div class="col-lg-8 col-sm-4">
+												<input type="text" th:field="*{sender}" class="form-control" placeholder="Sender" data-toggle="tooltip" data-placement="bottom" title="Tooltip for Template sender" autocomplete="off" />
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="subject" class="control-label col-lg-2">Recipient <span class="required">*</span></label>
+											<div class="col-lg-8 col-sm-4">
+												<input type="text" th:field="*{recipient}" class="form-control" placeholder="Recipient" data-toggle="tooltip" data-placement="bottom" title="Tooltip for First recipient" autocomplete="off" />
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="subject" class="control-label col-lg-2">CC <span class="required">*</span></label>
+											<div class="col-lg-8 col-sm-4">
+												<input type="text" th:field="*{cc}" class="form-control" placeholder="CC" data-toggle="tooltip" data-placement="bottom" title="Tooltip for Last name" autocomplete="off" />
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="bcc" class="control-label col-lg-2">BCC <span class="required">*</span></label>
+											<div class="col-lg-8 col-sm-4">
+												<input type="text" th:field="*{bcc}" class="form-control" placeholder="Bcc" data-toggle="tooltip" data-placement="bottom" title="Tooltip for Password" autocomplete="off" />
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="textcontent" class="control-label col-lg-2">Text Content <span class="required">*</span></label>
+											<div class="col-lg-8 col-sm-4">
+												<textarea th:field="*{textcontent}" rows="8" cols="50" class="form-control" placeholder="Email Template Text Content" data-toggle="tooltip" data-placement="bottom" title="Tooltip for Text Content"></textarea>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="htmlcontent" class="control-label col-lg-2">HTML Content <span class="required">*</span></label>
+											<div class="col-lg-8 col-sm-4">
+												<textarea th:field="*{htmlcontent}" rows="8" cols="50" class="form-control" placeholder="Email Template HTML Content" data-toggle="tooltip" data-placement="bottom" title="Tooltip for HTML Content"></textarea>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="servicename" class="control-label col-lg-2">Service Name <span class="required">*</span></label>
+											<div class="col-lg-8 col-sm-4">
+												<input type="text" th:field="*{servicename}" class="form-control" placeholder="Service Name" data-toggle="tooltip" data-placement="bottom" title="Tooltip for Service Name" autocomplete="off" />
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="methodname" class="control-label col-lg-2">Method Name <span class="required">*</span></label>
+											<div class="col-lg-8 col-sm-4">
+												<!-- <input type="text" th:field="*{methodname}" class="form-control" placeholder="Method Name" data-toggle="tooltip" data-placement="bottom" title="Tooltip for Method Name" autocomplete="off" /> -->
+												<select th:field="*{methodname}" class="form-control" placeholder="Method Name" data-toggle="tooltip" data-placement="bottom" title="Tooltip for Method Name">
+													<option th:each="method : ${methodnames}" th:value="${method}" th:text="${method}"></option>
+												</select>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-lg-8 col-sm-4" style="height: 20px;">
+												<input type="hidden" th:field="*{templateid}" />
+											</div>
+											<div class="col-lg-8 col-sm-4">
+												<button type="submit" class="btn btn-primary btn-label-left">
+													<span><i class="fa fa-clock-o"></i></span>
+													Submit
+												</button>
+												<a th:href="@{/admin/templates}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
+											</div>
+										</div>
+
+									</form>
+								</div>
+							</div>
+						</section>
+					</div>
+				</div>
+			</section>
+		</section>
+      <!--main content end-->
+	</div>
+</html>

@@ -44,11 +44,15 @@
 
 		<!-- Google Font -->
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic" />
-
+		<style>
+			.has-error {
+				border: 1px solid red;
+			}
+		</style>
 	</head>
 
-	<!-- <body class="hold-transition skin-blue sidebar-mini"> --> <!-- Production -->
-	<body class="hold-transition skin-yellow-light sidebar-mini"> <!-- Test -->
+	<body class="hold-transition skin-blue sidebar-mini"> <!-- Production -->
+	<!-- <body class="hold-transition skin-yellow-light sidebar-mini"> --> <!-- Test -->
 
 		<div class="wrapper">
 
@@ -58,7 +62,7 @@
 					<!-- mini logo for sidebar mini 50x50 pixels -->
 					<span class="logo-mini"><b>V</b>HC</span>
 					<!-- logo for regular state and mobile devices -->
-					<span class="logo-lg"><b>Store</b>Admin</span>
+					<span class="logo-lg"><b><span th:text="${store!=null?store.name:'Store'}"></span></b> - Admin</span>
 				</a>
 				<!-- Header Navbar: style can be found in header.less -->
 				<nav class="navbar navbar-static-top">
@@ -70,13 +74,16 @@
 					<div class="nav navbar-nav">
  						<ul class="nav navbar-nav">
         					<li class="user user-menu">
-        						<a th:href="@{/store/admin/items}"><i class="fa fa-circle-o"></i> Items</a>
+        						<a th:href="@{/store/admin/inventories}"><i class="fa fa-circle-o"></i> Inventories</a>
         					</li>
         					<li class="user user-menu">
         						<a th:href="@{/store/admin/itemsale}"><i class="fa fa-circle-o"></i> Item Sales</a>
         					</li>
         					<li class="user user-menu">
         						<a th:href="@{/store/admin/itemreturn}"><i class="fa fa-circle-o"></i> Returns</a>
+        					</li>
+        					<li class="user user-menu">
+        						<a th:href="@{/store/admin/salesummary}"><i class="fa fa-circle-o"></i> Summary</a>
         					</li>
 						</ul>
 					</div>
@@ -386,6 +393,7 @@
 							<li th:class="${subMenu}=='purchorders'?active:''"><a th:href="@{/store/admin/purchorders}"><i class="fa fa-circle-o"></i> P.O.s</a></li>
 							<li th:class="${subMenu}=='shipments'?active:''"><a th:href="@{/store/admin/shipments}"><i class="fa fa-circle-o"></i> Shipments</a></li>
 							<li th:class="${subMenu}=='items'?active:''"><a th:href="@{/store/admin/items}"><i class="fa fa-circle-o"></i> Items</a></li>
+							<li th:class="${subMenu}=='is'?active:''"><a th:href="@{/store/admin/inventories}"><i class="fa fa-circle-o"></i> Inventories</a></li>
 						</ul>
 					</li>
 					<!-- <li class="treeview">
@@ -1291,7 +1299,10 @@
 				  'searching'   : true,
 				  'ordering'    : true,
 				  'info'        : true,
-				  'autoWidth'   : false
+				  'autoWidth'   : false,
+				  'deferRending': true
+				  //'processing'	: true,
+				  //'serverSide'	: true
 				})
 			});
 			$(function () {
@@ -1303,7 +1314,19 @@
 				  'info'        : true,
 				  'autoWidth'   : false
 				})
-			})
+			});
+			$(function () {
+				$('#mainTable2').DataTable({
+				  'paging'      : true,
+				  'lengthChange': false,
+				  'searching'   : true,
+				  'ordering'    : false,
+				  'info'        : true,
+				  'autoWidth'   : false,
+				  'deferRending': true,
+				  'order': [[ 0, "asc" ]]
+				})
+			});
 		</script>
 	</body>
 </html>

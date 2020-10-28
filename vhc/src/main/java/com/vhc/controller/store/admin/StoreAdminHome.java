@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.vhc.controller.store.StoreBase;
+import com.vhc.core.model.Staff;
+import com.vhc.core.model.Store;
 import com.vhc.core.model.User;
 import com.vhc.security.LoginUser;
 
@@ -37,11 +39,17 @@ public class StoreAdminHome extends StoreBase {
 	public String dspHome(ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Home");
 

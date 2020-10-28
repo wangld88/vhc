@@ -15,6 +15,8 @@ public interface BrandRepositroy extends CrudRepository<Brand, Long> {
 
 	public List<Brand> findAll();
 
+	public List<Brand> findAllByDisplayNotNullOrderByName();
+
 	public List<Brand> findAllByOrderByName();
 
 	public List<Brand> findByNameIgnoreCaseLikeOrderByName(String name);

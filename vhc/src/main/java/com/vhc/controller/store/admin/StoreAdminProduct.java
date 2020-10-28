@@ -40,6 +40,8 @@ import com.vhc.core.model.Color;
 import com.vhc.core.model.Image;
 import com.vhc.core.model.Inventory;
 import com.vhc.core.model.Product;
+import com.vhc.core.model.Staff;
+import com.vhc.core.model.Store;
 import com.vhc.core.model.Style;
 import com.vhc.core.model.Type;
 import com.vhc.core.model.User;
@@ -61,11 +63,17 @@ public class StoreAdminProduct extends StoreBase {
 	public String dspHome(ModelMap model) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
 
 		List<Inventory> inventories = inventoryService.getByStoreid(1);
 
@@ -100,14 +108,22 @@ public class StoreAdminProduct extends StoreBase {
 	public String dspBrands(ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		String rtn = "store/admin/brands";
 
 		List<Brand> brands = brandService.getAll();
+
 		model.addAttribute("brands", brands);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Products");
@@ -121,11 +137,18 @@ public class StoreAdminProduct extends StoreBase {
 	public String dspBrand(ModelMap model, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		String rtn = "store/admin/brand";
 
 		List<City> cities = cityService.getAll();
@@ -143,11 +166,18 @@ public class StoreAdminProduct extends StoreBase {
 	public String updateBrand(ModelMap model, @PathVariable("brandid") Long brandid, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		String rtn = "store/admin/brand";
 
 		long mfid = brandid.longValue();
@@ -177,11 +207,18 @@ public class StoreAdminProduct extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		logger.info("doBrand is call!!!!!");
 
 		String street = requestParams.get("street");
@@ -195,6 +232,7 @@ public class StoreAdminProduct extends StoreBase {
 		String website = requestParams.get("website");
 		String comments = requestParams.get("comments");
 		String brandid = requestParams.get("brandid");
+		String display = requestParams.get("display");
 
 		Address ads = new Address();
 
@@ -220,6 +258,7 @@ public class StoreAdminProduct extends StoreBase {
 		brand.setEmail(email);
 		brand.setWebsite(website);
 		brand.setComments(comments);
+		brand.setDisplay(display);
 
 		if(picture != null && !picture.isEmpty()) {
 			logger.info("$$$$$ picture: "+picture );
@@ -253,11 +292,18 @@ public class StoreAdminProduct extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		String rtn = "/store/admin/brand/" + brandid;
 
 		Brand brand = brandService.getById(brandid);
@@ -265,6 +311,8 @@ public class StoreAdminProduct extends StoreBase {
 
 		brandService.save(brand);
 		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("menu", "Products");
+		model.addAttribute("subMenu", "categories");
 
 		return "redirect:" + rtn;
 	}
@@ -276,11 +324,18 @@ public class StoreAdminProduct extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		List<Product> products = productService.getAll();
 
 		model.addAttribute("products", products);
@@ -298,11 +353,17 @@ public class StoreAdminProduct extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
 
 		List<Type> types = typeService.getAll();
 		List<Brand> brands = brandService.getAll();
@@ -327,11 +388,18 @@ public class StoreAdminProduct extends StoreBase {
 	public String updateProduct(ModelMap model, @PathVariable("productid") Long productid, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		String rtn = "store/admin/product";
 
 		long prodid = productid.longValue();
@@ -367,17 +435,23 @@ public class StoreAdminProduct extends StoreBase {
 
 	@RequestMapping(method=RequestMethod.POST, value="/product")
 	public String doProduct(@RequestParam Map<String,String> requestParams,
-			@RequestParam(name="categoryid",required = false) Long[] categoryids,
+			@RequestParam(name="categoryid", required = false) Long[] categoryids,
 			ModelMap model, HttpSession httpSession) {
 		String rtn = "products";
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
 		logger.info("doProduct is call!!!!!");
 
 		String productid = requestParams.get("productid");
@@ -398,8 +472,10 @@ public class StoreAdminProduct extends StoreBase {
 		String comments = requestParams.get("comments");
 		String storefront = requestParams.get("storefront");
 		String display = requestParams.get("display");
+		String tax = requestParams.get("tax");
+		String seqnum = requestParams.get("seqnum");
 
-		logger.info("display: {}, categoryids: {}", display, categoryids);
+		//System.out.println("display: {}, categoryids: {}, tax: {}, seqnum: {}"+", "+ display+", "+ categoryids.length+", "+ tax+", "+seqnum);
 
 		Brand brand = brandService.getById(Long.parseLong(brandid));
 		Color color = colorService.getById(Long.parseLong(colorid));
@@ -419,15 +495,34 @@ public class StoreAdminProduct extends StoreBase {
 
 		if(retail != null && !retail.isEmpty()) {
 			product.setRetail(new BigDecimal(retail));
+		} else if (product.getRetail() != null) {
+			product.setRetail(null);
 		}
 
 		if(clinic != null && !clinic.isEmpty()) {
 			product.setClinic(new BigDecimal(clinic));
+		} else if (product.getClinic() != null) {
+			product.setClinic(null);
 		}
 
 		if(onsale != null && !onsale.isEmpty()) {
 			product.setOnsale(new BigDecimal(onsale));
+		} else if (product.getOnsale() != null) {
+			product.setOnsale(null);
 		}
+
+		if(tax != null && !tax.isEmpty()) {
+			product.setTax(Long.parseLong(tax));
+		} else if (product.getTax() != null) {
+			product.setTax(null);
+		}
+
+		if(seqnum != null && !seqnum.isEmpty()) {
+			product.setSeqnum(seqnum);
+		} else if (product.getSeqnum() != null) {
+			product.setSeqnum(null);
+		}
+
 		product.setName(name);
 		product.setModelnum(modelnum);
 		product.setUpc(upc);
@@ -490,11 +585,18 @@ public class StoreAdminProduct extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		List<Category> categories = categoryService.getAll();
 		model.addAttribute("categories", categories);
 		model.addAttribute("loginUser", loginUser);
@@ -512,11 +614,17 @@ public class StoreAdminProduct extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
 
 		List<Type> types = typeService.getAll();
 		List<Brand> brands = brandService.getAll();
@@ -539,11 +647,18 @@ public class StoreAdminProduct extends StoreBase {
 	public String updateCategory(ModelMap model, @PathVariable("categoryid") Long categoryid, HttpSession httpSession) {
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		String rtn = "store/admin/category";
 
 		Category category = categoryService.getById(categoryid);
@@ -579,11 +694,18 @@ public class StoreAdminProduct extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		logger.info("doProduct is call!!!!!");
 
 		Category category = new Category();
@@ -633,11 +755,18 @@ public class StoreAdminProduct extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		String rtn = "/store/admin/category/" + categoryid;
 
 		Category category = categoryService.getById(categoryid);
@@ -659,11 +788,18 @@ public class StoreAdminProduct extends StoreBase {
 		logger.info("add category product");
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		String rtn = "redirect:/store/admin/category/" + categoryid;
 
 		/*@RequestParam Map<String,String> requestParams,
@@ -719,11 +855,17 @@ public class StoreAdminProduct extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
 
 		logger.debug("Entering ProductController uploadImage");
 		model.addAttribute("loginUser", loginUser);
@@ -774,11 +916,18 @@ public class StoreAdminProduct extends StoreBase {
 
 		Object principal = getPrincipal();
 
-		if(!isStoreAdmin(principal)) {
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
+		Store store = staff.getStore();
+
+		model.addAttribute("store", store);
+
 		String rtn = "product/" + productid;
 
 		Image image = new Image();

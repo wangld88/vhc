@@ -21,8 +21,10 @@ import com.vhc.core.service.CountryService;
 import com.vhc.core.service.CreditcardService;
 import com.vhc.core.service.CustomerService;
 import com.vhc.core.service.DebitcardService;
+import com.vhc.core.service.GiftcardHistoryService;
 import com.vhc.core.service.GiftcardService;
 import com.vhc.core.service.ImageService;
+import com.vhc.core.service.InventoryHistoryService;
 import com.vhc.core.service.InventoryService;
 import com.vhc.core.service.InvoiceService;
 import com.vhc.core.service.ItemService;
@@ -41,6 +43,7 @@ import com.vhc.core.service.PurchaseorderService;
 import com.vhc.core.service.RegionService;
 import com.vhc.core.service.RoleService;
 import com.vhc.core.service.ShipmentService;
+import com.vhc.core.service.ShippingmethodService;
 import com.vhc.core.service.SizeService;
 import com.vhc.core.service.StaffService;
 import com.vhc.core.service.StatusService;
@@ -48,6 +51,7 @@ import com.vhc.core.service.StoreService;
 import com.vhc.core.service.StyleService;
 import com.vhc.core.service.SupplierService;
 import com.vhc.core.service.TagService;
+import com.vhc.core.service.TemplateService;
 import com.vhc.core.service.TransactionService;
 import com.vhc.core.service.UserService;
 import com.vhc.core.service.UserroleService;
@@ -102,6 +106,9 @@ public class BaseController {
 
 	@Autowired
 	protected InventoryService inventoryService;
+
+	@Autowired
+	protected InventoryHistoryService inventoryHistoryService;
 
 	@Autowired
 	protected StatusService statusService;
@@ -190,6 +197,14 @@ public class BaseController {
 	@Autowired
 	protected PageimageService pageimageService;
 
+	@Autowired
+	protected GiftcardHistoryService giftcardHistoryService;
+
+	@Autowired
+	protected ShippingmethodService shippingmethodService;
+
+	@Autowired
+	protected TemplateService templateService;
 
 	protected static final String DATE_FORMAT = "MM/dd/yyyy";
 

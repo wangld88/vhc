@@ -46,20 +46,23 @@
 								<tbody>
 									<tr>
 										<th><i class="icon_documents"></i> Gift Card Code</th>
-										<th><i class="icon_calendar"></i> Staus</th>
+										<th><i class="icon_calendar"></i> Store</th>
+										<th><i class="icon_calendar"></i> Status</th>
 										<th><i class="icon_pin_alt"></i> Amount</th>
 										<th><i class="icon_pin_alt"></i> Balance</th>
 										<th><i class="icon_cogs"></i> Action</th>
 									</tr>
 									<tr th:each="giftcard:${giftcards}">
 										<td th:text="${giftcard.code}"></td>
-										<td th:text="${giftcard.status!=null?giftcard.status.name:''}"></td>
+										<td th:text="${giftcard.store!=null?giftcard.store.name:''}"></td>
+										<td th:text="${giftcard.status!=null?giftcard.status.name:'Activated'}"></td>
 										<td th:text="${giftcard.amount!=null?#numbers.formatDecimal(giftcard.amount, 0, 2):''}"></td>
 										<td th:text="${giftcard.balance!=null?#numbers.formatDecimal(giftcard.balance, 0, 2):''}"></td>
 										<td>
 											<form id="giftcards" name="giftcards" th:action="@{/admin/giftcard/}+${giftcard.giftcardid}" method="post">
 												<div class="btn-group">
-													<a class="btn btn-success" th:href="@{/admin/giftcard/}+${giftcard.giftcardid}" title="Edit Gift Card"><i class="icon_pencil-edit_alt"></i></a>
+													<a class="btn btn-success" th:href="@{/admin/giftcard/}+${giftcard.giftcardid}" title="Edit Gift Card" style="margin-right: 5px;"><i class="icon_pencil-edit"></i></a>
+													<a class="btn btn-success" th:href="@{/admin/giftcard/log/}+${giftcard.giftcardid}" title="Gift Card History" style="margin-right: 5px;"><i class="icon_document_alt"></i></a>
 													<button type="submit" class="btn btn-danger" title="Remove Gift Card"><i class="icon_trash"></i></button>
 													<!-- <a class="btn btn-primary" th:href="@{/admin/giftcard}" title="Add New Gift Card"><i class="icon_plus_alt2"></i></a> -->
 													<!-- <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a> -->

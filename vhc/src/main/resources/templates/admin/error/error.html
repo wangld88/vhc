@@ -10,13 +10,15 @@
 						<li class="breadcrumb-item active">Debug Information</li>
 					</ol>
 
-					<strong>Requested URL:</strong> <span th:text="${exception.requestURL}"></span><br><br>
-					<strong>Title:</strong> <span th:text="${exception.title}"></span><br><br>
+					<strong>Requested URL:</strong> <span th:text="${exception!=null?exception.requestURL:'N/A'}"></span><br><br>
+					<strong>Title:</strong> <span th:text="${exception!=null?exception.title:'N/A'}"></span><br><br>
 					<!-- <strong>Exception:</strong> <span th:text="${exception==null?'N/A':exception.exception}"></span><br><br> -->
 
 					<strong>Exception Stack Trace</strong><br>
-					<div th:each="ste: ${exception.trace}">
-						<span th:text="${ste}"></span>
+					<div th:if="${exception!=null}">
+						<div th:each="ste: ${exception.trace}">
+							<span th:text="${ste}"></span>
+						</div>
 					</div>
 				</div>
 			</section>

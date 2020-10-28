@@ -239,11 +239,11 @@
 				border-color: #575657
 			}
 
-			.header {
+			/* .header {
 				background-color:#bce0ee;
 				color:#3d3c3c !important;
 				font-family: UniversCondensed, Arial, sans-serif !important;
-			}
+			} */
 		</style>
 
 		<section id="main-content">
@@ -362,6 +362,25 @@
 										    </div>
 										</div>
 										<div class="form-group ">
+										    <label for="tax" class="control-label col-lg-2">Tax </label>
+										    <div class="col-lg-10">
+											    <div class="row col-lg-5">
+											        <input type="radio" id="tax" name="tax" value="5" th:checked="${product!=null and product.tax==5}" /> 5
+											    </div>
+											    <div class="row col-lg-5">
+											        <input type="radio" id="tax" name="tax" value="13" th:checked="${product!=null and product.tax==13}" /> 13
+											    </div>
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="seqnum" class="control-label col-lg-2">Display Sequence </label>
+										    <div class="col-lg-10">
+										        <select class="form-control" id="seqnum" name="seqnum">
+										        	<option th:each="i:${#numbers.sequence(1, 9)}" th:value="${i}" th:text="${i}" th:selected="${product!=null and product.seqnum==(''+i)}"></option>
+										        </select>
+										    </div>
+										</div>
+										<div class="form-group ">
 										    <label for="comments" class="control-label col-lg-2">Comments </label>
 										    <div class="col-lg-10">
 										        <textarea class="form-control " id="comments" name="comments" th:value="${product==null?'':product.comments}" ></textarea>
@@ -371,6 +390,18 @@
 										    <label for="storefront" class="control-label col-lg-2">Store Front </label>
 										    <div class="col-lg-10">
 										        <input type="checkbox" id="storefront" name="storefront" value="1" th:checked="${(product!=null and product.storefront=='1')}" /> Display the product at store front
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="display" class="control-label col-lg-2">Show on Web </label>
+										    <div class="col-lg-10">
+										        <input type="checkbox" id="display" name="display" value="1" th:checked="${(product!=null and product.display=='1')}" /> Display the product on website
+										    </div>
+										</div>
+										<div class="form-group ">
+										    <label for="storefront" class="control-label col-lg-2">Category </label>
+										    <div class="col-lg-10">
+										        <input type="checkbox" id="categoryid" name="categoryid" th:each="ctgy : ${categories}" th:value="${ctgy.categoryid}" th:checked="${(product!=null and product.inCategory(ctgy.categoryid))}" th:utext="'&nbsp;'+${ctgy.name}+'&nbsp;&nbsp;&nbsp;&nbsp;'" />
 										    </div>
 										</div>
 										<div class="form-group">

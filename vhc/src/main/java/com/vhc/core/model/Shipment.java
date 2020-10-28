@@ -18,6 +18,8 @@ import javax.validation.constraints.Size;
 
 import org.jsondoc.core.annotation.ApiObjectField;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 @Entity
 @Table(name="SHIPMENTS")
@@ -66,6 +68,7 @@ public class Shipment implements Serializable {
 
     @OneToOne(targetEntity = Purchaseorder.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = true, name = "poid")
+    @JsonIgnoreProperties
 	private Purchaseorder purchaseorder;
 
 

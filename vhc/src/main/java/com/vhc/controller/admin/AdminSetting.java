@@ -2,6 +2,7 @@ package com.vhc.controller.admin;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +26,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.vhc.core.model.City;
 import com.vhc.core.model.Color;
 import com.vhc.core.model.Country;
-import com.vhc.core.model.Image;
 import com.vhc.core.model.Location;
 import com.vhc.core.model.Page;
 import com.vhc.core.model.Pageimage;
-import com.vhc.core.model.Product;
 import com.vhc.core.model.Province;
+import com.vhc.core.model.Region;
+import com.vhc.core.model.Shippingmethod;
 import com.vhc.core.model.Size;
 import com.vhc.core.model.Store;
 import com.vhc.core.model.Style;
@@ -88,7 +89,7 @@ public class AdminSetting extends AdminBase {
 
 		Page page = new Page();
 
-		if(pageid != null || !pageid.isEmpty()) {
+		if(pageid != null && !pageid.isEmpty()) {
 			page = pageService.getById(Long.parseLong(pageid));
 		}
 
@@ -218,6 +219,7 @@ public class AdminSetting extends AdminBase {
 		User loginUser = getLoginUser(principal);
 
 		List<Type> types = typeService.getAll();
+
 		model.addAttribute("types", types);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Settings");
@@ -321,6 +323,59 @@ public class AdminSetting extends AdminBase {
 	}
 
 
+	@RequestMapping(method={RequestMethod.GET}, value={"/size"})
+	public String dspSize(ModelMap model, HttpSession httpSession) {
+		String rtn = "admin/size";
+
+		Object principal = getPrincipal();
+
+		if(!isSuperAdmin(principal)) {
+			return "redirect:/admin/logout";
+		}
+
+		User loginUser = getLoginUser(principal);
+
+		List<Type> types = typeService.getByReftbl("sizes");
+		List<Region> regions = regionService.getAll();
+
+		model.addAttribute("types", types);
+		model.addAttribute("regions", regions);
+		model.addAttribute("adminmenu", "Settings");
+		model.addAttribute("submenu", "sizes");
+		model.addAttribute("loginUser", loginUser);
+
+		return rtn;
+	}
+
+
+	@RequestMapping(method={RequestMethod.GET}, value={"/size/{sizeid}"})
+	public String updateSize(ModelMap model, @PathVariable("sizeid") Long sizeid, HttpSession httpSession) {
+		String rtn = "admin/size";
+
+		Size size = sizeService.getById(sizeid.longValue());
+
+		Object principal = getPrincipal();
+
+		if(!isSuperAdmin(principal)) {
+			return "redirect:/admin/logout";
+		}
+
+		User loginUser = getLoginUser(principal);
+
+		List<Type> types = typeService.getByReftbl("sizes");
+		List<Region> regions = regionService.getAll();
+
+		model.addAttribute("types", types);
+		model.addAttribute("regions", regions);
+		model.addAttribute("size", size);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Settings");
+		model.addAttribute("submenu", "sizes");
+
+		return rtn;
+	}
+
+
 	@RequestMapping(method={RequestMethod.GET}, value={"/sizes"})
 	public String dspSizes(ModelMap model, HttpSession httpSession) {
 
@@ -343,6 +398,54 @@ public class AdminSetting extends AdminBase {
 		model.addAttribute("subMenu", "sizes");
 
 		return rtn;
+	}
+
+
+	@RequestMapping(method={RequestMethod.POST}, value={"/size"})
+	public String doSize(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
+		String rtn = "sizes";
+
+		logger.info("doType is call!!!!!");
+		String sizenum = requestParams.get("sizenum");
+		String sizeid = requestParams.get("sizeid");
+		String typeid = requestParams.get("typeid");
+		String regionid = requestParams.get("regionid");
+
+		Object principal = getPrincipal();
+
+		if(!isSuperAdmin(principal)) {
+			return "redirect:/admin/logout";
+		}
+
+		User loginUser = getLoginUser(principal);
+
+		Size size = null;
+
+		if(sizeid != null && !sizeid.isEmpty()) {
+			size = sizeService.getById(Long.parseLong(sizeid));
+		} else {
+			size = new Size();
+		}
+
+		if(typeid != null && !typeid.isEmpty()) {
+			Type type = typeService.getById(Long.parseLong(typeid));
+			size.setType(type);
+		}
+
+		if(regionid != null && !regionid.isEmpty()) {
+			Region region = regionService.getById(Long.parseLong(regionid));
+			size.setRegion(region);
+		}
+
+		size.setSizenum(sizenum);
+
+		sizeService.save(size);
+
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Settings");
+		model.addAttribute("submenu", "sizes");
+
+		return "redirect:" + rtn;
 	}
 
 
@@ -668,7 +771,9 @@ public class AdminSetting extends AdminBase {
 		}
 
 		User loginUser = getLoginUser(principal);
+		List<Province> provinces = provinceService.getAll();
 
+		model.addAttribute("provinces", provinces);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Settings");
 		model.addAttribute("submenu", "cities");
@@ -978,6 +1083,7 @@ public class AdminSetting extends AdminBase {
 
 		String name = requestParams.get("name");
 		String styleid = requestParams.get("styleid");
+		String seqnum = requestParams.get("seqnum");
 
 		Style style = new Style();
 
@@ -986,6 +1092,12 @@ public class AdminSetting extends AdminBase {
 		}
 
 		style.setName(name);
+
+		if(seqnum != null && !seqnum.isEmpty()) {
+			style.setSeqnum(seqnum);
+		} else if (style.getSeqnum() != null) {
+			style.setSeqnum(null);
+		}
 
 		style = styleService.save(style);
 
@@ -1140,6 +1252,141 @@ public class AdminSetting extends AdminBase {
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Settings");
 		model.addAttribute("submenu", "locations");
+
+		return "redirect:" + rtn;
+	}
+
+
+	@RequestMapping(method={RequestMethod.GET}, value={"/shippingmethods"})
+	public String dspShippingMethods(ModelMap model, HttpSession httpSession) {
+
+		logger.info("dspShippingMethods is called");
+		Object principal = getPrincipal();
+
+		if(!isSuperAdmin(principal)) {
+			return "redirect:/admin/logout";
+		}
+
+		String rtn = "admin/shippingmethods";
+		User loginUser = getLoginUser(principal);
+		List<Shippingmethod> methods = shippingmethodService.getAll();
+
+		model.addAttribute("methods", methods);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Settings");
+		model.addAttribute("submenu", "shippingmethods");
+
+		return rtn;
+	}
+
+
+	@RequestMapping(method={RequestMethod.GET}, value={"/shippingmethods/search"})
+	public String searchShippingMethods(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
+
+		logger.info("searchShippingMethod is called");
+		Object principal = getPrincipal();
+
+		if(!isSuperAdmin(principal)) {
+			return "redirect:/admin/logout";
+		}
+
+		String rtn = "admin/shippingmethods";
+		User loginUser = getLoginUser(principal);
+		String name = "%" + requestParams.get("name") + "%";
+		List<Shippingmethod> methods = shippingmethodService.getByName(name);
+
+		model.addAttribute("methods", methods);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Settings");
+		model.addAttribute("submenu", "shippingmethods");
+
+		return rtn;
+	}
+
+
+	@RequestMapping(method={RequestMethod.GET}, value={"/shippingmethod"})
+	public String dspShippingMethod(ModelMap model, HttpSession httpSession) {
+		String rtn = "admin/shippingmethod";
+
+		Object principal = getPrincipal();
+
+		if(!isSuperAdmin(principal)) {
+			return "redirect:/admin/logout";
+		}
+
+		User loginUser = getLoginUser(principal);
+
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Settings");
+		model.addAttribute("submenu", "shippingmethods");
+
+		return rtn;
+	}
+
+
+	@RequestMapping(method={RequestMethod.GET}, value={"/shippingmethod/{methodid}"})
+	public String updateShippingMethod(ModelMap model, @PathVariable("methodid") Long methodid, HttpSession httpSession) {
+		String rtn = "admin/shippingmethod";
+
+		Object principal = getPrincipal();
+
+		if(!isSuperAdmin(principal)) {
+			return "redirect:/admin/logout";
+		}
+
+		User loginUser = getLoginUser(principal);
+
+		long mfid = methodid.longValue();
+		Shippingmethod method = shippingmethodService.getById(mfid);
+
+		model.addAttribute("method", method);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Settings");
+		model.addAttribute("submenu", "shippingmethods");
+
+		return rtn;
+	}
+
+
+	@RequestMapping(method={RequestMethod.POST}, value={"/shippingmethod"})
+	public String doShippingMethod(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
+		String rtn = "shippingmethods";
+
+		logger.info("doShippingMethod is call!!!!!");
+
+		Object principal = getPrincipal();
+
+		if(!isSuperAdmin(principal)) {
+			return "redirect:/admin/logout";
+		}
+
+		User loginUser = getLoginUser(principal);
+
+		String name = requestParams.get("name");
+		String methodid = requestParams.get("shipmethodid");
+		String description = requestParams.get("description");
+		String cost = requestParams.get("cost");
+
+		Shippingmethod method = new Shippingmethod();
+
+		if(methodid != null && !methodid.isEmpty()) {
+			method.setShipmethodid(Long.parseLong(methodid));
+		}
+
+		method.setName(name);
+		method.setDescription(description);
+
+		if(cost != null && !cost.isEmpty()) {
+			method.setCost(new BigDecimal(cost));
+		} else if (method.getCost() != null) {
+			method.setCost(null);;
+		}
+
+		method = shippingmethodService.save(method);
+
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Settings");
+		model.addAttribute("submenu", "shippingmethods");
 
 		return "redirect:" + rtn;
 	}

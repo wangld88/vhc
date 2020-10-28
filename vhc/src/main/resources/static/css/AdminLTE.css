@@ -2330,6 +2330,20 @@ a:focus {
   font-size: 10px;
   font-weight: 400;
 }
+.btn-ctl {
+  border-radius: 3px;
+  position: relative;
+  /* padding: 15px 5px; */
+  margin: 0 0 10px 10px;
+  min-width: 80px;
+  height: 60px;
+  text-align: center;
+  color: #666;
+  background-color: #3c8dbc;
+  border-color: #367fa9;
+  font-size: 12px;
+}
+
 /*
  * Component: Callout
  * ------------------
