@@ -138,6 +138,6 @@ public class ProductService {
 
 	@Transactional(rollbackFor=Exception.class)
 	public void delete(long productid) {
-		productRepository.delete(productid);
+		productRepository.deleteById(productid);
 	}
 }

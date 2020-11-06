@@ -80,6 +80,6 @@ public class InventoryService {
 
 	@Transactional(rollbackFor=Exception.class)
 	public void delete(long inventoryid) {
-		inventoryRepository.delete(inventoryid);
+		inventoryRepository.deleteById(inventoryid);
 	}
 }

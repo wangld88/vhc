@@ -61,6 +61,6 @@ public class ItemService {
 
 	@Transactional(rollbackFor=Exception.class)
 	public void delete(long itemid) {
-		itemRepository.delete(itemid);
+		itemRepository.deleteById(itemid);
 	}
 }

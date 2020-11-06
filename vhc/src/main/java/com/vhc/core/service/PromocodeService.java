@@ -34,7 +34,7 @@ public class PromocodeService {
 
 	@Transactional(rollbackFor=Exception.class)
 	public void delete(long promocodeid) {
-		this.promocodeRepository.delete(promocodeid);
+		this.promocodeRepository.deleteById(promocodeid);
 	}
 
 }

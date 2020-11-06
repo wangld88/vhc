@@ -49,7 +49,7 @@ public class GiftcardService {
 
 	@Transactional(rollbackFor=Exception.class)
 	public void delete(long giftcardid) {
-		giftcardRepository.delete(giftcardid);
+		giftcardRepository.deleteById(giftcardid);
 	}
 
 }
