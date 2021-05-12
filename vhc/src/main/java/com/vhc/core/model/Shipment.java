@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 @Entity
-@Table(name="SHIPMENTS")
+@Table(name="shipments")
 @NamedQuery(name="Shipment.findAll", query="SELECT s FROM Shipment s")
 public class Shipment implements Serializable {
 

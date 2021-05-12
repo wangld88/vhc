@@ -19,7 +19,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="CITIES", uniqueConstraints={@UniqueConstraint(columnNames = {"name" , "provinceid"})})
+@Table(name="cities", uniqueConstraints={@UniqueConstraint(columnNames = {"name" , "provinceid"})})
 @ApiObject
 //@NamedQuery(name="City.findAll", query="SELECT c FROM City c")
 public class City implements Serializable {

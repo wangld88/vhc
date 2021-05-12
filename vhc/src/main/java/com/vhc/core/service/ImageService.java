@@ -30,14 +30,17 @@ public class ImageService {
 	}
 
 
+	@Transactional(readOnly=true)
 	public Image getById(long imageid) {
 		return imageRepository.findByImageid(imageid);
 	}
 
+	@Transactional(readOnly=true)
 	public List<Image> getByProduct(long productid) {
 		return imageRepository.findByProduct_productid(productid);
 	}
 
+	@Transactional(readOnly=true)
 	public List<Image> getAll() {
 		return imageRepository.findAll();
 	}

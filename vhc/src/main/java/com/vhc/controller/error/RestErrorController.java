@@ -2,6 +2,7 @@ package com.vhc.controller.error;
 
 import java.util.Map;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -9,13 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.web.ErrorAttributes;
-import org.springframework.boot.autoconfigure.web.ErrorController;
+import org.springframework.boot.web.servlet.error.ErrorAttributes;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.vhc.util.Message;
@@ -23,7 +25,7 @@ import com.vhc.util.Message;
 @RestController
 public class RestErrorController implements ErrorController {
 
-    private static final String PATH = "/error";
+    private static final String PATH = "/error/error";
 
     @Value("${includestacktrace}")
     private boolean debug=true;
@@ -44,22 +46,45 @@ public class RestErrorController implements ErrorController {
     }*/
 
     @RequestMapping(value = PATH)
-    ModelAndView error(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView error(HttpServletRequest request, WebRequest webRequest, HttpServletResponse response) {
         // Appropriate HTTP response code (e.g. 404 or 500) is automatically set by Spring.
         // Here we just define response body.
-    	Map<String, Object> att = getErrorAttributes(request, debug);
-    	LOGGER.debug("There is an error in RestErrorController: "+response.getStatus());
-    	return setErrorView(request, response, att, HttpStatus.INTERNAL_SERVER_ERROR);
+	    Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+
+	    if (status != null) {
+	        Integer statusCode = Integer.valueOf(status.toString());
+
+	        /*if(statusCode == HttpStatus.FORBIDDEN.value()) {
+	            return new ModelAndView("error/403");
+	        } else */if(statusCode == HttpStatus.NOT_FOUND.value()) {
+	            return new ModelAndView("error/404");
+	        } else if(statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+	            return new ModelAndView("error/500");
+	        } else {
+	        	Map<String, Object> att = getErrorAttributes(webRequest, debug);
+	        	LOGGER.debug("There is an error in RestErrorController: "+response.getStatus());
+	        	return setErrorView(request, response, att, HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+	    } else {
+	    	return new ModelAndView("error");
+	    }
     }
+
+
+	@RequestMapping("/error")
+	public String handleError(HttpServletRequest request) {
+	    return "error";
+	}
+
 
     @Override
     public String getErrorPath() {
         return PATH;
     }
 
-    private Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace) {
-        RequestAttributes requestAttributes = new ServletRequestAttributes(request);
-        return errorAttributes.getErrorAttributes(requestAttributes, includeStackTrace);
+    private Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
+        //RequestAttributes requestAttributes = new ServletRequestAttributes(request);
+        return errorAttributes.getErrorAttributes(webRequest, includeStackTrace);
     }
 
     private ModelAndView setErrorView(HttpServletRequest request, HttpServletResponse response, Map<String, Object> att, HttpStatus httpStatus) {

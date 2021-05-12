@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Entity
-@Table(name="CATEGORIES")
+@Table(name="categories")
 @ApiObject
 @NamedQuery(name="Category.findAll", query="SELECT c FROM Category c")
 public class Category implements Serializable {

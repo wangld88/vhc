@@ -18,6 +18,8 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
 
 	List<Product> findAll();
 
+	List<Product> findByBrand_brandidAndType_typeidAndStyle_styleid(long brandid, long typeid, long styleid);
+
 	Product findByProductid(long productid);
 
 	Product findByName(String name);

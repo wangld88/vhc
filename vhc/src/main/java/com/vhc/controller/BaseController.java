@@ -7,6 +7,8 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.vhc.core.service.PromocodeService;
@@ -17,15 +19,21 @@ import com.vhc.core.service.CategoryService;
 import com.vhc.core.service.CategoryproductService;
 import com.vhc.core.service.CityService;
 import com.vhc.core.service.ColorService;
+import com.vhc.core.service.CountinventoryService;
+import com.vhc.core.service.CountlogService;
 import com.vhc.core.service.CountryService;
+import com.vhc.core.service.CountuploadService;
 import com.vhc.core.service.CreditcardService;
 import com.vhc.core.service.CustomerService;
 import com.vhc.core.service.DebitcardService;
+import com.vhc.core.service.EventService;
+import com.vhc.core.service.EventproductService;
 import com.vhc.core.service.GiftcardHistoryService;
 import com.vhc.core.service.GiftcardService;
 import com.vhc.core.service.ImageService;
 import com.vhc.core.service.InventoryHistoryService;
 import com.vhc.core.service.InventoryService;
+import com.vhc.core.service.InventorycountService;
 import com.vhc.core.service.InvoiceService;
 import com.vhc.core.service.ItemService;
 import com.vhc.core.service.LocationService;
@@ -63,22 +71,97 @@ public class BaseController {
 	private static final Logger logger = LoggerFactory.getLogger(BaseController.class);
 
 	@Autowired
-	protected MessageHandler messageHandler;
-
-	@Autowired
-	protected ProductService productService;
+	protected TagService tagService;
 
 	@Autowired
 	protected CityService cityService;
 
 	@Autowired
-	protected AddressService addressService;
+	protected ItemService itemService;
+
+	@Autowired
+	protected PageService pageService;
+
+	@Autowired
+	protected RoleService roleService;
+
+	@Autowired
+	protected SizeService sizeService;
 
 	@Autowired
 	protected TypeService typeService;
 
 	@Autowired
+	protected UserService userService;
+
+	@Autowired
 	protected BrandService brandService;
+
+	@Autowired
+	protected ColorService colorService;
+
+	@Autowired
+	protected EventService eventService;
+
+	@Autowired
+	protected ImageService imageService;
+
+	@Autowired
+	protected OrderService orderService;
+
+	@Autowired
+	protected StaffService staffService;
+
+	@Autowired
+	protected StoreService storeService;
+
+	@Autowired
+	protected StyleService styleService;
+
+	@Autowired
+	protected RegionService regionService;
+
+	@Autowired
+	protected StatusService statusService;
+
+	@Autowired
+	protected AccountService accountService;
+
+	@Autowired
+	protected AddressService addressService;
+
+	@Autowired
+	protected CountryService countryService;
+
+	@Autowired
+	protected InvoiceService invoiceService;
+
+	@Autowired
+	protected MessageHandler messageHandler;
+
+	@Autowired
+	protected PaymentService paymentService;
+
+	@Autowired
+	protected ProductService productService;
+
+	@Autowired
+	protected CategoryService categoryService;
+
+	@Autowired
+	protected CountlogService countlogService;
+
+	@Autowired
+	protected CustomerService customerService;
+
+	@Autowired
+	protected GiftcardService giftcardService;
+
+	@Autowired
+	protected LocationService locationService;
+
+	@Autowired
+	protected ProvinceService provinceService;
 
 	@Autowired
 	protected SupplierService supplierService;
@@ -87,124 +170,73 @@ public class BaseController {
 	protected ShipmentService shipmentService;
 
 	@Autowired
-	protected ItemService itemService;
-
-	@Autowired
-	protected StoreService storeService;
-
-	@Autowired
-	protected UserService userService;
-
-	@Autowired
-	protected ColorService colorService;
-
-	@Autowired
-	protected RegionService regionService;
-
-	@Autowired
-	protected SizeService sizeService;
-
-	@Autowired
-	protected InventoryService inventoryService;
-
-	@Autowired
-	protected InventoryHistoryService inventoryHistoryService;
-
-	@Autowired
-	protected StatusService statusService;
-
-	@Autowired
-	protected ImageService imageService;
-
-	@Autowired
-	protected PurchaseorderService purchaseorderService;
-
-	@Autowired
-	protected RoleService roleService;
+	protected TemplateService templateService;
 
 	@Autowired
 	protected UserroleService userroleService;
 
 	@Autowired
-	protected BCryptPasswordEncoder bCryptPasswordEncoder;
+	protected DebitcardService debitcardService;
 
 	@Autowired
-	protected StaffService staffService;
-
-	@Autowired
-	protected CustomerService customerService;
-
-	@Autowired
-	protected AccountService accountService;
-
-	@Autowired
-	protected OrderService orderService;
+	protected InventoryService inventoryService;
 
 	@Autowired
 	protected OrderitemService orderitemService;
 
 	@Autowired
-	protected InvoiceService invoiceService;
-
-	@Autowired
-	protected PaymentService paymentService;
-
-	@Autowired
-	protected TransactionService transactionService;
-
-	@Autowired
-	protected CountryService countryService;
-
-	@Autowired
-	protected ProvinceService provinceService;
-
-	@Autowired
-	protected StyleService styleService;
-
-	@Autowired
-	protected LocationService locationService;
-
-	@Autowired
-	protected CategoryService categoryService;
-
-	@Autowired
-	protected CategoryproductService categoryproductService;
-
-	@Autowired
-	protected PageService pageService;
-
-	@Autowired
-	protected TagService tagService;
-
-	@Autowired
-	protected ProducttagService producttagService;
-
-	@Autowired
-	protected GiftcardService giftcardService;
-
-	@Autowired
-	protected PaymentmethodService paymentmethodService;
-
-	@Autowired
 	protected PromocodeService promocodeService;
-
-	@Autowired
-	protected CreditcardService creditcardService;
-
-	@Autowired
-	protected DebitcardService debitcardService;
 
 	@Autowired
 	protected PageimageService pageimageService;
 
 	@Autowired
-	protected GiftcardHistoryService giftcardHistoryService;
+	protected CreditcardService creditcardService;
+
+	@Autowired
+	protected ProducttagService producttagService;
+
+	@Autowired
+	protected CountuploadService countuploadService;
+
+	@Autowired
+	protected TransactionService transactionService;
+
+	@Autowired
+	protected EventproductService eventproductService;
+
+	@Autowired
+	protected PaymentmethodService paymentmethodService;
+
+	@Autowired
+	protected PurchaseorderService purchaseorderService;
+
+	@Autowired
+	protected BCryptPasswordEncoder bCryptPasswordEncoder;
+
+	@Autowired
+	protected CountinventoryService countinventoryService;
+
+	@Autowired
+	protected InventorycountService inventorycountService;
 
 	@Autowired
 	protected ShippingmethodService shippingmethodService;
 
 	@Autowired
-	protected TemplateService templateService;
+	protected CategoryproductService categoryproductService;
+
+	@Autowired
+	protected GiftcardHistoryService giftcardHistoryService;
+
+	@Autowired
+	protected InventoryHistoryService inventoryHistoryService;
+
+	@Value("${storage.location}")
+	protected String filePath;
+
+	@Autowired
+	protected Environment environment;
 
 	protected static final String DATE_FORMAT = "MM/dd/yyyy";
 

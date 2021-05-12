@@ -40,6 +40,6 @@ public class LocationService {
 
 	@Transactional(rollbackFor=Exception.class)
 	public void delete(long locationid) {
-		locationRepository.delete(locationid);
+		locationRepository.deleteById(locationid);
 	}
 }

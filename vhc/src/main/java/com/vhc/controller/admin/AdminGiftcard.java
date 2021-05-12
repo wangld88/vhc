@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +13,6 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.vhc.controller.BaseController;
 import com.vhc.core.model.City;
 import com.vhc.core.model.Status;
 import com.vhc.core.model.Store;
@@ -34,13 +30,12 @@ import com.vhc.core.model.GiftcardHistory;
 import com.vhc.core.model.Promocode;
 import com.vhc.core.model.User;
 import com.vhc.core.util.Message;
-import com.vhc.security.LoginUser;
 import com.vhc.service.util.ExcelProcessor;
 
 
 @Controller
 @RequestMapping({"/admin"})
-public class AdminGiftcard extends BaseController {
+public class AdminGiftcard extends AdminBase {
 
 	private final Logger logger = LoggerFactory.getLogger(AdminGiftcard.class);
 
@@ -48,9 +43,10 @@ public class AdminGiftcard extends BaseController {
 	public String dspGiftcards(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/giftcards";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
+			logger.error("[ADM Ship] The login user {} is not a super admin.", loginUser!=null?loginUser.getUserid():"Not Existing");
 			return "redirect:/admin/logout";
 		}
 
@@ -68,7 +64,7 @@ public class AdminGiftcard extends BaseController {
 	public String dspGiftcard(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/giftcard";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
 			return "redirect:/admin/logout";
@@ -93,7 +89,7 @@ public class AdminGiftcard extends BaseController {
 	public String dspGiftcardUpload(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/giftcardupload";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
 			return "redirect:/admin/logout";
@@ -113,7 +109,7 @@ public class AdminGiftcard extends BaseController {
 	@RequestMapping(method={RequestMethod.POST}, value={"/giftcardupload"})
 	public String doGiftcardUpload(@RequestParam("file") MultipartFile file, ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/giftcardupload";
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 		Message msg = new Message();
 
 		logger.info("Gift card upload is called!!!");
@@ -127,7 +123,7 @@ public class AdminGiftcard extends BaseController {
 		    String path = currDir.getAbsolutePath();
 		    String fileLocation = path + "/" + file.getOriginalFilename(); //path.substring(0, path.length() - 1) + file.getOriginalFilename();
 		    logger.info("File Location: "+fileLocation+", path: "+path);
-		    
+
 		    FileOutputStream f = new FileOutputStream(fileLocation);
 		    int ch = 0;
 		    while ((ch = in.read()) != -1) {
@@ -137,9 +133,9 @@ public class AdminGiftcard extends BaseController {
 		    f.close();
 
 		    List<Store> stores = storeService.getAll();
-		    
+
 		    ExcelProcessor processor = new ExcelProcessor();
-		    
+
 			List<Giftcard> cards = processor.read(fileLocation, loginUser, stores);
 
 			logger.warn("Size of the upload cards: {}", cards.size());
@@ -189,7 +185,7 @@ public class AdminGiftcard extends BaseController {
 	public String updateGiftcard(ModelMap model, @PathVariable("giftcardid") Long giftcardid, HttpSession httpSession) {
 		String rtn = "admin/giftcard";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
 			return "redirect:/admin/logout";
@@ -219,7 +215,7 @@ public class AdminGiftcard extends BaseController {
 	public String dspGiftcardHistory(ModelMap model, @PathVariable("giftcardid") Long giftcardid, HttpSession httpSession) {
 		String rtn = "admin/giftcardhistory";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
 			return "redirect:/admin/logout";
@@ -246,13 +242,11 @@ public class AdminGiftcard extends BaseController {
 
 		logger.info("doGiftcard is call!!!!!");
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
 			return "redirect:/admin/logout";
 		}
-
-		//Address ads = new Address();
 
 		String cardid = requestParams.get("giftcardid");
 		String code = requestParams.get("code");
@@ -369,7 +363,7 @@ public class AdminGiftcard extends BaseController {
 	public String deleteGiftcard(@PathVariable("giftcardid") Long giftcardid, ModelMap model, HttpSession httpSession) {
 		String rtn = "/admin/giftcards";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
 			return "redirect:/admin/logout";
@@ -393,7 +387,7 @@ public class AdminGiftcard extends BaseController {
 	public String dspGiftcardSearch(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		String rtn = "/admin/giftcards";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
 			return "redirect:/admin/logout";
@@ -418,7 +412,7 @@ public class AdminGiftcard extends BaseController {
 	public String dspPromocodes(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/promocodes";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
 			return "redirect:/admin/logout";
@@ -438,7 +432,7 @@ public class AdminGiftcard extends BaseController {
 	public String dspPromocode(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/promocode";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
 			return "redirect:/admin/logout";
@@ -459,7 +453,7 @@ public class AdminGiftcard extends BaseController {
 	public String updatePromocode(ModelMap model, @PathVariable("promocodeid") Long promocodeid, HttpSession httpSession) {
 		String rtn = "admin/promocode";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
 			return "redirect:/admin/logout";
@@ -480,12 +474,13 @@ public class AdminGiftcard extends BaseController {
 
 
 	@RequestMapping(method={RequestMethod.POST}, value={"/promocode"})
-	public String doPromocode(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) throws Exception {
+	public String doPromocode(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession)
+			throws Exception {
 		String rtn = "promocodes";
 
 		logger.info("doPromocode is call!!!!!");
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
 			return "redirect:/admin/logout";
@@ -535,9 +530,10 @@ public class AdminGiftcard extends BaseController {
 	public String deletePromocode(@PathVariable("promocodeid") Long promocodeid, ModelMap model, HttpSession httpSession) {
 		String rtn = "/admin/promocodes";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
@@ -553,28 +549,5 @@ public class AdminGiftcard extends BaseController {
 
 		return "redirect:" + rtn;
 	}
-
-
-	private User getPrincipal(){
-    	User user = null;
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        boolean isSuper = false;
-        for (GrantedAuthority grantedAuthority : authorities) {
-        	isSuper = grantedAuthority.getAuthority().equals("SUPERADMIN");
-        }
-
-        if (principal instanceof LoginUser) {
-        	LoginUser auth = (LoginUser)principal;
-        	if(isSuper) {
-        		user = auth.getUser();
-        	}
-        } else {
-            user = userService.getByUsername("");
-        }
-        return user;
-    }
-
 
 }

@@ -20,7 +20,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="TRANSACTIONS")
+@Table(name="transactions")
 @ApiObject
 @NamedQuery(name="Transaction.findAll", query="SELECT T FROM Transaction T")
 public class Transaction implements Serializable {

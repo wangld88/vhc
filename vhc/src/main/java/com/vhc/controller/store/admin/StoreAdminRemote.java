@@ -7,15 +7,20 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
+import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vhc.controller.store.StoreBase;
@@ -28,6 +33,7 @@ import com.vhc.core.model.City;
 import com.vhc.core.model.Customer;
 import com.vhc.core.model.Giftcard;
 import com.vhc.core.model.Inventory;
+import com.vhc.core.model.Item;
 import com.vhc.core.model.Order;
 import com.vhc.core.model.Product;
 import com.vhc.core.model.Promocode;
@@ -66,9 +72,6 @@ public class StoreAdminRemote extends StoreBase {
 
 		List<Size> sizes = new ArrayList<>();
 
-		/*if(typeid == null || typeid.trim().isEmpty()) {
-			sizes = sizeService.getAll();
-		}*/
 		if(typeid != null && !typeid.trim().isEmpty()) {
 			sizes = sizeService.getByTypeAndSizenum(Long.parseLong(typeid), size + "%");
 		} else {
@@ -86,7 +89,6 @@ public class StoreAdminRemote extends StoreBase {
 		logger.info("AJAX Customer search is called");
 
 		String lastname = requestParams.get("lastname");
-		//String phone = requestParams.get("phone");
 
 		//Message msg = new Message();
 		List<Customer> customers = new ArrayList<>();
@@ -96,7 +98,6 @@ public class StoreAdminRemote extends StoreBase {
 		} else {
 			User user = new User();
 			user.setLastname(lastname);
-			//user.setPhone(phone);
 
 			customers = customerService.getByLastnamePhone(user);
 		}
@@ -146,9 +147,6 @@ public class StoreAdminRemote extends StoreBase {
 		String postalcode = requestParams.get("postalcode");
 		String createdby = requestParams.get("createdby");
 		Calendar cal = Calendar.getInstance();
-		//String email = requestParams.get("email");
-		//String password = requestParams.get("password");
-		//String confpswd = requestParams.get("confpswd");
 
 		// create address
 		Address ads = new Address();
@@ -156,7 +154,7 @@ public class StoreAdminRemote extends StoreBase {
 		ads.setCity(city);
 		ads.setStreet(street);
 		ads.setPostalcode(postalcode);
-//System.out.println("createdby: "+createdby);
+
 		User createUser = userService.getById(Long.parseLong(createdby));
 
 		if(username == null || username.isEmpty()) {
@@ -189,13 +187,6 @@ public class StoreAdminRemote extends StoreBase {
 			try {
 				logger.info("Customer doSignup");
 
-				/*if(!password.isEmpty() && confpswd != null && !confpswd.isEmpty() && password.equals(confpswd)) {
-					user.setPassword(bCryptPasswordEncoder.encode(password));
-				} else {
-					msg.setStatus(Message.ERROR);
-					msg.setMessage("An error occurred which you sign up, root cause: the entered passwords do not match each other.");
-				}*/
-
 				customer.setUser(user);
 				user = userService.save(user);
 
@@ -212,14 +203,12 @@ public class StoreAdminRemote extends StoreBase {
 
 				ads = addressService.save(ads);
 
-				System.out.println("Saved User: "+user.getUserid());
 				customer.setAddress(ads);
 				customer.setUser(user);
 				customer.setCreatedby(createUser);
 				customer.setCreationdate(cal);
 				customer.setUpdatedate(cal);
 				customer.setUpdatedby(user);
-				//customer.setComments(comments);
 
 				customer = customerService.save(customer);
 
@@ -239,10 +228,12 @@ public class StoreAdminRemote extends StoreBase {
 				customer.setComments("Error occurred when adding new customer, please check with system admin.");
 				Throwable cause = e.getCause();
 				String message = cause.getMessage();
+
 				while(cause != null && cause.getMessage() != null && !cause.getMessage().isEmpty()) {
 					message = cause.getMessage();
 					cause = cause.getCause();
 				}
+
 				logger.error("Error occurred when adding new customer: {}", e.getMessage());
 				//msg.setStatus(Message.ERROR);
 				//msg.setMessage("An error occurred which you sign up, root cause: " + message);
@@ -334,6 +325,40 @@ public class StoreAdminRemote extends StoreBase {
 		}
 
 		return null;
+	}
+
+	@RequestMapping(method=RequestMethod.POST, value = "/api/inventories/{storeid}")
+	public @ResponseBody DataTablesOutput<Inventory> getInventories(
+			@PathVariable Long storeid,
+			@Valid @RequestBody DataTablesInput input) {
+		System.out.println("DataTablesOutput");
+		logger.info("[SAdm API]Load inventory table is called, storeid: {}", storeid);
+		Store store = storeService.getById(storeid);
+
+		Status received = statusService.getByNameAndReftbl("Received", "inventories");
+		Status returned = statusService.getByNameAndReftbl("Returned", "inventories");
+		Status transfered = statusService.getByNameAndReftbl("Transferred", "inventories");
+
+		List<Status> statuss = new ArrayList<>();
+		statuss.add(received);
+		statuss.add(returned);
+		statuss.add(transfered);
+
+		return inventoryService.getAll(input, store, statuss, transfered);
+
+	}
+
+
+	@RequestMapping(method=RequestMethod.POST, value = "/api/items/{storeid}")
+	public @ResponseBody DataTablesOutput<Item> getItems(
+			@PathVariable Long storeid,
+			@Valid @RequestBody DataTablesInput input) {
+		System.out.println("getItems DataTablesOutput============");
+		logger.info("[SAdm API] Load item table is called, storeid: {}", storeid);
+		Store store = storeService.getById(storeid);
+
+		return itemService.getAllByStore(input, store);
+
 	}
 
 }

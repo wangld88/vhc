@@ -10,6 +10,8 @@ import com.vhc.core.model.InventoryHistory;
 
 public interface InventoryHistoryRepository extends CrudRepository<InventoryHistory, Long> {
 
+	InventoryHistory findByInventory_inventoryidAndStatus_nameAndReceivedateIsNull(long inventoryid, String status);
+
 	List<InventoryHistory> findAllByInventory(Inventory inventory);
 
 }

@@ -18,7 +18,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="STORES")
+@Table(name="stores")
 @NamedQuery(name="Store.findAll", query="SELECT s FROM Store s")
 public class Store implements Serializable {
 

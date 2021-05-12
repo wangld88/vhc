@@ -18,24 +18,24 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="ADDRESSES")
+@Table(name="addresses")
 @NamedQuery(name="Address.findAll", query="SELECT a FROM Address a")
 public class Address implements Serializable {
 
 	private static final long serialVersionUID = 7899965418289768342L;
-	
-	
+
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "addressid", updatable = false, nullable = false)
 	private long addressid;
-	
+
 
 	@Column(nullable=false, length=100)
 	@Size(max=100)
 	@ApiObjectField(description="Street Name", format="Not Null, maxlength = 100", required=true)
 	private String street;
-	
+
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="cityid")
 	@ApiObjectField(description="Unique City", format="Not Null", required=true)
@@ -46,17 +46,17 @@ public class Address implements Serializable {
 	@ApiObjectField(description="Postal Code", format="Not Null, maxlength = 10", required=true)
 	private String postalcode;
 
-	
+
 	public Address() {
-		
+
 	}
-	
+
 	public Address(String street, City city, String postalcode) {
 		this.street = street;
 		this.city = city;
 		this.postalcode = postalcode;
 	}
-	
+
 	public long getAddressid() {
 		return addressid;
 	}

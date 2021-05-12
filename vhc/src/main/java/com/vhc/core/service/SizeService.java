@@ -17,7 +17,7 @@ public class SizeService {
 
 
 	public List<Size> getAll() {
-		return sizeRepository.findAllByOrderByRegionAscTypeAscSizenumAsc();
+		return sizeRepository.findAllByOrderByRegionAscTypeAscSeqnumAsc();
 	}
 
 	public List<Size> getBySizenum(String sizenum) {

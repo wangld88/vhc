@@ -15,7 +15,7 @@ import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
 @Entity
-@Table(name="PRODUCTVIEW")
+@Table(name="productview")
 @ApiObject
 @NamedQuery(name="Productview.findAll", query="SELECT p FROM Productview p")
 public class Productview {

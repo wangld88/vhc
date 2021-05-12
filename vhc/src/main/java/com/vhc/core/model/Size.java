@@ -19,11 +19,11 @@ import javax.persistence.Table;
 import org.jsondoc.core.annotation.ApiObjectField;
 
 /**
- * @author Jerry
+ * @author J.W.
  *
  */
 @Entity
-@Table(name="SIZES")
+@Table(name="sizes")
 @NamedQuery(name="Size.findAll", query="SELECT b FROM Size b")
 public class Size implements Serializable {
 
@@ -47,6 +47,10 @@ public class Size implements Serializable {
 	@JoinColumn(name="regionid")
 	@ApiObjectField(description="Region", required=true)
 	private Region region;
+
+	@Column(nullable=true)
+	@ApiObjectField(description="Sequence number", required=false)
+	private Double seqnum;
 
 
 	public Size() {
@@ -83,6 +87,14 @@ public class Size implements Serializable {
 
 	public void setRegion(Region region) {
 		this.region = region;
+	}
+
+	public Double getSeqnum() {
+		return seqnum;
+	}
+
+	public void setSeqnum(Double seqnum) {
+		this.seqnum = seqnum;
 	}
 
 }

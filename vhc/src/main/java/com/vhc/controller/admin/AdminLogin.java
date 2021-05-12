@@ -33,7 +33,7 @@ public class AdminLogin extends BaseController {
 	@RequestMapping(value={"/Access_Denied"}, method={RequestMethod.GET})
 	public String accessDeniedPage(ModelMap model) {
 		model.addAttribute("user", getPrincipal());
-		return "/error/accessDenied";
+		return "/error/accessdenied";
 	}
 
 

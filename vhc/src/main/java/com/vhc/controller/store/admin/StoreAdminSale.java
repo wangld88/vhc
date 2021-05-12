@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -68,6 +69,72 @@ public class StoreAdminSale extends StoreBase {
 
 	private final static long TAX_KID = 5;
 
+
+	@RequestMapping(method=RequestMethod.GET, value="/onlinesales")
+	public String dspOnlineSales(ModelMap model, @ModelAttribute("customer") Customer customer, HttpSession httpSession) {
+		String rtn = "store/admin/onlinesales";
+
+		Object principal = getPrincipal();
+
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
+			return "redirect:/store/admin/logout";
+		}
+
+		Store store = staff.getStore();
+
+		List<Staff> staffs = staffService.getByStore(store);
+		Status completed = statusService.getByNameAndReftbl("Completed", "orders");
+		List<Order> orders = orderService.getUnprocessedOnlines(); //getIncompletedOnlines(completed);
+
+		logger.info("[Store] orders: {}", orders.size());
+
+		model.addAttribute("store", store);
+		model.addAttribute("staffs", staffs);
+		model.addAttribute("orders", orders);
+		model.addAttribute("customer", customer);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("menu", "Sales");
+
+		return rtn;
+	}
+
+	@RequestMapping(method=RequestMethod.GET, value="/onlinesales/{orderid}")
+	public String dspOnlineSale(@PathVariable("orderid") Long orderid,
+			ModelMap model,
+			HttpServletRequest request,
+			HttpSession httpSession) {
+		String rtn = "store/admin/order";
+
+		Object principal = getPrincipal();
+
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
+			return "redirect:/store/admin/logout";
+		}
+
+		Store store = staff.getStore();
+
+		List<Staff> staffs = staffService.getByStore(store);
+		Status completed = statusService.getByNameAndReftbl("Completed", "orders");
+		List<Order> orders = orderService.getUnprocessedOnlines(); //getIncompletedOnlines(completed);
+
+		logger.info("[Store] orders: {}", orders.size());
+
+		model.addAttribute("store", store);
+		model.addAttribute("staffs", staffs);
+		model.addAttribute("orders", orders);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("menu", "Sales");
+
+		return rtn;
+	}
 
 	@RequestMapping(method=RequestMethod.GET, value="/sales")
 	public String dspSales(ModelMap model, @ModelAttribute("customer") Customer customer, HttpSession httpSession) {

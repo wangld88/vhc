@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 import org.jsondoc.core.annotation.ApiObjectField;
 
 @Entity
-@Table(name="SHIPPINGMETHODS")
+@Table(name="shippingmethods")
 @NamedQuery(name="Shippingmethod.findAll", query="SELECT s FROM Shippingmethod s")
 public class Shippingmethod implements Serializable {
 

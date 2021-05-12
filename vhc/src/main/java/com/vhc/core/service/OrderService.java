@@ -2,6 +2,7 @@ package com.vhc.core.service;
 
 import com.vhc.core.model.Customer;
 import com.vhc.core.model.Order;
+import com.vhc.core.model.Status;
 import com.vhc.core.repository.OrderRepository;
 
 import java.util.List;
@@ -35,6 +36,26 @@ public class OrderService {
 	@Transactional(readOnly=true)
 	public List<Order> getByCustomer(long customerid) {
 		return orderRepository.findByCustomer_customerid(customerid);
+	}
+
+	@Transactional(readOnly=true)
+	public List<Order> getAllOnlines() {
+		return orderRepository.findByStoreIsNull();
+	}
+
+	@Transactional(readOnly=true)
+	public List<Order> getInProgressOnlines(List<Status> status) {
+		return orderRepository.findByStoreIsNullAndStatusIn(status);
+	}
+
+	@Transactional(readOnly=true)
+	public List<Order> getUnprocessedOnlines() {
+		return orderRepository.findByStoreIsNullAndStatusIsNull();
+	}
+
+	@Transactional(readOnly=true)
+	public List<Order> getIncompletedOnlines(Status status) {
+		return orderRepository.findByStoreIsNullAndStatusIsNot(status);
 	}
 
 	@Transactional(rollbackFor=Exception.class)

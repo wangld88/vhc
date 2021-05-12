@@ -3,8 +3,10 @@ package com.vhc.controller.store.admin;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
@@ -15,7 +17,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.vhc.util.Message;
 import com.vhc.controller.store.StoreBase;
-import com.vhc.dto.ItemForm;
 import com.vhc.core.model.Address;
 import com.vhc.core.model.City;
 import com.vhc.core.model.Inventory;
@@ -732,9 +732,9 @@ public class StoreAdminShipment extends StoreBase {
 
 		String rtn = "store/admin/items";
 
-		List<Item> items = itemService.getAllAvailables(); //getAll();
+		//List<Item> items = itemService.getAllAvailables();
 
-		model.addAttribute("items", items);
+		//model.addAttribute("items", items);
 		model.addAttribute("store", store);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
@@ -766,7 +766,7 @@ public class StoreAdminShipment extends StoreBase {
 		List<Shipment> shipments = new ArrayList<>();
 		List<Product> products = new ArrayList<>();
 
-		System.out.println("Loaded orderid: "+orderid);
+		//System.out.println("Loaded orderid: "+orderid);
 		if(orderid != null && !orderid.isEmpty()) {
 			orders.add(purchaseorderService.getById(Long.parseLong(orderid)));
 		} else {
@@ -902,7 +902,7 @@ public class StoreAdminShipment extends StoreBase {
 		String rtn_shipmentid = requestParams.get("rtn_shipmentid");
 		Message msg = new Message();
 
-		System.out.println("orderid: "+orderid+", rtn_orderid: "+rtn_orderid);
+		//System.out.println("orderid: "+orderid+", rtn_orderid: "+rtn_orderid);
 		logger.info("sizeid is: "+sizeid);
 		Calendar cal = Calendar.getInstance();
 
@@ -1116,21 +1116,22 @@ public class StoreAdminShipment extends StoreBase {
 
 		Store store = staff.getStore();
 
-		Status received = statusService.getByNameAndReftbl("Received", "inventories");
-		Status returned = statusService.getByNameAndReftbl("Returned", "inventories");
-		Status transfered = statusService.getByNameAndReftbl("Transferred", "inventories");
+		//move to datatable api call
 
-		List<Long> statuss = new ArrayList<>();
-		statuss.add(received.getStatusid());
-		statuss.add(returned.getStatusid());
-		statuss.add(transfered.getStatusid());
+//		Status received = statusService.getByNameAndReftbl("Received", "inventories");
+//		Status returned = statusService.getByNameAndReftbl("Returned", "inventories");
+//		Status transfered = statusService.getByNameAndReftbl("Transferred", "inventories");
+//
+//		List<Long> statuss = new ArrayList<>();
+//		statuss.add(received.getStatusid());
+//		statuss.add(returned.getStatusid());
+//		statuss.add(transfered.getStatusid());
 
-		List<Inventory> inventories = inventoryService.getByStoreAvaiable(store.getStoreid(), statuss);
-		//List<Inventory> inventories1 = inventoryService.getByStoreid(store.getStoreid());
-//System.out.println("!!Inventories size1: "+inventories1.size()+", inventories: "+inventories.size());
+//		List<Inventory> inventories = inventoryService.getByStoreAvaiable(store.getStoreid(), statuss);
+		////List<Inventory> inventories1 = inventoryService.getByStoreid(store.getStoreid());
 
 		model.addAttribute("store", store);
-		model.addAttribute("inventories", inventories);
+//		model.addAttribute("inventories", inventories);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "inventories");
@@ -1155,7 +1156,7 @@ public class StoreAdminShipment extends StoreBase {
 
 		List<Store> stores = new ArrayList<>();
 		stores.add(store);
-		//String rtn = "store/admin/inventory";
+
 		String rtn = "store/admin/item";
 
 		String shipmentid = requestParams.get("shipmentid");
@@ -1183,7 +1184,10 @@ public class StoreAdminShipment extends StoreBase {
 
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/inventory/{inventoryid}"})
-	public String updateInventory(@RequestParam Map<String,String> requestParams, ModelMap model, @PathVariable("inventoryid") Long inventoryid, HttpSession httpSession) {
+	public String updateInventory(@RequestParam Map<String,String> requestParams,
+			ModelMap model,
+			@PathVariable("inventoryid") Long inventoryid,
+			HttpSession httpSession) {
 		Object principal = getPrincipal();
 
 		User loginUser = getLoginUser(principal);
@@ -1213,6 +1217,9 @@ public class StoreAdminShipment extends StoreBase {
 
 		List<Status> statuses = statusService.getByReftbl("inventories");
 		List<Location> locations = locationService.getByStore(store);
+		List<InventoryHistory> histories = inventoryHistoryService.getByInventory(inv);
+
+		logger.info("[SAdm Inv] statuses.size: {}", statuses.size());
 
 		model.addAttribute("store", store);
 		model.addAttribute("stores", stores);
@@ -1221,6 +1228,7 @@ public class StoreAdminShipment extends StoreBase {
 		model.addAttribute("sum", sum);
 		model.addAttribute("inventories", inventories);
 		model.addAttribute("inventory", inv);
+		model.addAttribute("histories", histories);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Inventories");
 		model.addAttribute("subMenu", "inventories");
@@ -1233,9 +1241,9 @@ public class StoreAdminShipment extends StoreBase {
 	public String doInventory(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession)
 		throws Exception {
 
-		logger.info("!!!!! doInventory is called");
-
-		String rtn = "store/admin/inventories" ;
+		logger.debug("!!!!! doInventory is called");
+//System.out.println("!!!!! doInventory is called");
+		String rtn = "redirect:/store/admin/inventories" ;
 
 		Object principal = getPrincipal();
 
@@ -1247,6 +1255,13 @@ public class StoreAdminShipment extends StoreBase {
 			return "redirect:/store/admin/logout";
 		}
 
+		Set<String> keys = requestParams.keySet();
+		Iterator<String> itr = keys.iterator();
+
+		while(itr.hasNext()) {
+			String key = itr.next();
+			System.out.println("Request Key: "+key+", Value: "+requestParams.get(key));
+		}
 		Store store = staff.getStore();
 
 		String itemid = requestParams.get("itemid");
@@ -1260,6 +1275,7 @@ public class StoreAdminShipment extends StoreBase {
 
 		Inventory inventory = new Inventory();
 
+		//Update Inventory
 		if(uinventoryid != null) {
 			storeid = requestParams.get("ustoreid");
 			quantity = requestParams.get("uquantity");
@@ -1274,8 +1290,20 @@ public class StoreAdminShipment extends StoreBase {
 		Calendar cal = Calendar.getInstance();
 		Item item = itemService.getById(Long.parseLong(itemid));
 		Status status = statusService.getById(Long.parseLong(statusid));
+		InventoryHistory history = null;
 
 		inventory.setItem(item);
+
+		//Set to transfer
+		if(tstoreid != null && !tstoreid.isEmpty()) {
+			Store tstore = storeService.getById(Long.parseLong(tstoreid));
+
+			System.out.println("@@@@@ Transfer to " + tstore.getName());
+
+			inventory.setDeststore(tstore);
+			inventory.setSenddate(cal);
+			inventory.setSentby(loginUser);
+		}
 
 		if(storeid == null || storeid.isEmpty()) {
 			inventory.setStore(store);
@@ -1284,24 +1312,45 @@ public class StoreAdminShipment extends StoreBase {
 			inventory.setStore(store1);
 		}
 
-		if(tstoreid != null && !tstoreid.isEmpty()) {
-			Store tstore = storeService.getById(Long.parseLong(tstoreid));
-			inventory.setDeststore(tstore);
-		}
-		inventory.setStatus(status);
-		if(inventory.getStatus().getStatusid() != status.getStatusid() && inventory.getStatus().getName().equals("Transferred")) {
+		inventory.setQuantity(Long.parseLong(quantity));
+		inventory.setReceivedby(loginUser);
+		inventory.setReceivedate(cal);
+
+		//System.out.println("Before Receive history status ID: "+inventory.getStatus().getStatusid());
+		//Receive from Transfer
+		if(inventory.getStatus() != null &&
+				inventory.getStatus().getStatusid() != status.getStatusid() &&
+				inventory.getStatus().getName().equals("Transferred")) {
+			history = inventoryHistoryService.getUnreceivedTransfer(inventory, "Transferred");
+			//System.out.println("INSIDE Receive history: "+history);
+
+			if(history == null) {
+				history = new InventoryHistory(inventory);
+			} else {
+				history.setReceivedby(loginUser);
+				history.setReceivedate(cal);
+			}
+			history = inventoryHistoryService.save(history);
+
 			inventory.setDeststore(null);
 			inventory.setLocation(null);
+			inventory.setStore(store);
 		}
+
+		inventory.setStatus(status);
+
 		if(locationid != null && !locationid.isEmpty()) {
 			Location location = locationService.getById(Long.parseLong(locationid));
 			inventory.setLocation(location);
 		}
-		inventory.setQuantity(Long.parseLong(quantity));
-		inventory.setReceivedby(loginUser);
-		inventory.setReceivedate(cal);
 		//try {
 		inventory = inventoryService.save(inventory);
+
+		//new Inventory
+		if(inventoryid == null || status.getName().equals("Transferred")) {
+			history = new InventoryHistory(inventory);
+			history = inventoryHistoryService.save(history);
+		}
 		/*} catch(Exception e) {
 			e.
 		}*/
@@ -1332,7 +1381,7 @@ public class StoreAdminShipment extends StoreBase {
 	public String doTransfer(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession)
 		throws Exception {
 
-		logger.info("!!!!! doTransfer is called");
+		logger.debug("!!!!! doTransfer is called");
 		String rtn = "redirect:/store/admin/item/" ;
 
 		Object principal = getPrincipal();
@@ -1349,10 +1398,11 @@ public class StoreAdminShipment extends StoreBase {
 
 		String itemid = requestParams.get("itemid");
 		String tstoreid = requestParams.get("tstoreid");
-		String statusid = requestParams.get("statusid");
+		//String statusid = requestParams.get("statusid");
 		String uinventoryid = requestParams.get("tinventoryid");
 
-logger.info("uinventoryid: "+uinventoryid);
+		logger.debug("[Store ADM] Transfer - uinventoryid: {}", uinventoryid);
+System.out.print("[Store ADM] Transfer - uinventoryid: "+uinventoryid);
 		if(uinventoryid == null) {
 			return rtn;
 		}
@@ -1378,9 +1428,12 @@ logger.info("uinventoryid: "+uinventoryid);
 
 		//try {
 		inventory = inventoryService.save(inventory);
+
+		logger.debug("[Store ADM] Transfer - Date: {}, By: {}", inventory.getSenddate(), inventory.getSentby().getUserid());
 		/*} catch(Exception e) {
 			e.
 		}*/
+		System.out.print("[Store ADM] Transfer - Date: "+inventory.getSenddate()+", By: "+inventory.getSentby().getUserid());
 
 		List<Inventory> inventories = inventoryService.getByItem(item);
 		long sum = 0;
@@ -1396,6 +1449,68 @@ logger.info("uinventoryid: "+uinventoryid);
 		model.addAttribute("subMenu", "inventories");
 
 		rtn += itemid;
+
+		return rtn;
+	}
+
+	@RequestMapping(method={RequestMethod.POST}, value={"/inventory/transfer/cancel"})
+	public String cancelTransfer(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession)
+		throws Exception {
+
+		logger.debug("!!!!! cancelTransfer is called");
+		String rtn = "redirect:/store/admin/inventories" ;
+
+		Object principal = getPrincipal();
+
+		User loginUser = getLoginUser(principal);
+		Staff staff = staffService.getByUser(loginUser);
+
+		if(!isStoreAdmin(principal) || staff == null) {
+			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
+			return "redirect:/store/admin/logout";
+		}
+
+		String inventoryid = requestParams.get("inventoryid");
+
+		Inventory inventory = inventoryService.getById(Long.parseLong(inventoryid));
+		Calendar cal = Calendar.getInstance();
+		//logger.debug("[Store ADM] Cancel Transfer - Date: {}, By: {}", inventory.getSenddate(), inventory.getSentby().getUserid());
+		Status received = statusService.getByNameAndReftbl("Received", "inventories");
+		Status canceled = statusService.getByNameAndReftbl("Cancelled", "payments");
+		Item item = inventory.getItem();  //itemService.getById(Long.parseLong(itemid));
+
+		inventory.setStatus(canceled);
+		inventory.setDeststore(null);
+		inventory.setReceivedate(cal);
+		inventory.setReceivedby(loginUser);
+		inventory.setComments("Transfer has been canceled by " + loginUser.getFirstname() + " " + loginUser.getLastname());
+
+		inventory = inventoryService.save(inventory);
+
+		InventoryHistory history1 = new InventoryHistory(inventory);
+		history1 = inventoryHistoryService.save(history1);
+
+		inventory.setStatus(received);
+		inventory = inventoryService.save(inventory);
+		InventoryHistory history = new InventoryHistory(inventory);
+		history = inventoryHistoryService.save(history);
+
+//		Store store = staff.getStore();
+//
+//		List<Inventory> inventories = inventoryService.getByItem(item);
+//		long sum = 0;
+//		for(Inventory i: inventories) {
+//			sum += i.getQuantity();
+//		}
+
+		//model.addAttribute("sum", sum);
+		//model.addAttribute("inventories", inventories);
+		//model.addAttribute("store", store);
+		//model.addAttribute("loginUser", loginUser);
+		//model.addAttribute("menu", "Inventories");
+		//model.addAttribute("subMenu", "inventories");
+
+		//rtn += item.getItemid();
 
 		return rtn;
 	}

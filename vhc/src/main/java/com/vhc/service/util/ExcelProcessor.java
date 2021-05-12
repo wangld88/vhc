@@ -20,6 +20,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vhc.core.model.Countlog;
 import com.vhc.core.model.Giftcard;
 import com.vhc.core.model.Store;
 import com.vhc.core.model.User;
@@ -132,7 +133,7 @@ public class ExcelProcessor {
 				System.out.print(colIx+": "+cellValue + "\t" );
 			}
 
-			if(maxColIx == 3 && row.getCell(0) != null && row.getCell(1) != null && row.getCell(2) != null) {
+			if(maxColIx == 4 && row.getCell(0) != null && row.getCell(1) != null && row.getCell(2) != null) {
 				System.out.println("The rowIndex " + row.getRowNum()
 					+ " does not have the right value: "
 					+ ", 0: " + row.getCell(0).getCellTypeEnum()
@@ -155,6 +156,8 @@ public class ExcelProcessor {
 					} else {
 						logger.error("Given store can not be found.");
 					}
+				} else {
+					logger.error("The store list is empty");
 				}
 				card.setLoaddate(Calendar.getInstance());
 				card.setLoadedby(user);
@@ -183,6 +186,61 @@ public class ExcelProcessor {
         workbook.close();
 
         return cards;
+	}
+
+
+	public List<String> readInventory(String filename)
+			throws IOException, InvalidFormatException {
+
+		File file = new File(filename);
+		List<String> logs = new ArrayList<>();
+
+        Workbook workbook = WorkbookFactory.create(file);
+
+        // Retrieving the number of sheets in the Workbook
+        System.out.println("Workbook has " + workbook.getNumberOfSheets() + " Sheets : ");
+
+        Sheet sheet = workbook.getSheetAt(0);
+
+        DataFormatter dataFormatter = new DataFormatter();
+        int counter = 0;
+
+        for (Row row: sheet) {
+        	counter++; //Skip header
+
+			if(counter == 1) {
+				continue;
+			}
+
+        	short minColIx = row.getFirstCellNum();
+			short maxColIx = row.getLastCellNum();
+
+			System.out.println("counter: "+counter+", minColIx: "+minColIx+", maxColIx: "+maxColIx);
+			for(short colIx=minColIx; colIx<maxColIx; colIx++) {
+
+				Cell cell = row.getCell(colIx);
+				if(cell == null) {
+					continue;
+				}
+
+				//... do something with cell
+				String cellValue = dataFormatter.formatCellValue(cell);
+				System.out.print(colIx+": "+cellValue + "\t" );
+			}
+
+			if(maxColIx == 1 && row.getCell(0) != null) {
+
+				logs.add(dataFormatter.formatCellValue(row.getCell(0)));
+
+			} else {
+				System.out.println("The rowIndex " + row.getRowNum() + " does not have the right value: ");
+			}
+        }
+
+        workbook.close();
+
+		return logs;
+
 	}
 
 	private static void printCellValue(Cell cell) {

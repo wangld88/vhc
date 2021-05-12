@@ -17,11 +17,11 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 /**
  *
- * @author Jerry
+ * @author J.W.
  *
  */
 @Entity
-@Table(name="COUNTRIES")
+@Table(name="countries")
 @ApiObject
 @NamedQuery(name="Country.findAll", query="SELECT c FROM Country c")
 public class Country implements Serializable {

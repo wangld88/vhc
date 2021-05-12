@@ -16,6 +16,12 @@ public class InventoryHistoryService {
 	private InventoryHistoryRepository inventoryHistoryRepository;
 
 
+	public InventoryHistory getUnreceivedTransfer(Inventory inventory, String status) {
+
+		return this.inventoryHistoryRepository.findByInventory_inventoryidAndStatus_nameAndReceivedateIsNull(inventory.getInventoryid(), status);
+
+	}
+
 	public List<InventoryHistory> getByInventory(Inventory inventory) {
 
 		return this.inventoryHistoryRepository.findAllByInventory(inventory);

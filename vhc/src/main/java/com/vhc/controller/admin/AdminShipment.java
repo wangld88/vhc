@@ -1,5 +1,8 @@
 package com.vhc.controller.admin;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,18 +13,23 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.vhc.controller.BaseController;
 import com.vhc.core.model.Address;
 import com.vhc.core.model.City;
+import com.vhc.core.model.Countinventory;
+import com.vhc.core.model.Countlog;
+import com.vhc.core.model.Countupload;
 import com.vhc.core.model.Inventory;
+import com.vhc.core.model.Inventorycount;
 import com.vhc.core.model.Item;
 import com.vhc.core.model.Product;
 import com.vhc.core.model.Purchaseorder;
@@ -32,18 +40,19 @@ import com.vhc.core.model.Status;
 import com.vhc.core.model.Store;
 import com.vhc.core.model.Supplier;
 import com.vhc.core.model.User;
-import com.vhc.security.LoginUser;
+import com.vhc.core.util.Message;
+import com.vhc.service.util.ExcelProcessor;
 
 
 /**
  *
  *
- * @author Jerry
+ * @author K & J Consulting
  *
  */
 @Controller
 @RequestMapping({"/admin"})
-public class AdminShipment extends BaseController {
+public class AdminShipment extends AdminBase {
 
 	private final Logger logger = LoggerFactory.getLogger(AdminShipment.class);
 
@@ -52,9 +61,16 @@ public class AdminShipment extends BaseController {
 	public String dspSuppliers(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/suppliers";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
 		List<Supplier> mfs = supplierService.getAll();
 		model.addAttribute("suppliers", mfs);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Products");
 		model.addAttribute("submenu", "suppliers");
 
@@ -66,11 +82,18 @@ public class AdminShipment extends BaseController {
 	public String searchSupplier(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/suppliers";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
 		String name = "%" + requestParams.get("name") + "%";
 		List<Supplier> suppliers = supplierService.getByName(name);
 
 		model.addAttribute("suppliers", suppliers);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Products");
 		model.addAttribute("submenu", "suppliers");
 
@@ -82,10 +105,17 @@ public class AdminShipment extends BaseController {
 	public String dspSupplier(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/supplier";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
 		List<City> cities = cityService.getAll();
 
 		model.addAttribute("cities", cities);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Products");
 		model.addAttribute("submenu", "suppliers");
 
@@ -97,13 +127,20 @@ public class AdminShipment extends BaseController {
 	public String updateSupplier(ModelMap model, @PathVariable("supplierid") Long supplierid, HttpSession httpSession) {
 		String rtn = "admin/supplier";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
 		long mfid = supplierid.longValue();
 		Supplier mf = supplierService.getById(mfid);
 
 		List<City> cities = cityService.getAll();
 		model.addAttribute("mf", mf);
 		model.addAttribute("cities", cities);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "suppliers");
 
@@ -116,6 +153,12 @@ public class AdminShipment extends BaseController {
 		String rtn = "suppliers";
 
 		logger.info("doSupplier is call!!!!!");
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
 
 		Address ads = new Address();
 
@@ -150,7 +193,7 @@ public class AdminShipment extends BaseController {
 		mf.setWebsite(website);
 		mf.setComments(comments);
 		supplierService.save(mf);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Products");
 		model.addAttribute("submenu", "suppliers");
 
@@ -162,9 +205,16 @@ public class AdminShipment extends BaseController {
 	public String dspPurchaseOrders(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/purchorders";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
 		List<Purchaseorder> orders = purchaseorderService.getAll();
 		model.addAttribute("orders", orders);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "purchorders");
 
@@ -176,11 +226,18 @@ public class AdminShipment extends BaseController {
 	public String searchPurchaseOrders(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/purchorders";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
 		String name = "%" + requestParams.get("name") + "%";
 		List<Purchaseorder> purchorders = purchaseorderService.getByName(name);
 
 		model.addAttribute("orders", purchorders);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "purchorders");
 
@@ -192,13 +249,20 @@ public class AdminShipment extends BaseController {
 	public String dspPurchaseOrder(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/purchorder";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
 		List<Supplier> suppliers = supplierService.getAll();
 
 		List<User> users = userService.getByRolename("ADMIN");
 
 		model.addAttribute("users", users);
 		model.addAttribute("suppliers", suppliers);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "purchorders");
 
@@ -209,6 +273,13 @@ public class AdminShipment extends BaseController {
 	@RequestMapping(method={RequestMethod.GET}, value={"/purchorder/{orderid}"})
 	public String updatePurchaseOrder(ModelMap model, @PathVariable("orderid") Long orderid, HttpSession httpSession) {
 		String rtn = "admin/purchorder";
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
 
 		long odrid = orderid.longValue();
 		Purchaseorder order = purchaseorderService.getById(odrid);
@@ -222,7 +293,7 @@ public class AdminShipment extends BaseController {
 		model.addAttribute("items", items);
 		model.addAttribute("suppliers", suppliers);
 		model.addAttribute("purchorder", order);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "purchorders");
 
@@ -236,7 +307,14 @@ public class AdminShipment extends BaseController {
 
 		String rtn = "purchorders";
 
-		User recordedby = this.getPrincipal();
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
+		User recordedby = loginUser;
 
 		logger.info("doShipment is call!!!!! - " + recordedby.getUsername());
 
@@ -277,7 +355,7 @@ public class AdminShipment extends BaseController {
 
 		purchaseorderService.save(order);
 
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "purchorders");
 
@@ -289,9 +367,15 @@ public class AdminShipment extends BaseController {
 	public String dspShipments(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/shipments";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
 		List<Shipment> mfs = shipmentService.getAll();
 		model.addAttribute("shipments", mfs);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "shipments");
 
@@ -303,11 +387,18 @@ public class AdminShipment extends BaseController {
 	public String searchShipments(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/shipments";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
 		String name = "%" + requestParams.get("name") + "%";
 		List<Shipment> shipments = shipmentService.getByName(name);
 
 		model.addAttribute("shipments", shipments);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "shipments");
 
@@ -319,10 +410,17 @@ public class AdminShipment extends BaseController {
 	public String dspShipment(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/shipment";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
 		List<Supplier> suppliers = supplierService.getAll();
 
 		model.addAttribute("suppliers", suppliers);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "shipments");
 
@@ -334,6 +432,13 @@ public class AdminShipment extends BaseController {
 	public String updateShipment(ModelMap model, @PathVariable("shipmentid") Long shipmentid, HttpSession httpSession) {
 		String rtn = "admin/shipment";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
 		long mfid = shipmentid.longValue();
 		Shipment mf = shipmentService.getById(mfid);
 
@@ -343,7 +448,7 @@ public class AdminShipment extends BaseController {
 		model.addAttribute("items", items);
 		model.addAttribute("suppliers", suppliers);
 		model.addAttribute("shipment", mf);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "shipments");
 
@@ -356,7 +461,15 @@ public class AdminShipment extends BaseController {
 		throws Exception {
 
 		String rtn = "shipments";
-		User recordedby = this.getPrincipal();
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
+		User recordedby = loginUser;
 
 		logger.info("doShipment is call!!!!! - " + recordedby.getUsername());
 
@@ -391,7 +504,7 @@ public class AdminShipment extends BaseController {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "shipments");
 
@@ -402,6 +515,12 @@ public class AdminShipment extends BaseController {
 	public String dspItems(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/items";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
 		//list all
 		//List<Item> allItems = itemService.getAll();
 
@@ -410,7 +529,7 @@ public class AdminShipment extends BaseController {
 		//System.out.println("All Items: "+allItems.size()+", available items: "+items.size());
 
 		model.addAttribute("items", items);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "items");
 
@@ -422,11 +541,18 @@ public class AdminShipment extends BaseController {
 	public String searchItem(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/items";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
 		String name = "%" + requestParams.get("name") + "%";
 		List<Item> items = itemService.getByName(name);
 
 		model.addAttribute("items", items);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "items");
 
@@ -438,6 +564,13 @@ public class AdminShipment extends BaseController {
 	public String dspItem(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		logger.info("dspItem: ");
 		String rtn = "admin/item";
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
 		String shipmentid = requestParams.get("shipmentid");
 		List<Shipment> shipments = new ArrayList<>();
 
@@ -455,7 +588,7 @@ public class AdminShipment extends BaseController {
 		model.addAttribute("regions", regions);
 		model.addAttribute("products", products);
 		model.addAttribute("shipments", shipments);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "items");
 
@@ -466,6 +599,13 @@ public class AdminShipment extends BaseController {
 	@RequestMapping(method={RequestMethod.GET}, value={"/item/{itemid}"})
 	public String updateItem(ModelMap model, @PathVariable("itemid") Long itemid, HttpSession httpSession) {
 		String rtn = "admin/item";
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
 
 		long mfid = itemid.longValue();
 		Item mf = itemService.getById(mfid);
@@ -490,7 +630,7 @@ public class AdminShipment extends BaseController {
 		model.addAttribute("products", products);
 		model.addAttribute("item", mf);
 		model.addAttribute("stores", stores);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("inventories", inventories);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "items");
@@ -499,20 +639,31 @@ public class AdminShipment extends BaseController {
 	}
 
 
-	@RequestMapping(method={RequestMethod.POST}, value={"/item/{itemid}"})
+	@RequestMapping(method={RequestMethod.POST}, value={"/items/{itemid}"})
 	public String removeItem(ModelMap model, @PathVariable("itemid") Long itemid, HttpSession httpSession) {
 		String rtn = "/admin/items";
-		logger.info("removeProduct is call!!!!!"+itemid);
+		System.out.println("removeProduct is call!!!!!");
+		logger.info("removeProduct is call!!!!! "+itemid);
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
 		long itmid = itemid.longValue();
 
-		Inventory inventory = inventoryService.getByItemid(itmid);
+		try {
+			Inventory inventory = inventoryService.getByItemid(itmid);
 
-		if(inventory != null) {
-			inventoryService.delete(inventory.getInventoryid());
+			if(inventory != null) {
+				inventoryService.delete(inventory.getInventoryid());
+			}
+
+			itemService.delete(itmid);
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
-		itemService.delete(itmid);
-
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "items");
 
@@ -525,7 +676,12 @@ public class AdminShipment extends BaseController {
 		throws Exception {
 
 		String rtn = "item";
-		User loginUser = this.getPrincipal();
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
 
 		logger.info("doShipment is call!!!!! - " + loginUser.getUsername());
 
@@ -556,6 +712,10 @@ public class AdminShipment extends BaseController {
 		//Product product = productService.getById(Long.parseLong(productid));
 		Product product = productService.getByFullname(productname);
 		Size size = sizeService.getById(Long.parseLong(sizeid));
+
+		if(product == null && productid != null) {
+			product = productService.getById(Long.parseLong(productid));
+		}
 
 		if(itemid != null && !itemid.isEmpty()) {
 			itmid = Long.parseLong(itemid);
@@ -659,7 +819,7 @@ public class AdminShipment extends BaseController {
 			rtn = "shipment/" + rtn_shipmentid;
 		}
 
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "items");
 
@@ -667,14 +827,421 @@ public class AdminShipment extends BaseController {
 	}
 
 
+	@GetMapping("/inventorycounts")
+	public String dspInventoryCounts(ModelMap model, HttpSession httpSession) {
+
+		String rtn = "admin/inventorycounts";
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
+		logger.info("[ADM Ship] dspInventoryCounts is call!!!!! ");
+
+		List<Inventorycount> inventorycounts = inventorycountService.getAll();
+		//List<Countlog> countlogs = countlogService.getAll();
+
+		model.addAttribute("counts", inventorycounts);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Inventories");
+		model.addAttribute("submenu", "inventorycounts");
+
+		return rtn;
+
+	}
+
+	@GetMapping("/inventorycount/")
+	public String dspNewInventoryCount(ModelMap model, HttpSession httpSession) {
+		String rtn = "admin/inventorycount";
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		//model.addAttribute("logs", logs);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Inventories");
+		model.addAttribute("submenu", "inventorycounts");
+
+		return rtn;
+	}
+
+	@PostMapping("/inventorycount/")
+	public String doNewInventoryCount(ModelMap model, HttpSession httpSession) {
+		String rtn = "redirect:/admin/inventorycount";
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		Status status = statusService.getByNameAndReftbl("Started", "inventorycounts");
+		List<Status> statuss = statusService.getByReftblExclude("Delivered", "inventories");
+		List<Inventory> invs = inventoryService.getAllAvaiable(statuss);
+
+		Calendar cal = Calendar.getInstance();
+		Inventorycount count = new Inventorycount();
+		count.setCreatedby(loginUser);
+		count.setCreationdate(cal);
+		count.setCounted(0);
+		count.setScanned(0);
+		count.setTotal(invs.size());
+		count.setStatus(status);
+
+		count = inventorycountService.save(count);
+
+		for(Inventory inv : invs) {
+			Countinventory cinv = new Countinventory();
+			cinv.setInventory(inv);
+			Item itm = inv.getItem();
+			Product p = itm.getProduct();
+			cinv.setProduct(p.getName());
+			cinv.setInventory(inv);
+			cinv.setModelnum(p.getModelnum());
+			cinv.setSku(itm.getSku());
+			if(itm.getSize().getRegion() != null) {
+				cinv.setSizenum(itm.getSize().getRegion().getCode() + itm.getSize().getSizenum());
+			}
+			cinv.setBrand(p.getBrand().getName());
+			cinv.setCount(count);
+			if(inv.getLocation() != null) {
+				cinv.setLocation(inv.getLocation().getName());
+			} else {
+				cinv.setLocation("N/A");
+			}
+			cinv.setStore(inv.getStore().getName());
+
+			cinv = countinventoryService.save(cinv);
+		}
+
+		//model.addAttribute("logs", logs);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Inventories");
+		model.addAttribute("submenu", "inventorycounts");
+
+		return rtn+count.getCountid();
+	}
+
+	@GetMapping("/inventorycount/{countid}")
+	public String dspInventoryCount(ModelMap model, @PathVariable("countid") Long countid, HttpSession httpSession) {
+		String rtn = "admin/inventorycount";
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		Inventorycount count = inventorycountService.getById(countid);
+		List<Countupload> uploads = countuploadService.getByCount(count);
+		//List<Countlog> logs = countlogService.getByUpload(upload);
+
+		model.addAttribute("uploads", uploads);
+		model.addAttribute("count", count);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Inventories");
+		model.addAttribute("submenu", "inventorycounts");
+
+		return rtn;
+	}
+
+	@PostMapping("/inventorycount/complete/{countid}")
+	public String completeInventoryCount(ModelMap model,
+			@PathVariable("countid") Long countid,
+			HttpSession httpSession) {
+		String rtn = "admin/inventorycount";
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		Calendar cal = Calendar.getInstance();
+		Status status = statusService.getByNameAndReftbl("Completed", "inventorycounts");
+		Inventorycount count = inventorycountService.getById(countid);
+
+		count.setStatus(status);
+		count.setUpdatedate(cal);
+		count.setUpdatedby(loginUser);
+		count = inventorycountService.save(count);
+
+		List<Countupload> uploads = countuploadService.getByCount(count);
+
+		model.addAttribute("uploads", uploads);
+		model.addAttribute("count", count);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Inventories");
+		model.addAttribute("submenu", "inventorycounts");
+
+		return rtn;
+	}
+
+	@GetMapping("/inventorycount/countlog/{countuploadid}")
+	public String dspCountlog(ModelMap model,
+			@PathVariable("countuploadid") Long countuploadid,
+			HttpSession httpSession) {
+
+		String rtn = "admin/countlog";
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		Countupload upload = countuploadService.getById(countuploadid);
+		List<Countlog> logs = countlogService.getByUpload(upload);
+
+		model.addAttribute("logs", logs);
+		model.addAttribute("count", upload.getCount());
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Inventories");
+		model.addAttribute("submenu", "inventorycounts");
+
+		return rtn;
+	}
+
+	@GetMapping("/inventorycount/shortage/{countid}")
+	public String dspCountShortage(ModelMap model,
+			@PathVariable("countid") Long countid,
+			HttpSession httpSession) {
+		String rtn = "admin/countshortage";
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		Inventorycount count = inventorycountService.getById(countid);
+
+		List<Countinventory> invs = countinventoryService.getShortageByCount(count);
+
+		model.addAttribute("cinventories", invs);
+		model.addAttribute("count", count);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Inventories");
+		model.addAttribute("submenu", "inventorycounts");
+
+		return rtn;
+	}
+
+
+	@GetMapping("/inventorycount/overage/{countid}")
+	public String dspCountOverage(ModelMap model,
+			@PathVariable("countid") Long countid,
+			HttpSession httpSession) {
+		String rtn = "admin/countoverage";
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		Inventorycount count = inventorycountService.getById(countid);
+
+		List<Countlog> logs = countlogService.getOverageByCount(count);
+
+		model.addAttribute("logs", logs);
+		model.addAttribute("count", count);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Inventories");
+		model.addAttribute("submenu", "inventorycounts");
+
+		return rtn;
+	}
+
+
+	@GetMapping("/inventoryupload")
+	public String dspInventoryUpload(ModelMap model, @RequestParam Map<String,String> requestParams, HttpSession httpSession) {
+		String rtn = "admin/inventoryupload";
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		String countid = requestParams.get("countid");
+
+		Inventorycount count = inventorycountService.getById(Long.parseLong(countid));
+		//model.addAttribute("statuss", statuss);
+		model.addAttribute("count", count);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Inventories");
+		model.addAttribute("submenu", "inventorycounts");
+
+		return rtn;
+	}
+
+	@RequestMapping(method={RequestMethod.POST}, value={"/inventoryupload"})
+	public String doInventoryUpload(@RequestParam("file") MultipartFile file,
+			@RequestParam Map<String,String> requestParams,
+			ModelMap model, HttpSession httpSession) {
+		String rtn = "/admin/inventorycount/countlog/";
+		User loginUser = getSuperAdmin();
+		Message msg = new Message();
+
+		logger.info("Inventory count upload is called!!!");
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		try {
+		    InputStream in = file.getInputStream();
+		    logger.info("$$$$$$$$$$$$$$$$$$ environment:{}, filePath: {}", environment, filePath);
+		    File currDir = new File(filePath); //new File("C:\\temp\\"); //"/disk2/upload"
+		    String path = currDir.getAbsolutePath();
+		    String fileLocation = path + "/" + file.getOriginalFilename(); //path.substring(0, path.length() - 1) + file.getOriginalFilename();
+		    logger.info("File Location: "+fileLocation+", path: "+path);
+
+		    FileOutputStream f = new FileOutputStream(fileLocation);
+		    int ch = 0;
+		    while ((ch = in.read()) != -1) {
+		        f.write(ch);
+		    }
+		    f.flush();
+		    f.close();
+
+		    //List<Store> stores = storeService.getAll();
+
+		    ExcelProcessor processor = new ExcelProcessor();
+
+			List<String> skus = processor.readInventory(fileLocation);
+			List<Countlog> logs = new ArrayList<>();
+
+			List<Status> status = statusService.getByReftblExclude("Delivered", "inventories");
+			logger.warn("Size of the upload cards: {}", logs.size());
+
+			long total = 0;
+			Calendar cal = Calendar.getInstance();
+
+			String countid = requestParams.get("countid");
+
+			Inventorycount count = inventorycountService.getById(Long.parseLong(countid));
+
+			if(!skus.isEmpty()) {
+				Countupload upload = new Countupload();
+				upload.setCount(count);
+				upload.setFilename(file.getOriginalFilename());
+				upload.setCreationdate(cal);
+				upload.setCreatedby(loginUser);
+				upload = countuploadService.save(upload);
+
+				List<Countinventory> countInvs = new ArrayList<>();
+
+				for(String sku : skus) {
+
+					sku = sku.trim();
+					List<Countinventory> invs = countinventoryService.getAvailableByUPC(sku);
+					Countlog newlog = new Countlog();
+					newlog.setCreatedby(loginUser);
+					newlog.setCreationdate(cal);
+					newlog.setSku(sku);
+					newlog.setUpload(upload);
+
+					newlog = countlogService.save(newlog);
+					logs.add(newlog);
+
+					if(!invs.isEmpty()) {
+						Countinventory inv = invs.get(0);
+						newlog.setInventory(inv.getInventory());
+						inv.setCountlog(newlog);
+						inv = countinventoryService.save(inv);
+						newlog = countlogService.save(newlog);
+
+						countInvs.add(inv);
+					}
+
+					//newlog.setCount(count);
+					total++;
+				}
+
+				upload.setTotal(total);
+				upload.setCounted(countInvs.size());
+				upload = countuploadService.save(upload);
+
+				rtn += upload.getCountuploadid();
+
+				//update Inventory Count
+				count.setCounted(count.getCounted() + countInvs.size());
+				count.setScanned(count.getScanned() + total);
+				count = inventorycountService.save(count);
+
+				msg.setStatus(Message.SUCCESS);
+				msg.setMessage("The inventory count batch process completed successfully!");
+			}
+
+		} catch(Exception e) {
+			msg.setStatus(Message.ERROR);
+			msg.setMessage("The inventory count batch process failed, found error: " + e.getMessage());
+			e.printStackTrace();
+			logger.error("The inventory count batch process failed, found error: " + e.getMessage());
+		}
+
+		List<City> cities = cityService.getAll();
+		List<Status> statuss = statusService.getByReftbl("inventories");
+
+		model.addAttribute("message", msg);
+		model.addAttribute("statuss", statuss);
+		model.addAttribute("cities", cities);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Inventories");
+		model.addAttribute("submenu", "inventorycounts");
+
+		return "redirect:"+rtn;
+	}
+
+
+	@GetMapping("/countinventory/{countid}")
+	public String dspCountinventory(ModelMap model,
+			@PathVariable("countid") Long countid,
+			HttpSession httpSession) {
+
+		String rtn = "admin/countinventory";
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			return "redirect:/admin/logout";
+		}
+
+		Inventorycount count = inventorycountService.getById(countid);
+
+		List<Countinventory> invs = countinventoryService.getByCount(count);
+
+		model.addAttribute("cinventories", invs);
+		model.addAttribute("count", count);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("adminmenu", "Inventories");
+		model.addAttribute("submenu", "inventorycounts");
+
+		return rtn;
+	}
+
+
 	@RequestMapping(method={RequestMethod.GET}, value={"/inventorys"})
 	public String dspInventorys(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/inventorys";
 
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
 
 		List<Inventory> inventorys = inventoryService.getAll();
 		model.addAttribute("inventorys", inventorys);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "inventorys");
 
@@ -685,6 +1252,12 @@ public class AdminShipment extends BaseController {
 	@RequestMapping(method={RequestMethod.GET}, value={"/inventory"})
 	public String dspInventory(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/inventory";
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
 		String shipmentid = requestParams.get("shipmentid");
 		List<Shipment> shipments = new ArrayList<>();
 
@@ -701,7 +1274,7 @@ public class AdminShipment extends BaseController {
 		model.addAttribute("items", items);
 		model.addAttribute("stores", stores);
 		model.addAttribute("status", status);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "inventorys");
 
@@ -711,13 +1284,12 @@ public class AdminShipment extends BaseController {
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/inventory/{inventoryid}"})
 	public String updateInventory(ModelMap model, @PathVariable("inventoryid") Long inventoryid, HttpSession httpSession) {
-		/*Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isStoreAdmin(principal)) {
-			return "redirect:/store/admin/logout";
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);*/
 
 		String rtn = "admin/inventory";
 
@@ -731,7 +1303,7 @@ public class AdminShipment extends BaseController {
 		model.addAttribute("stores", stores);
 		model.addAttribute("status", status);
 		model.addAttribute("inventory", inventory);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "inventorys");
 
@@ -746,7 +1318,13 @@ public class AdminShipment extends BaseController {
 		logger.info("!!!!! doInventory is called");
 		String rtn = "redirect:item/" ;
 
-		User receivedby = this.getPrincipal();
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+		User receivedby = loginUser;
 
 		String itemid = requestParams.get("itemid");
 		String storeid = requestParams.get("storeid");
@@ -777,7 +1355,7 @@ public class AdminShipment extends BaseController {
 		}
 
 		model.addAttribute("sum", sum);
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("inventories", inventories);
 		model.addAttribute("adminmenu", "Inventories");
 		model.addAttribute("submenu", "inventorys");
@@ -787,15 +1365,4 @@ public class AdminShipment extends BaseController {
 		return rtn;
 	}
 
-	private User getPrincipal(){
-    	User user = null;
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        //System.out.println("Role is : "+((LoginStudent)principal).toString());
-        if (principal instanceof LoginUser) {
-            user = ((LoginUser)principal).getUser();
-        } else {
-            user = userService.getByUsername("");
-        }
-        return user;
-    }
 }

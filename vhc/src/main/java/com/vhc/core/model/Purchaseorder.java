@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
 @Entity
-@Table(name="PURCHASEORDERS")
+@Table(name="purchaseorders")
 @NamedQuery(name="Purchaseorder.findAll", query="SELECT p FROM Purchaseorder p")
 public class Purchaseorder implements Serializable {
 

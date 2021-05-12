@@ -40,7 +40,7 @@ public class GiftcardHistoryService {
 
 	@Transactional(rollbackFor=Exception.class)
 	public void delete(long gfhistoryid) {
-		giftcardHistoryRepository.delete(gfhistoryid);
+		giftcardHistoryRepository.deleteById(gfhistoryid);
 	}
 
 }

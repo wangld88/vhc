@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 import org.jsondoc.core.annotation.ApiObjectField;
 
 @Entity
-@Table(name="CARDTYPES")
+@Table(name="cardtypes")
 @NamedQuery(name="Cardtype.findAll", query="SELECT c FROM Cardtype c")
 public class Cardtype implements Serializable {
 

@@ -334,10 +334,10 @@
 								<span class="menu-arrow arrow_carrot-right"></span>
 							</a>
 							<ul class="sub">
-								<li><a class="" th:href="@{/admin/purchorders}">P.O.s</a></li>
+								<li><a class="" th:href="@{/admin/purchorders}">Purchase Orders</a></li>
 								<li><a class="" th:href="@{/admin/shipments}">Shipments</a></li>
 								<li><a class="" th:href="@{/admin/items}">Items</a></li>
-								<!-- <li><a class="" th:href="@{/admin/report/sales}">Reports</a></li> -->
+								<li><a class="" th:href="@{/admin/inventorycounts}">Inventory Counts</a></li>
 							</ul>
 						</li>
 						<li th:class="${adminmenu}=='Business'?'active sub-menu':'sub-menu'">
@@ -350,7 +350,8 @@
 								<li><a class="" th:href="@{/admin/stores}">Stores</a></li>
 								<li><a class="" th:href="@{/admin/staffs}">Staffs</a></li>
 								<li><a class="" th:href="@{/admin/giftcards}">Gift Cards</a></li>
-								<li><a class="sub" th:href="@{/admin/promocodes}">Promotion Codes</a></li>
+								<li><a class="" th:href="@{/admin/promocodes}">Promotion Codes</a></li>
+								<li><a class="" th:href="@{/admin/events}">Sale Events</a></li>
 							</ul>
 						</li>
 						<li th:class="${adminmenu}=='Reports'?'active sub-menu':'sub-menu'">

@@ -34,7 +34,7 @@
 									<tr th:each="size:${sizes}">
 										<td th:text="${size.region!=null?size.region.name:''}"></td>
 										<td th:text="${size.sizenum}"></td>
-										<td th:text="${size.type.name}"></td>
+										<td th:text="${size.type!=null?size.type.name:''}"></td>
 										<td>
 											<div class="btn-group">
 												<a th:href="@{/admin/size/}+${size.sizeid}" title="Edit Size"><i class="fa fa-edit"></i></a>

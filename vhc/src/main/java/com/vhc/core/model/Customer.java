@@ -24,7 +24,7 @@ import com.vhc.core.model.User;
 
 
 @Entity
-@Table(name="CUSTOMERS")
+@Table(name="customers")
 @NamedQuery(name="Customer.findAll", query="SELECT s FROM Customer s")
 public class Customer implements Serializable {
 

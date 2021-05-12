@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html layout:decorator="admin/layout/layout">
+	<div layout:fragment="content">
+
+		<style>
+			.back-to-top {
+				margin: 0;
+				position: fixed;
+				bottom: 20px;
+				right: 20px;
+				z-index: 100;
+				display: none;
+				text-decoration: none;
+				cursor: pointer;
+			}
+
+			.back-to-top:hover {
+				color: #ffffff;
+			    background-color: #555; /* Add a dark-grey background on hover */
+			}
+		</style>
+
+		<section id="main-content">
+			<section class="wrapper">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Inventory Management</h3>
+						<ol class="breadcrumb">
+							<li><i class="fa fa-home"></i><a th:href="@{/admin/home}">Home</a></li>
+							<li><i class="icon_document_alt"></i>Inventories</li>
+							<li><i class="fa fa-file-text-o"></i>List Inventory Count</li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+						<section class="panel">
+							<header class="panel-heading">
+								<font size="4">Inventory Count Detail</font>  <span style="width: 240px;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <a th:href="@{/admin/inventorycounts}" title="Back"><i class="arrow_triangle-left_alt2"></i></a>
+							</header>
+
+							<div class="col-lg-12" th:if="${count==null}">
+								<br>
+								<form id="count" name="counts" th:action="@{/admin/inventorycount/}" method="post">
+									<div class="btn-group">
+										<button class="btn btn-primary" value="Start Inventory Count">Start Inventory Count</button>
+									</div>
+								</form>
+							</div>
+							<div class="col-lg-10 col-lg-offset-1" th:if="${count!=null}">
+								<br>
+								<div class="row">
+									<div class="col-lg-7">
+										<div class="row">
+											<label class="col-sm-4 col-form-label">Count No.</label>
+											<div class="col-sm-8">
+												<span th:text="${count.countid}"></span>
+											</div>
+										</div>
+										<div class="row">
+											<label class="col-sm-4 col-form-label">Counted</label>
+											<div class="col-sm-8">
+												<span th:text="${count.counted}"></span>
+											</div>
+										</div>
+										<div class="row">
+											<label class="col-sm-4 col-form-label">Total Scanned</label>
+											<div class="col-sm-8">
+												<span th:text="${count.scanned}"></span>
+											</div>
+										</div>
+										<div class="row">
+											<label class="col-sm-4 col-form-label">Total Inventories</label>
+											<div class="col-sm-8">
+												<span th:text="${count.total}"></span>
+											</div>
+										</div>
+										<div class="row">
+											<label class="col-sm-4 col-form-label">Start At</label>
+											<div class="col-sm-8">
+												<span th:text="${#calendars.format(count.creationdate,'MM/dd/yyyy')}"></span>
+											</div>
+										</div>
+										<div class="row">
+											<label class="col-sm-4 col-form-label">End At</label>
+											<div class="col-sm-8">
+												<span th:text="${count.updatedate!=null?#calendars.format(count.updatedate,'MM/dd/yyyy'):''}"></span>
+											</div>
+										</div>
+										<div class="row">
+											<label class="col-sm-4 col-form-label">Status</label>
+											<div class="col-sm-8">
+												<span th:text="${count.status!=null?count.status.name:'N/A'}"></span>
+											</div>
+										</div>
+									</div>
+									<div class="col-lg-5">
+										<div class="row">
+											<a class="btn btn-primary" th:href="@{/admin/countinventory/}+${count.countid}" style="width: 100px;">View Detail</a>
+										</div>
+										<br>
+										<div class="row" th:if="${count.status!=null and count.status.name!='Completed'}">
+											<form th:action="@{/admin/inventorycount/complete/}+${count.countid}" method="post">
+												<button class="btn btn-primary" style="width: 100px;">Complete</button>
+											</form>
+										</div>
+										<div class="row" th:if="${count.status!=null and count.status.name=='Completed'}">
+											<a class="btn btn-primary" th:href="@{/admin/inventorycount/shortage/}+${count.countid}" style="width: 100px;">Shortage</a>
+										</div>
+										<br>
+										<div class="row" th:if="${count.status!=null and count.status.name=='Completed'}">
+											<a class="btn btn-primary" th:href="@{/admin/inventorycount/overage/}+${count.countid}" style="width: 100px;">Overage</a>
+										</div>
+									</div>
+								</div>
+								<hr>
+								<div class="row">
+									<form th:action="@{/admin/inventoryupload}" method="get">
+										<input type="hidden" id="countid" name="countid" th:value="${count.countid}">
+										<div th:if="${uploads!=null and uploads.size()!=0}">
+											<div><h4>Uploaded Files</h4></div>
+											<!-- <div th:each="upload : ${uploads}">
+												<div class="row">
+													<div class="col-lg-7">
+														<div class="col-lg-4"><span th:text="${upload.filename}"></span></div>
+														<div class="col-lg-4"><span th:text="${upload.counted}"></span></div>
+														<div class="col-lg-2"><span th:text="${upload.total}"></span></div>
+													</div>
+													<div class="col-lg-5">
+														<div class="col-lg-2"><a class="btn btn-primary" th:href="@{/admin/inventorycount/countlog/}+${upload.countuploadid}">View Upload</a></div>
+													</div>
+												</div>
+											</div> -->
+											<table class="dataTable">
+												<thead>
+													<tr>
+														<th>File Name</th>
+														<th>Counted #</th>
+														<th>Total #</th>
+														<th>Action</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr th:each="upload : ${uploads}">
+														<td><span th:text="${upload.filename}"></span></td>
+														<td><span th:text="${upload.counted}"></span></td>
+														<td><span th:text="${upload.total}"></span></td>
+														<td><a class="btn btn-primary" th:href="@{/admin/inventorycount/countlog/}+${upload.countuploadid}">View Upload</a></td>
+													</tr>
+												</tbody>
+											</table>
+											<hr>
+											<div class="col-lg-offset-5"  th:if="${count.status!=null and count.status.name!='Completed'}">
+												<button class="btn btn-primary"> + Upload More Inventory Count File</button>
+											</div>
+											<hr>
+										</div>
+										<div th:if="${uploads==null or uploads.size()==0}">
+											<div class="col-lg-7">
+												<span>No inventory count file has been uploaded.</span>
+											</div>
+											<div class="col-lg-5">
+												<button class="btn btn-primary">Upload One</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</section>
+						<!-- <a class="back-to-top well well-sm" href="#"><i class="glyphicon glyphicon-chevron-up"></i> Back to Top</a> -->
+					</div>
+				</div>
+ 			</section>
+		</section>
+
+		<script th:src="@{/js/jquery-1.10.2.min.js}"></script>
+		<script th:src="@{/js/jquery.dataTables.min.js}"></script>
+    <!-- <script src="Scripts/jquery-1.7.js"></script> -->
+
+    <!-- <script th:src="@{/js/dataTables.bootstrap.min.js}"></script> -->
+<!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script type="text/javascript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script> -->
+		<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
+
+		<script type="text/javascript">
+			$(document).ready(function() {
+				var offset = 250;
+
+				var duration = 300;
+
+				$(window).scroll(function() {
+
+					if ($(this).scrollTop() > offset) {
+						$('.back-to-top').fadeIn(duration);
+					} else {
+						$('.back-to-top').fadeOut(duration);
+					}
+
+				});
+
+			    var token = $("meta[name='_csrf']").attr("content");
+			    var header = $("meta[name='_csrf_header']").attr("content");
+
+			    /* var table = $('#mainTable').DataTable({
+					ajax: {
+						url: "api/items",
+						type: "post",
+						dataType: "json",
+						contentType: "application/json; charset=utf-8",
+						data: function(d) {
+						    return JSON.stringify(d);
+						},
+						beforeSend: function(xhr){
+                            xhr.setRequestHeader(header, token);
+                        }
+					},
+					serverSide: true,
+					processing : true,
+					responsive: true,
+					order: [ [ 10, "desc" ] ],
+					columns: [
+						{data: "product.name", searchable: true},
+						{data: "product.modelnum", searchable: true},
+						{data: "sku", searchable: true},
+						{data: "size", searchable: false,
+							render: function (data, type, row) {
+								return data["sizenum"] + '(' + data["region"]["code"] + ')';
+							}
+						},
+						{data: "cost", searchable: false},
+						{data: "quantity", searchable: false},
+						{data: "purchaseorder.code", searchable: true,
+							render: function (data, type, row) {
+								return data || '';
+							}
+						},
+						{data: "shipment.code", searchable: true,
+							render: function (data, type, row) {
+								console.log("shipment data: "+row);
+								return data || '';
+							}
+						},
+						{data: "receivedby.firstname", searchable: false,
+							render: function (data, type, row) {
+						    	return data || '';}},
+						{data: "receivedate", searchable: false,
+		                    render: function (data, type, row) {
+		                    	if(data != null && data != "null") {
+		                    		console.log("data on date: "+data);
+		                    		return new Date(data).toLocaleString();
+		                    	} else {
+		                    		return '';
+		                    	}
+							}
+						},
+						{data: "itemid", searchable: false,
+						 render: function(data, type, row) {
+							 str = '<form id="items'+data+'" name="items'+data+'" action="items/'+data+'" method="post">'
+							 		+ '<a class="btn btn-success" href="item/' + data + '" title="Edit Item"><i class="icon_pencil-edit_alt"></i></a>'
+							 		+ '<a class="btn btn-danger" title="Remove Item" onclick="deleteItem('+data+')"><i class="icon_trash"></i></a>'
+							 		+ '<input type="hidden" name="_csrf" >'
+							 		+ '</form>';
+							 return str;
+						 }
+						}
+					]
+				}); */
+
+			    $("#name").on('keydown', function(e) {
+			        if (e.which == 13) {
+			            e.preventDefault();
+			        }
+			    });
+
+			    $("#name").on('keyup', function(e) {
+			    	e.preventDefault();
+			    	table.search(this.value).draw();
+			    })
+			});
+		</script>
+		<script type="text/javascript">
+			function deleteItem(id) {
+				var form = document.getElementById("items"+id);
+				if(confirm("Do you want to delete the item?")) {
+					var token = $("meta[name='_csrf']").attr("content");
+					$(form).find("input[name=_csrf]").val(token);
+
+					form.submit();
+				} else
+					return false;
+			}
+		</script>
+	</div>
+</html>

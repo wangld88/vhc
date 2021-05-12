@@ -1,5 +1,6 @@
 package com.vhc.controller.admin;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -62,7 +65,7 @@ public class AdminBase extends BaseController {
 
     	model.setStatus(HttpStatus.NOT_FOUND);
 		model.addObject("exception", att);
-		model.addObject("loginUser", getPrincipal());
+		model.addObject("loginUser", getLoginUser());
 
         return model;
     }
@@ -86,7 +89,7 @@ public class AdminBase extends BaseController {
 			}
 
 		}
-		model.addObject("loginUser", getPrincipal());
+		model.addObject("loginUser", getLoginUser());
 		model.addObject("errordetails", errorDetails);
 
 		return model;
@@ -114,16 +117,86 @@ public class AdminBase extends BaseController {
 		return model;
 	}
 
-	private User getPrincipal(){
+	/*private User getPrincipal(){
     	User user = null;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        //System.out.println("Role is : "+((LoginStudent)principal).toString());
+
+        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        boolean isSuper = false;
+        for (GrantedAuthority grantedAuthority : authorities) {
+        	isSuper = grantedAuthority.getAuthority().equals("SUPERADMIN");
+        }
+
+        if (principal instanceof LoginUser) {
+        	LoginUser auth = (LoginUser)principal;
+        	if(isSuper) {
+        		user = auth.getUser();
+        	}
+        } else {
+            user = userService.getByUsername("");
+        }
+        return user;
+    }*/
+
+	protected Object getPrincipal(){
+        return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+	protected User getLoginUser() {
+
+		User user = null;
+		Object principal = getPrincipal();
+
         if (principal instanceof LoginUser) {
             user = ((LoginUser)principal).getUser();
         } else {
             user = userService.getByUsername("");
         }
+
         return user;
     }
+
+	protected User getLoginUser(Object principal) {
+
+		User user = null;
+
+        if (principal instanceof LoginUser) {
+            user = ((LoginUser)principal).getUser();
+        } else {
+            user = userService.getByUsername("");
+        }
+
+        return user;
+    }
+
+	protected boolean isSuperAdmin(Object principal) {
+
+		if(principal instanceof LoginUser) {
+			return ((LoginUser) principal).getAuthorities().contains(new SimpleGrantedAuthority("SUPERADMIN"));
+		} else {
+			return false;
+		}
+	}
+
+	protected User getSuperAdmin(){
+		User user = null;
+	    Object principal = getPrincipal();
+
+	    Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+	    boolean isSuper = false;
+	    for (GrantedAuthority grantedAuthority : authorities) {
+	    	isSuper = grantedAuthority.getAuthority().equals("SUPERADMIN");
+	    }
+
+	    if (principal instanceof LoginUser) {
+	    	LoginUser auth = (LoginUser)principal;
+	    	if(isSuper) {
+	    		user = auth.getUser();
+	    	}
+	    } else {
+	        user = userService.getByUsername("");
+	    }
+	    return user;
+	}
 
 }

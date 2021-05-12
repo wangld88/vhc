@@ -1,7 +1,6 @@
 package com.vhc.controller.admin;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -9,8 +8,6 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,18 +15,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.vhc.controller.BaseController;
 import com.vhc.core.model.Address;
 import com.vhc.core.model.City;
 import com.vhc.core.model.Staff;
 import com.vhc.core.model.Store;
 import com.vhc.core.model.User;
-import com.vhc.security.LoginUser;
 
 
 @Controller
 @RequestMapping({"/admin"})
-public class AdminStore extends BaseController {
+public class AdminStore extends AdminBase {
 
 	private final Logger logger = LoggerFactory.getLogger(AdminStore.class);
 
@@ -37,9 +32,10 @@ public class AdminStore extends BaseController {
 	public String dspStores(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/stores";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
@@ -56,9 +52,10 @@ public class AdminStore extends BaseController {
 	public String dspStore(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/store";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
@@ -76,9 +73,10 @@ public class AdminStore extends BaseController {
 	public String updateStore(ModelMap model, @PathVariable("storeid") Long storeid, HttpSession httpSession) {
 		String rtn = "admin/store";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
@@ -101,9 +99,10 @@ public class AdminStore extends BaseController {
 
 		logger.info("doStore is call!!!!!");
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
@@ -160,9 +159,10 @@ public class AdminStore extends BaseController {
 	public String dspStaffs(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/staffs";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
@@ -179,9 +179,10 @@ public class AdminStore extends BaseController {
 	public String dspStaff(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/staff";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
@@ -205,9 +206,10 @@ public class AdminStore extends BaseController {
 	public String updateStaff(ModelMap model, @PathVariable("staffid") Long staffid, HttpSession httpSession) {
 		String rtn = "admin/staff";
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
@@ -233,9 +235,10 @@ public class AdminStore extends BaseController {
 
 		logger.info("doStaff is call!!!!!");
 
-		User loginUser = getPrincipal();
+		User loginUser = getSuperAdmin();
 
 		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
@@ -261,27 +264,5 @@ public class AdminStore extends BaseController {
 
 		return "redirect:" + rtn;
 	}
-
-	private User getPrincipal(){
-    	User user = null;
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        boolean isSuper = false;
-        for (GrantedAuthority grantedAuthority : authorities) {
-        	isSuper = grantedAuthority.getAuthority().equals("SUPERADMIN");
-        }
-
-        if (principal instanceof LoginUser) {
-        	LoginUser auth = (LoginUser)principal;
-        	if(isSuper) {
-        		user = auth.getUser();
-        	}
-        } else {
-            user = userService.getByUsername("");
-        }
-        return user;
-    }
-
 
 }

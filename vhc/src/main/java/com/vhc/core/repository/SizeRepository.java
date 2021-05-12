@@ -10,7 +10,7 @@ public interface SizeRepository extends CrudRepository<Size, Long> {
 
 	List<Size> findAll();
 
-	List<Size> findAllByOrderByRegionAscTypeAscSizenumAsc();
+	List<Size> findAllByOrderByRegionAscTypeAscSeqnumAsc();
 
 	List<Size> findByType_typeidAndRegion_regionid(long typeid, long regionid);
 

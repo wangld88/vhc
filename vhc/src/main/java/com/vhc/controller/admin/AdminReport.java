@@ -10,7 +10,6 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.vhc.core.model.Orderitem;
 import com.vhc.core.model.Store;
 import com.vhc.core.model.User;
-import com.vhc.security.LoginUser;
 
 
 @Controller
@@ -35,7 +33,12 @@ public class AdminReport extends AdminBase {
 
 		logger.info("Generate sales report!");
 
-		User loginUser = this.getPrincipal();
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
 
 		String id = request.getParameter("storeid");
 		String from = request.getParameter("from");
@@ -92,7 +95,12 @@ public class AdminReport extends AdminBase {
 	public String dspSearch(HttpServletRequest request, ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/reportsales";
 
-		User loginUser = this.getPrincipal();
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
 
 		String name = request.getParameter("name");
 
@@ -114,15 +122,4 @@ public class AdminReport extends AdminBase {
 		return rtn;
 	}
 
-	private User getPrincipal(){
-    	User user = null;
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        //System.out.println("Role is : "+((LoginStudent)principal).toString());
-        if (principal instanceof LoginUser) {
-            user = ((LoginUser)principal).getUser();
-        } else {
-            user = userService.getByUsername("");
-        }
-        return user;
-    }
 }

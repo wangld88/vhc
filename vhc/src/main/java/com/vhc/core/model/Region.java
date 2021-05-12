@@ -15,7 +15,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="REGIONS")
+@Table(name="regions")
 @NamedQuery(name="Region.findAll", query="SELECT b FROM Region b")
 public class Region implements Serializable {
 

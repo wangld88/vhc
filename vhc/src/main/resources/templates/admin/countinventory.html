@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html layout:decorator="admin/layout/layout">
+	<div layout:fragment="content">
+
+		<style>
+			.back-to-top {
+				margin: 0;
+				position: fixed;
+				bottom: 20px;
+				right: 20px;
+				z-index: 100;
+				display: none;
+				text-decoration: none;
+				cursor: pointer;
+			}
+
+			.back-to-top:hover {
+				color: #ffffff;
+			    background-color: #555; /* Add a dark-grey background on hover */
+			}
+		</style>
+
+		<section id="main-content">
+			<section class="wrapper">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3 class="page-header"><i class="fa fa-file-text-o"></i> Inventory Management</h3>
+						<ol class="breadcrumb">
+							<li><i class="fa fa-home"></i><a th:href="@{/admin/home}">Home</a></li>
+							<li><i class="icon_document_alt"></i>Inventories</li>
+							<li><i class="fa fa-file-text-o"></i>View Inventory Count Summary</li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+						<section class="panel">
+							<header class="panel-heading">
+								<font size="4">Inventory Count Summary</font>  <span style="width: 240px;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <a th:href="@{/admin/inventorycount/}+${count.countid}" title="Back"><i class="arrow_triangle-left_alt2"></i></a>
+							</header>
+
+							<table id="mainTable" class="table table-striped table-advance table-hover">
+								<thead>
+									<tr>
+										<th>No.</th>
+										<th>Brand</th>
+										<th>Product</th>
+										<th>Model No.</th>
+										<th>UPC</th>
+										<th>Size</th>
+										<th>Inventory ID</th>
+										<th>Stroe</th>
+										<th>Location</th>
+										<th>Counted</th>
+										<!-- <th><i class="icon_cogs"></i> Action</th> -->
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="cinv:${cinventories}">
+										<td th:text="${cinv.countinventoryid}"></td>
+										<td th:text="${cinv.brand}"></td>
+										<td th:text="${cinv.product}"></td>
+										<td th:text="${cinv.modelnum}"></td>
+										<td th:text="${cinv.sku}"></td>
+										<td th:text="${cinv.sizenum}"></td>
+										<td th:text="${cinv.inventory!=null?cinv.inventory.inventoryid:'N/A'}"></td>
+										<td th:text="${cinv.store}"></td>
+										<td th:text="${cinv.location}"></td>
+										<td th:text="${cinv.countlog!=null?cinv.countlog.countlogid:''}"></td>
+										<!-- <td>
+											<form th:id="${'counts'+count.countid}" th:name="${'counts'+count.countid}" th:action="@{/admin/inventorycount/}+${count.countid}" method="post">
+												<div class="btn-group">
+													<a class="btn btn-success" th:href="@{/admin/inventorycount/}+${count.countid}" title="Edit Inventory Count"><i class="icon_pencil-edit_alt"></i></a>
+												</div>
+											</form>
+										</td> -->
+									</tr>
+								</tbody>
+								<!-- <thead>
+									<tr>
+										<th><i class="icon_documents"></i> Product</th>
+										<th><i class="icon_mobile"></i> Model</th>
+										<th><i class="icon_mail_alt"></i> UPC</th>
+										<th><i class="icon_mobile"></i> Size</th>
+										<th><i class="icon_mobile"></i> Cost</th>
+										<th><i class="icon_pin_alt"></i> Quantity</th>
+										<th><i class="icon_mobile"></i> PO No.</th>
+										<th><i class="icon_mobile"></i> Shipment</th>
+										<th><i class="icon_pin_alt"></i> Received By</th>
+										<th><i class="icon_contacts_alt"></i> Received Date</th>
+										<th><i class="icon_cogs"></i> Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="mf:${items}" th:if="${mf.inventories!=null and mf.inventories.size()>0 and mf.inventories.get(0).status.statusid!=3}">
+										<td th:text="${mf.product.name}"></td>
+										<td th:text="${mf.product.modelnum}"></td>
+										<td th:text="${mf.sku}"></td>
+										<td th:text="${mf.size.sizenum + '(' + mf.size.region.code + ')'}"></td>
+										<td th:text="${mf.cost}"></td>
+										<td th:text="${mf.quantity}"></td>
+										<td th:text="${mf.purchaseorder!=null?mf.purchaseorder.code:''}"></td>
+										<td th:text="${mf.shipment!=null?mf.shipment.code:''}"></td>
+										<td th:text="${mf.receivedby!=null?mf.receivedby.firstname:''}"></td>
+										<td th:text="${mf.receivedate!=null?#calendars.format(mf.receivedate,'dd/MM/yyyy'):''}"></td>
+										<td>
+											<form th:id="${'items'+mf.itemid}" th:name="${'items'+mf.itemid}" th:action="@{/admin/item/}+${mf.itemid}" method="post">
+												<div class="btn-group">
+													<a class="btn btn-success" th:href="@{/admin/item/}+${mf.itemid}" title="Edit Item"><i class="icon_pencil-edit_alt"></i></a>
+													<a class="btn btn-danger" title="Remove Item" th:onclick="${'deleteItem('+mf.itemid+')'}"><i class="icon_trash"></i></a>
+												</div>
+											</form>
+										</td>
+									</tr>
+								</tbody> -->
+							</table>
+						</section>
+						<a class="back-to-top well well-sm" href="#"><i class="glyphicon glyphicon-chevron-up"></i> Back to Top</a>
+					</div>
+				</div>
+ 			</section>
+		</section>
+
+		<script th:src="@{/js/jquery-1.10.2.min.js}"></script>
+		<script th:src="@{/js/jquery.dataTables.min.js}"></script>
+    <!-- <script src="Scripts/jquery-1.7.js"></script> -->
+
+    <!-- <script th:src="@{/js/dataTables.bootstrap.min.js}"></script> -->
+<!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script type="text/javascript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script> -->
+		<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
+
+		<script type="text/javascript">
+			$(document).ready(function() {
+				var offset = 250;
+
+				var duration = 300;
+
+				$(window).scroll(function() {
+
+					if ($(this).scrollTop() > offset) {
+						$('.back-to-top').fadeIn(duration);
+					} else {
+						$('.back-to-top').fadeOut(duration);
+					}
+
+				});
+
+			    var token = $("meta[name='_csrf']").attr("content");
+			    var header = $("meta[name='_csrf_header']").attr("content");
+
+			    /* var table = $('#mainTable').DataTable({
+					ajax: {
+						url: "api/items",
+						type: "post",
+						dataType: "json",
+						contentType: "application/json; charset=utf-8",
+						data: function(d) {
+						    return JSON.stringify(d);
+						},
+						beforeSend: function(xhr){
+                            xhr.setRequestHeader(header, token);
+                        }
+					},
+					serverSide: true,
+					processing : true,
+					responsive: true,
+					order: [ [ 10, "desc" ] ],
+					columns: [
+						{data: "product.name", searchable: true},
+						{data: "product.modelnum", searchable: true},
+						{data: "sku", searchable: true},
+						{data: "size", searchable: false,
+							render: function (data, type, row) {
+								return data["sizenum"] + '(' + data["region"]["code"] + ')';
+							}
+						},
+						{data: "cost", searchable: false},
+						{data: "quantity", searchable: false},
+						{data: "purchaseorder.code", searchable: true,
+							render: function (data, type, row) {
+								return data || '';
+							}
+						},
+						{data: "shipment.code", searchable: true,
+							render: function (data, type, row) {
+								console.log("shipment data: "+row);
+								return data || '';
+							}
+						},
+						{data: "receivedby.firstname", searchable: false,
+							render: function (data, type, row) {
+						    	return data || '';}},
+						{data: "receivedate", searchable: false,
+		                    render: function (data, type, row) {
+		                    	if(data != null && data != "null") {
+		                    		console.log("data on date: "+data);
+		                    		return new Date(data).toLocaleString();
+		                    	} else {
+		                    		return '';
+		                    	}
+							}
+						},
+						{data: "itemid", searchable: false,
+						 render: function(data, type, row) {
+							 str = '<form id="items'+data+'" name="items'+data+'" action="items/'+data+'" method="post">'
+							 		+ '<a class="btn btn-success" href="item/' + data + '" title="Edit Item"><i class="icon_pencil-edit_alt"></i></a>'
+							 		+ '<a class="btn btn-danger" title="Remove Item" onclick="deleteItem('+data+')"><i class="icon_trash"></i></a>'
+							 		+ '<input type="hidden" name="_csrf" >'
+							 		+ '</form>';
+							 return str;
+						 }
+						}
+					]
+				}); */
+
+			    $("#name").on('keydown', function(e) {
+			        if (e.which == 13) {
+			            e.preventDefault();
+			        }
+			    });
+
+			    $("#name").on('keyup', function(e) {
+			    	e.preventDefault();
+			    	table.search(this.value).draw();
+			    })
+			});
+		</script>
+		<script type="text/javascript">
+			function deleteItem(id) {
+				var form = document.getElementById("items"+id);
+				if(confirm("Do you want to delete the item?")) {
+					var token = $("meta[name='_csrf']").attr("content");
+					$(form).find("input[name=_csrf]").val(token);
+
+					form.submit();
+				} else
+					return false;
+			}
+		</script>
+	</div>
+</html>

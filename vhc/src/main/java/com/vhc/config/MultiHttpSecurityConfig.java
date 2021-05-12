@@ -35,7 +35,9 @@ public class MultiHttpSecurityConfig {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 
-		    http
+			//http.csrf().disable();
+
+			http
 			    .authorizeRequests()
 		    	.antMatchers(new String[] { "/*" }).permitAll()
 		    	.antMatchers(new String[] { "/error/**" }).permitAll()
@@ -58,7 +60,9 @@ public class MultiHttpSecurityConfig {
 		    	.logoutSuccessUrl("/admin/login")
 		    	.permitAll()
 		    .and()
-		    	.rememberMe();
+		    	.rememberMe()
+		    /*.and()
+		    	.csrf().disable()*/;
 		}
 	}
 
@@ -69,23 +73,25 @@ public class MultiHttpSecurityConfig {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 
+			//http.csrf().disable();
+
 			http
 				.antMatcher("/store/**")
 				.authorizeRequests()
 		    	.antMatchers("/static/**").permitAll()
-				.antMatchers("/store/*").permitAll()
-				.antMatchers("/store/aboutus/*").permitAll()
-				.antMatchers("/store/brands/*").permitAll()
-				.antMatchers("/store/brand/*").permitAll()
-				.antMatchers("/store/mens/*").permitAll()
-				.antMatchers("/store/womens/*").permitAll()
-				.antMatchers("/store/womens/products").permitAll()
-				.antMatchers("/store/kids/*").permitAll()
-				.antMatchers("/store/accessories/*").permitAll()
-				.antMatchers("/store/shopping/**").permitAll()
-				.antMatchers("/store/products").permitAll()
-				.antMatchers("/store/cart/**").permitAll()
-				.antMatchers("/store/customer/cart/**").permitAll()
+//				.antMatchers("/store/*").permitAll()
+//				.antMatchers("/store/aboutus/*").permitAll()
+//				.antMatchers("/store/brands/*").permitAll()
+//				.antMatchers("/store/brand/*").permitAll()
+//				.antMatchers("/store/mens/*").permitAll()
+//				.antMatchers("/store/womens/*").permitAll()
+//				.antMatchers("/store/womens/products").permitAll()
+//				.antMatchers("/store/kids/*").permitAll()
+//				.antMatchers("/store/accessories/*").permitAll()
+//				.antMatchers("/store/shopping/**").permitAll()
+//				.antMatchers("/store/products").permitAll()
+//				.antMatchers("/store/cart/**").permitAll()
+//				.antMatchers("/store/customer/cart/**").permitAll()
 	         	.antMatchers("/vhc/store/admin/login/**").permitAll()
 	        	.antMatchers("/store/admin/**").hasAuthority("ADMIN")
 	                .anyRequest().authenticated()
@@ -100,35 +106,37 @@ public class MultiHttpSecurityConfig {
 		        .logout()
 		        	.logoutSuccessUrl("/store/admin/login")
 		            .permitAll();
+		    /*.and()
+		    	.csrf().disable();*/
 		}
 	}
 
 
-	@Configuration
-	@Order(2)
-	public static class CustomerSecurityConfiguration extends WebSecurityConfigurerAdapter {
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-
-			http
-				.antMatcher("/customer/**")
-				.authorizeRequests()
-	         	.antMatchers("/customer/login/**").permitAll()
-	        	.antMatchers("/customer/**").hasAuthority("CUSTOMER")
-	                .anyRequest().authenticated()
-	        .and()
-		        .formLogin()
-		            .loginPage("/customer/login")
-		            .successHandler(new CustomSuccessHandler())
-		            .usernameParameter("username")
-		            //.defaultSuccessUrl("/admin/home")
-		            .permitAll()
-	        .and()
-		        .logout()
-		        	.logoutSuccessUrl("/customer/login")
-		            .permitAll();
-		}
-	}
+//	@Configuration
+//	@Order(2)
+//	public static class CustomerSecurityConfiguration extends WebSecurityConfigurerAdapter {
+//		@Override
+//		protected void configure(HttpSecurity http) throws Exception {
+//
+//			http
+//				.antMatcher("/customer/**")
+//				.authorizeRequests()
+//	         	.antMatchers("/customer/login/**").permitAll()
+//	        	.antMatchers("/customer/**").hasAuthority("CUSTOMER")
+//	                .anyRequest().authenticated()
+//	        .and()
+//		        .formLogin()
+//		            .loginPage("/customer/login")
+//		            .successHandler(new CustomSuccessHandler())
+//		            .usernameParameter("username")
+//		            //.defaultSuccessUrl("/admin/home")
+//		            .permitAll()
+//	        .and()
+//		        .logout()
+//		        	.logoutSuccessUrl("/customer/login")
+//		            .permitAll();
+//		}
+//	}
 
 
 	@Autowired

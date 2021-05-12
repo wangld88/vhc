@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 import org.jsondoc.core.annotation.ApiObjectField;
 
 @Entity
-@Table(name="STATUS")
+@Table(name="status")
 @NamedQuery(name="Status.findAll", query="SELECT s FROM Status s")
 public class Status implements Serializable {
 

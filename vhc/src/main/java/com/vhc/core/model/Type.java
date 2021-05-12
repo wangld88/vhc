@@ -16,7 +16,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="TYPES")
+@Table(name="types")
 @ApiObject
 @NamedQuery(name="Type.findAll", query="SELECT t FROM Type t")
 public class Type implements Serializable {

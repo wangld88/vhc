@@ -21,7 +21,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="GIFTCARDHISTORIES")
+@Table(name="giftcardhistories")
 @NamedQuery(name="GiftcardHistory.findAll", query="SELECT s FROM GiftcardHistory s")
 public class GiftcardHistory implements Serializable {
 

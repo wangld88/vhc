@@ -16,7 +16,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="PAYMENTMETHODS")
+@Table(name="paymentmethods")
 @ApiObject
 @NamedQuery(name="Paymentmethod.findAll", query="SELECT p FROM Paymentmethod p")
 public class Paymentmethod implements Serializable {

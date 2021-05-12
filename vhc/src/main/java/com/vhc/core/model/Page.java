@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
 @Entity
-@Table(name="PAGES")
+@Table(name="pages")
 @ApiObject
 @NamedQuery(name="Page.findAll", query="SELECT c FROM Page c")
 public class Page implements Serializable {

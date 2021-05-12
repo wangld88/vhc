@@ -16,7 +16,7 @@ import javax.persistence.Table;
 import org.jsondoc.core.annotation.ApiObjectField;
 
 @Entity
-@Table(name="STAFFS")
+@Table(name="staffs")
 @NamedQuery(name="Staff.findAll", query="SELECT s FROM Staff s")
 public class Staff implements Serializable {
 

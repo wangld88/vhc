@@ -19,7 +19,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="INVENTORIES")
+@Table(name="inventories")
 @NamedQuery(name="Inventory.findAll", query="SELECT i FROM Inventory i")
 public class Inventory implements Serializable {
 
@@ -82,6 +82,7 @@ public class Inventory implements Serializable {
 	@JoinColumn(name="deststoreid")
 	@ApiObjectField(description="Unique Store", required=false)
 	private Store deststore;
+
 
 	public Inventory() {
 

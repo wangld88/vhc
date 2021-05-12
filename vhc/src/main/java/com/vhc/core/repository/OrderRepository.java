@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.vhc.core.model.Customer;
 import com.vhc.core.model.Order;
+import com.vhc.core.model.Status;
 
 
 public interface OrderRepository extends CrudRepository<Order, Long> {
@@ -17,5 +18,15 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
 	public List<Order> findByCustomer_customerid(long customerid);
 
 	public List<Order> findByCustomerOrderByCreationdate(Customer customer);
+
+	public List<Order> findByStoreIsNull();
+
+	public List<Order> findByStoreIsNullAndStatusIsNull();
+
+	public List<Order> findByStoreIsNullAndStatus(Status status);
+
+	public List<Order> findByStoreIsNullAndStatusIsNot(Status status);
+
+	public List<Order> findByStoreIsNullAndStatusIn(List<Status> status);
 
 }

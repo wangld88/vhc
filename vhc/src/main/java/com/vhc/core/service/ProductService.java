@@ -30,6 +30,10 @@ public class ProductService {
 		//return productRepository.findAll();
 	}
 
+	public List<Product> getByIds(long brandid, long typeid, long styleid) {
+		return productRepository.findByBrand_brandidAndType_typeidAndStyle_styleid(brandid, typeid, styleid);
+	}
+
 	public Product getByFullname(String name) {
 		return productRepository.findByName(name);
 	}
@@ -138,6 +142,6 @@ public class ProductService {
 
 	@Transactional(rollbackFor=Exception.class)
 	public void delete(long productid) {
-		productRepository.delete(productid);
+		productRepository.deleteById(productid);
 	}
 }

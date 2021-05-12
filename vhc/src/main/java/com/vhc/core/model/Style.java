@@ -14,7 +14,7 @@ import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
 @Entity
-@Table(name="STYLES")
+@Table(name="styles")
 @ApiObject
 @NamedQuery(name="Style.findAll", query="SELECT r FROM Style r")
 public class Style implements Serializable {

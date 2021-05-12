@@ -22,7 +22,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="RECIPIENTS")
+@Table(name="recipients")
 @ApiObject
 @NamedQuery(name="Recipient.findAll", query="SELECT p FROM Recipient p")
 public class Recipient implements Serializable {

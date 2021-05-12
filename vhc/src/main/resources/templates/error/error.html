@@ -8,20 +8,22 @@
 		<title>Error page</title>
 	</head>
 	<body>
-		
+
 		<h2>Application Error, please contact support.</h2>
-		
+
 		<h3>Debug Information:</h3>
-		
-		<span th:text="'Requested URL= ' + ${url}"></span><br><br>
-		
-		<span th:text="'Exception= ' + ${exception}"></span><br><br>
-		
+
+		<span th:text="'Requested URL= ' + ${content}"></span><br><br>
+
+		<span th:text="'Exception= ' + ${stackTrace}"></span><br><br>
+
+		<span th:text="'Exception= ' + ${errorMessage}"></span><br><br>
+
 		<strong>Exception Stack Trace: </strong><br>
-		<div th:each="ste : ${exception}">
-			<span th:text="${ste}"></span>
+		<div th:each="ste : ${title}">
+			<span th:utext="${ste}"></span>
 		</div>
-	
+
 
 	</body>
 </html>

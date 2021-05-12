@@ -25,7 +25,7 @@ import com.vhc.core.util.ImageProcessor;
 
 
 @Entity
-@Table(name="IMAGES")
+@Table(name="images")
 @ApiObject
 @NamedQuery(name="Image.findAll", query="SELECT c FROM Image c")
 public class Image implements Serializable {

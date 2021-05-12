@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,18 +16,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.vhc.controller.BaseController;
 import com.vhc.core.model.User;
-import com.vhc.security.LoginUser;
 
 
+
+/**
+ *
+ * @author K & J Consulting
+ *
+ */
 @Controller
 @RequestMapping({"/admin"})
 public class AdminHome extends AdminBase {
 
+	private Logger logger = LoggerFactory.getLogger(AdminHome.class);
+
 	@RequestMapping(method={RequestMethod.GET}, value={"/","/home"})
 	public String dspHome(ModelMap model, HttpSession httpSession) {
-		model.addAttribute("loginUser", getPrincipal());
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
+		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Home");
 		model.addAttribute("submenu", "homes");
 
@@ -35,31 +50,67 @@ public class AdminHome extends AdminBase {
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/charts"})
 	public String dspCharts(ModelMap model, HttpSession httpSession) {
-		model.addAttribute("loginUser", getPrincipal());
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
+		model.addAttribute("loginUser", loginUser);
 		return "admin/charts";
 	}
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/profile"})
 	public String dspProfile(ModelMap model, HttpSession httpSession) {
-		model.addAttribute("loginUser", getPrincipal());
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
+		model.addAttribute("loginUser", loginUser);
 		return "admin/profile";
 	}
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/form_component"})
 	public String dspFormComponent(ModelMap model, HttpSession httpSession) {
-		model.addAttribute("loginUser", getPrincipal());
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
+		model.addAttribute("loginUser", loginUser);
 		return "admin/form_component";
 	}
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/form_validation"})
 	public String dspFormValidation(ModelMap model, HttpSession httpSession) {
-		model.addAttribute("loginUser", getPrincipal());
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
+		model.addAttribute("loginUser", loginUser);
 		return "admin/form_validation";
 	}
 
 	@RequestMapping(method={RequestMethod.GET}, value={"/widgets"})
 	public String dspWidgets(ModelMap model, HttpSession httpSession) {
-		model.addAttribute("loginUser", getPrincipal());
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
+
+		model.addAttribute("loginUser", loginUser);
 		return "admin/widgets";
 	}
 
@@ -79,23 +130,12 @@ public class AdminHome extends AdminBase {
     	throws NoHandlerFoundException {
 
 		ModelMap model = new ModelMap();
+		User loginUser = getSuperAdmin();
 
-		model.addAttribute("loginUser", getPrincipal());
+		model.addAttribute("loginUser", loginUser);
 System.out.println("handleInvalidRequest=================");
 		throw new NoHandlerFoundException(request.getMethod(), request.getRequestURL().toString(), new HttpHeaders());
     }
 
-
-	private User getPrincipal(){
-    	User user = null;
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        //System.out.println("Role is : "+((LoginStudent)principal).toString());
-        if (principal instanceof LoginUser) {
-            user = ((LoginUser)principal).getUser();
-        } else {
-            user = userService.getByUsername("");
-        }
-        return user;
-    }
 
 }

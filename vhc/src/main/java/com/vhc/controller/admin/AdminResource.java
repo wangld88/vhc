@@ -9,8 +9,6 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -28,10 +26,14 @@ import com.vhc.dto.TemplateForm;
 import com.vhc.util.Message;
 import com.vhc.core.model.Template;
 import com.vhc.core.model.User;
-import com.vhc.security.LoginUser;
 import com.vhc.service.emailer.EmailContentService;
 
 
+/**
+ *
+ * @author K & J Consulting
+ *
+ */
 @Controller
 @RequestMapping("/admin")
 public class AdminResource extends AdminBase {
@@ -45,13 +47,12 @@ public class AdminResource extends AdminBase {
 
 		logger.info("dspTemplates is called");
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		List<Template> templates = templateService.getAll();
 
@@ -65,16 +66,15 @@ public class AdminResource extends AdminBase {
 
 
 	@RequestMapping(value="/template", method=RequestMethod.GET)
-	public String Template(Model model) {
+	public String newTemplate(Model model) {
 		String rtn = "/admin/template";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		//Get methods Email Content
 		Method[] methods = EmailContentService.class.getMethods();
@@ -86,6 +86,8 @@ public class AdminResource extends AdminBase {
 				names.add(methods[i].getName());
 			}
 		}
+
+		logger.info("dspTemplates is called");
 
 		TemplateForm template = new TemplateForm();
 		template.setServicename("EmailContentService");
@@ -107,13 +109,12 @@ public class AdminResource extends AdminBase {
 
 		String rtn = "/admin/template";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		Template template = templateService.getById(templateid);
 
@@ -134,6 +135,8 @@ public class AdminResource extends AdminBase {
 				names.add(methods[i].getName());
 			}
 		}
+
+		logger.info("[Admin Resource] dspTemplate is called {}", names.size());
 
 		model.addAttribute("methodnames", names);
 		model.addAttribute("templateForm", form);
@@ -156,13 +159,12 @@ public class AdminResource extends AdminBase {
 		//logger.info("Processing updateProfile form={}, bindingResult={}", form, bindingResult);
 		String rtn = "/admin/templates";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 		Message message = new Message();
 
 		if (bindingResult.hasErrors()) {
@@ -209,30 +211,4 @@ public class AdminResource extends AdminBase {
 	}
 
 
-	private Object getPrincipal() {
-
-		return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	}
-
-	private User getLoginUser(Object principal) {
-
-		User user = null;
-
-        if (principal instanceof LoginUser) {
-            user = ((LoginUser)principal).getUser();
-        } else {
-            user = userService.getByUsername("");
-        }
-
-        return user;
-    }
-
-	private boolean isSuperAdmin(Object principal) {
-
-		if(principal instanceof LoginUser) {
-			return ((LoginUser) principal).getAuthorities().contains(new SimpleGrantedAuthority("SUPERADMIN"));
-		} else {
-			return false;
-		}
-	}
 }

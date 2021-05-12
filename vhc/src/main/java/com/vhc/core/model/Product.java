@@ -29,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
 @Entity
-@Table(name="PRODUCTS")
+@Table(name="products")
 @ApiObject
 @NamedQuery(name="Product.findAll", query="SELECT p FROM Product p")
 public class Product implements Serializable {
@@ -77,6 +77,10 @@ public class Product implements Serializable {
 	@Column(name="onsale", nullable=true, length=10, columnDefinition="Decimal(6,2)")
 	@ApiObjectField(description="On Sale price", format="maxlength = 10", required=false)
 	private BigDecimal onsale;
+
+	@Column(name="eventprice", nullable=true, length=10, columnDefinition="Decimal(6,2)")
+	@ApiObjectField(description="Promotion event price", format="maxlength = 10", required=false)
+	private BigDecimal eventprice;
 
 	@Column(name="points", nullable=true)
 	@ApiObjectField(description="Bonus points", required=false)
@@ -274,6 +278,14 @@ public class Product implements Serializable {
 		this.onsale = onsale;
 	}
 
+	public BigDecimal getEventprice() {
+		return eventprice;
+	}
+
+	public void setEventprice(BigDecimal eventprice) {
+		this.eventprice = eventprice;
+	}
+
 	public List<Image> getImages() {
 		return images;
 	}
@@ -323,16 +335,21 @@ public class Product implements Serializable {
 	}
 
 	public BigDecimal getFinalprice() {
-		if(this.onsale != null && onsale.compareTo(BigDecimal.ZERO) > 0) {
+		if(eventprice != null && eventprice.compareTo(BigDecimal.ZERO) > 0) {
+			finalprice = eventprice;
+		} else if(this.onsale != null && onsale.compareTo(BigDecimal.ZERO) > 0) {
 			finalprice = onsale;
 		} else {
 			finalprice = retail;
 		}
+
 		return finalprice;
 	}
 
 	public void setFinalprice() {
-		if(onsale != null && onsale.compareTo(BigDecimal.ZERO) > 0) {
+		if(eventprice != null && eventprice.compareTo(BigDecimal.ZERO) > 0) {
+			finalprice = eventprice;
+		} else if(onsale != null && onsale.compareTo(BigDecimal.ZERO) > 0) {
 			finalprice = onsale;
 		} else {
 			finalprice = retail;

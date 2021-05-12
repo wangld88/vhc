@@ -24,7 +24,7 @@ import com.vhc.core.util.ImageProcessor;
 
 
 @Entity
-@Table(name="PAGEIMAGES")
+@Table(name="pageimages")
 @NamedQuery(name="Pageimage.findAll", query="SELECT s FROM Pageimage s")
 public class Pageimage implements Serializable {
 

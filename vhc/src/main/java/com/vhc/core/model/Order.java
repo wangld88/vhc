@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Entity
-@Table(name="ORDERS")
+@Table(name="orders")
 @NamedQuery(name="Order.findAll", query="SELECT s FROM Order s")
 public class Order implements Serializable {
 

@@ -19,7 +19,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="INVENTORYHISTORIES")
+@Table(name="inventoryHistories")
 @NamedQuery(name="InventoryHistory.findAll", query="SELECT i FROM InventoryHistory i")
 public class InventoryHistory implements Serializable {
 

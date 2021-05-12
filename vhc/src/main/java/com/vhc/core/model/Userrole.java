@@ -17,7 +17,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
-@Table(name="USER_ROLES")
+@Table(name="user_roles")
 @NamedQuery(name="Userrole.findAll", query="SELECT s FROM Userrole s")
 public class Userrole implements Serializable {
 

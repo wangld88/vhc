@@ -13,8 +13,6 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.engine.jdbc.LobCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,10 +35,14 @@ import com.vhc.core.model.Store;
 import com.vhc.core.model.Style;
 import com.vhc.core.model.Type;
 import com.vhc.core.model.User;
-import com.vhc.security.LoginUser;
 import com.vhc.util.ImageProcessor;
 
 
+/**
+ *
+ * @author K & J Consulting
+ *
+ */
 @Controller
 @RequestMapping("/admin")
 public class AdminSetting extends AdminBase {
@@ -52,13 +54,12 @@ public class AdminSetting extends AdminBase {
 	public String dspHomepage(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/page";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		Page page = pageService.getById(1);
 		logger.info("dspHomepage");
@@ -76,13 +77,12 @@ public class AdminSetting extends AdminBase {
 	public String saveHomepage(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/page";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		logger.info("dspHomepage");
 		String pageid = requestParams.get("pageid");
@@ -130,6 +130,13 @@ public class AdminSetting extends AdminBase {
 			throws IllegalStateException, IOException {
 
 		logger.debug("Entering SettingController uploadImage");
+
+		User loginUser = getSuperAdmin();
+
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
+		}
 
 		Pageimage image = new Pageimage();
 
@@ -183,13 +190,12 @@ public class AdminSetting extends AdminBase {
 			ModelMap model, HttpSession httpSession) {
 
 		String rtn = "/admin/page"; // /" + pageid;
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		Pageimage image = new Pageimage();
 		image.setPageimageid(pageimageid);
@@ -210,13 +216,12 @@ public class AdminSetting extends AdminBase {
 	public String dspTypes(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/types";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		List<Type> types = typeService.getAll();
 
@@ -233,13 +238,12 @@ public class AdminSetting extends AdminBase {
 	public String searchTypes(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/types";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		String name = "%" + requestParams.get("name") + "%";
 		List<Type> types = typeService.getByName(name);
@@ -257,13 +261,12 @@ public class AdminSetting extends AdminBase {
 	public String dspType(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/type";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		model.addAttribute("adminmenu", "Settings");
 		model.addAttribute("submenu", "types");
@@ -280,13 +283,12 @@ public class AdminSetting extends AdminBase {
 		long mfid = typeid.longValue();
 		Type type = typeService.getById(mfid);
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		model.addAttribute("type", type);
 		model.addAttribute("loginUser", loginUser);
@@ -304,13 +306,12 @@ public class AdminSetting extends AdminBase {
 		logger.info("doType is call!!!!!");
 		String name = requestParams.get("name");
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		Type type = new Type();
 		type.setName(name);
@@ -327,13 +328,12 @@ public class AdminSetting extends AdminBase {
 	public String dspSize(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/size";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		List<Type> types = typeService.getByReftbl("sizes");
 		List<Region> regions = regionService.getAll();
@@ -354,13 +354,12 @@ public class AdminSetting extends AdminBase {
 
 		Size size = sizeService.getById(sizeid.longValue());
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		List<Type> types = typeService.getByReftbl("sizes");
 		List<Region> regions = regionService.getAll();
@@ -380,13 +379,12 @@ public class AdminSetting extends AdminBase {
 	public String dspSizes(ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspSizes is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		String rtn = "admin/sizes";
 
@@ -411,13 +409,12 @@ public class AdminSetting extends AdminBase {
 		String typeid = requestParams.get("typeid");
 		String regionid = requestParams.get("regionid");
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		Size size = null;
 
@@ -453,14 +450,15 @@ public class AdminSetting extends AdminBase {
 	public String dspCountries(ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspCountries is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/countries";
-		User loginUser = getLoginUser(principal);
+
 		List<Country> countries = countryService.getAll();
 
 		model.addAttribute("countries", countries);
@@ -476,14 +474,14 @@ public class AdminSetting extends AdminBase {
 	public String searchCountries(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspCountries is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/countries";
-		User loginUser = getLoginUser(principal);
 		String name = "%" + requestParams.get("name") + "%";
 		List<Country> countries = countryService.getByName(name);
 
@@ -500,13 +498,12 @@ public class AdminSetting extends AdminBase {
 	public String dspCountry(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/country";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
-			return "redirect:admin/logout";
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Settings");
@@ -520,13 +517,12 @@ public class AdminSetting extends AdminBase {
 	public String updateCountry(ModelMap model, @PathVariable("countryid") Long countryid, HttpSession httpSession) {
 		String rtn = "admin/country";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		long mfid = countryid.longValue();
 		Country country = countryService.getById(mfid);
@@ -546,13 +542,12 @@ public class AdminSetting extends AdminBase {
 
 		logger.info("doCountry is call!!!!!");
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		String name = requestParams.get("name");
 		String code = requestParams.get("code");
@@ -580,14 +575,15 @@ public class AdminSetting extends AdminBase {
 	public String dspProvinces(ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspProvinces is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/provinces";
-		User loginUser = getLoginUser(principal);
+
 		List<Province> provinces = provinceService.getAll();
 
 		model.addAttribute("provinces", provinces);
@@ -603,14 +599,15 @@ public class AdminSetting extends AdminBase {
 	public String searchProvinces(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspProvinces is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/provinces";
-		User loginUser = getLoginUser(principal);
+
 		String name = "%" + requestParams.get("name") + "%";
 		List<Province> provinces = provinceService.getByName(name);
 
@@ -627,13 +624,12 @@ public class AdminSetting extends AdminBase {
 	public String dspProvince(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/province";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		List<Country> countries = countryService.getAll();
 
@@ -650,13 +646,12 @@ public class AdminSetting extends AdminBase {
 	public String updateProvince(ModelMap model, @PathVariable("provinceid") Long provinceid, HttpSession httpSession) {
 		String rtn = "admin/province";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		long mfid = provinceid.longValue();
 		Province province = provinceService.getById(mfid);
@@ -678,13 +673,12 @@ public class AdminSetting extends AdminBase {
 
 		logger.info("doProvince is call!!!!!");
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		String name = requestParams.get("name");
 		String code = requestParams.get("code");
@@ -717,14 +711,15 @@ public class AdminSetting extends AdminBase {
 	public String dspCities(ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspCities is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/cities";
-		User loginUser = getLoginUser(principal);
+
 		List<City> cities = cityService.getAll();
 
 		model.addAttribute("cities", cities);
@@ -740,14 +735,14 @@ public class AdminSetting extends AdminBase {
 	public String searchCities(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspCities is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/cities";
-		User loginUser = getLoginUser(principal);
 		String name = "%" + requestParams.get("name") + "%";
 		List<City> cities = cityService.getByName(name);
 
@@ -764,13 +759,13 @@ public class AdminSetting extends AdminBase {
 	public String dspCity(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/city";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
-		User loginUser = getLoginUser(principal);
 		List<Province> provinces = provinceService.getAll();
 
 		model.addAttribute("provinces", provinces);
@@ -786,13 +781,12 @@ public class AdminSetting extends AdminBase {
 	public String updateCity(ModelMap model, @PathVariable("cityid") Long cityid, HttpSession httpSession) {
 		String rtn = "admin/city";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
-			return "redirect:/store/admin/logout";
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
+			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		long mfid = cityid.longValue();
 		City city = cityService.getById(mfid);
@@ -814,13 +808,12 @@ public class AdminSetting extends AdminBase {
 
 		logger.info("doCountry is call!!!!!");
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		String name = requestParams.get("name");
 		String cityid = requestParams.get("cityid");
@@ -850,14 +843,14 @@ public class AdminSetting extends AdminBase {
 	public String dspColors(ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspColors is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/colors";
-		User loginUser = getLoginUser(principal);
 		List<Color> colors = colorService.getAll();
 
 		logger.info("dspColors is called: "+colors.size());
@@ -875,14 +868,14 @@ public class AdminSetting extends AdminBase {
 	public String searchColors(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspColors is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/colors";
-		User loginUser = getLoginUser(principal);
 		String name = "%" + requestParams.get("name") + "%";
 		List<Color> colors = colorService.getByName(name);
 
@@ -901,13 +894,12 @@ public class AdminSetting extends AdminBase {
 	public String dspColor(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/color";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Settings");
@@ -921,13 +913,12 @@ public class AdminSetting extends AdminBase {
 	public String updateColor(ModelMap model, @PathVariable("colorid") Long colorid, HttpSession httpSession) {
 		String rtn = "admin/color";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		long mfid = colorid.longValue();
 		Color color = colorService.getById(mfid);
@@ -947,13 +938,12 @@ public class AdminSetting extends AdminBase {
 
 		logger.info("doColor is call!!!!!");
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		String name = requestParams.get("name");
 		String colorid = requestParams.get("colorid");
@@ -980,14 +970,14 @@ public class AdminSetting extends AdminBase {
 	public String dspStyles(ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspStyles is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/styles";
-		User loginUser = getLoginUser(principal);
 		List<Style> styles = styleService.getAll();
 
 		model.addAttribute("styles", styles);
@@ -1003,14 +993,14 @@ public class AdminSetting extends AdminBase {
 	public String searchStyles(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspStyles is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/styles";
-		User loginUser = getLoginUser(principal);
 		String name = "%" + requestParams.get("name") + "%";
 		List<Style> styles = styleService.getByName(name);
 
@@ -1027,13 +1017,12 @@ public class AdminSetting extends AdminBase {
 	public String dspStyle(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/style";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Settings");
@@ -1047,13 +1036,12 @@ public class AdminSetting extends AdminBase {
 	public String updateStyle(ModelMap model, @PathVariable("styleid") Long styleid, HttpSession httpSession) {
 		String rtn = "admin/style";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		long mfid = styleid.longValue();
 		Style style = styleService.getById(mfid);
@@ -1073,13 +1061,12 @@ public class AdminSetting extends AdminBase {
 
 		logger.info("doColor is call!!!!!");
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		String name = requestParams.get("name");
 		String styleid = requestParams.get("styleid");
@@ -1113,14 +1100,14 @@ public class AdminSetting extends AdminBase {
 	public String dspLocations(ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspStyles is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/locations";
-		User loginUser = getLoginUser(principal);
 
 		List<Location> locations = locationService.getAll();
 
@@ -1137,14 +1124,14 @@ public class AdminSetting extends AdminBase {
 	public String searchLocations(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspStyles is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/locations";
-		User loginUser = getLoginUser(principal);
 
 		String name = "%" + requestParams.get("name") + "%";
 		List<Location> locations = locationService.getByName(name);
@@ -1162,13 +1149,12 @@ public class AdminSetting extends AdminBase {
 	public String dspLocation(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/location";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		Store store = staffService.getByUser(loginUser).getStore();
 
@@ -1189,13 +1175,12 @@ public class AdminSetting extends AdminBase {
 	public String updateLocation(ModelMap model, @PathVariable("locationid") Long locationid, HttpSession httpSession) {
 		String rtn = "admin/location";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		long mfid = locationid.longValue();
 		Location location = locationService.getById(mfid);
@@ -1222,13 +1207,12 @@ public class AdminSetting extends AdminBase {
 
 		logger.info("doLocation is call!!!!!");
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		String name = requestParams.get("name");
 		String locationid = requestParams.get("locationid");
@@ -1261,14 +1245,14 @@ public class AdminSetting extends AdminBase {
 	public String dspShippingMethods(ModelMap model, HttpSession httpSession) {
 
 		logger.info("dspShippingMethods is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/shippingmethods";
-		User loginUser = getLoginUser(principal);
 		List<Shippingmethod> methods = shippingmethodService.getAll();
 
 		model.addAttribute("methods", methods);
@@ -1284,14 +1268,14 @@ public class AdminSetting extends AdminBase {
 	public String searchShippingMethods(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 
 		logger.info("searchShippingMethod is called");
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
 
 		String rtn = "admin/shippingmethods";
-		User loginUser = getLoginUser(principal);
 		String name = "%" + requestParams.get("name") + "%";
 		List<Shippingmethod> methods = shippingmethodService.getByName(name);
 
@@ -1308,13 +1292,12 @@ public class AdminSetting extends AdminBase {
 	public String dspShippingMethod(ModelMap model, HttpSession httpSession) {
 		String rtn = "admin/shippingmethod";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Settings");
@@ -1328,13 +1311,12 @@ public class AdminSetting extends AdminBase {
 	public String updateShippingMethod(ModelMap model, @PathVariable("methodid") Long methodid, HttpSession httpSession) {
 		String rtn = "admin/shippingmethod";
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		long mfid = methodid.longValue();
 		Shippingmethod method = shippingmethodService.getById(mfid);
@@ -1354,13 +1336,12 @@ public class AdminSetting extends AdminBase {
 
 		logger.info("doShippingMethod is call!!!!!");
 
-		Object principal = getPrincipal();
+		User loginUser = getSuperAdmin();
 
-		if(!isSuperAdmin(principal)) {
+		if(loginUser == null) {
+			logger.error("The login user is not a super admin.");
 			return "redirect:/admin/logout";
 		}
-
-		User loginUser = getLoginUser(principal);
 
 		String name = requestParams.get("name");
 		String methodid = requestParams.get("shipmethodid");
@@ -1389,34 +1370,6 @@ public class AdminSetting extends AdminBase {
 		model.addAttribute("submenu", "shippingmethods");
 
 		return "redirect:" + rtn;
-	}
-
-
-	private Object getPrincipal() {
-
-		return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	}
-
-	private User getLoginUser(Object principal) {
-
-		User user = null;
-
-        if (principal instanceof LoginUser) {
-            user = ((LoginUser)principal).getUser();
-        } else {
-            user = userService.getByUsername("");
-        }
-
-        return user;
-    }
-
-	private boolean isSuperAdmin(Object principal) {
-
-		if(principal instanceof LoginUser) {
-			return ((LoginUser) principal).getAuthorities().contains(new SimpleGrantedAuthority("SUPERADMIN"));
-		} else {
-			return false;
-		}
 	}
 
 }

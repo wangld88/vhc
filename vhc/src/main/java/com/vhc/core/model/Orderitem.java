@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 
 @Entity
-@Table(name="ORDER_ITEMS")
+@Table(name="order_items")
 @NamedQuery(name="Orderitem.findAll", query="SELECT o FROM Orderitem o")
 public class Orderitem implements Serializable {
 

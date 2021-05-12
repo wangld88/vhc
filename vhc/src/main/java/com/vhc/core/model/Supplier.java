@@ -17,38 +17,38 @@ import javax.validation.constraints.Size;
 import org.jsondoc.core.annotation.ApiObjectField;
 
 @Entity
-@Table(name="SUPPLIERS")
+@Table(name="suppliers")
 @NamedQuery(name="Supplier.findAll", query="SELECT s FROM Supplier s")
 public class Supplier implements Serializable {
 
 	private static final long serialVersionUID = -3040831285573374995L;
-	
-	
+
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "supplierid", updatable = false, nullable = false)
 	private long supplierid;
-	
+
 	@Column(nullable=false, unique=true, length=200)
 	@Size(max=200)
 	@ApiObjectField(description="Item's Name", format="Not Null, maxlength = 200", required=true)
 	private String name;
-	
+
 	@Column(nullable=true, length=50)
 	@Size(max=50)
 	@ApiObjectField(description="Manufacture's Contact Name", format="maxlength = 50", required=false)
 	private String contact;
-	
+
 	@Column(nullable=true, length=30)
 	@Size(max=30)
 	@ApiObjectField(description="Phone Number", format="maxlength = 30", required=false)
 	private String phone;
-	
+
 	@Column(nullable=true, length=50)
 	@Size(max=50)
 	@ApiObjectField(description="Email Address", format="maxlength = 50", required=false)
 	private String email;
-	
+
 	@Column(nullable=true, length=100)
 	@Size(max=100)
 	@ApiObjectField(description="Web Site", format="maxlength = 100", required=false)
@@ -66,7 +66,7 @@ public class Supplier implements Serializable {
 
 
 	public Supplier() {
-		
+
 	}
 
 	public long getSupplierid() {

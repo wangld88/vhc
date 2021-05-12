@@ -15,7 +15,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="TAGS")
+@Table(name="tags")
 @NamedQuery(name="Tag.findAll", query="SELECT s FROM Tag s")
 public class Tag implements Serializable {
 

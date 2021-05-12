@@ -18,7 +18,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="DEBITCARDS")
+@Table(name="debitcards")
 @NamedQuery(name="Debitcard.findAll", query="SELECT s FROM Debitcard s")
 public class Debitcard implements Serializable {
 
