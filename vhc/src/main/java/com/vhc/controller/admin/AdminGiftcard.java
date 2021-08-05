@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vhc.core.model.City;
+import com.vhc.core.model.Customer;
 import com.vhc.core.model.Status;
 import com.vhc.core.model.Store;
 import com.vhc.core.model.Type;
@@ -74,10 +75,14 @@ public class AdminGiftcard extends AdminBase {
 		List<Status> statuss = statusService.getByReftbl("giftcards");
 
 		List<Store> stores = storeService.getAll();
-
+		List<Customer> customers = customerService.getAll();
+		
+		logger.info("[VHC Adm] Gift card customers: ", customers.size());
+		
 		model.addAttribute("stores", stores);
 		model.addAttribute("statuss", statuss);
 		model.addAttribute("cities", cities);
+		model.addAttribute("customers", customers);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("adminmenu", "Business");
 
@@ -199,6 +204,10 @@ public class AdminGiftcard extends AdminBase {
 
 		List<Store> stores = storeService.getAll();
 
+		List<Customer> customers = customerService.getAll();
+		logger.info("[VHC Adm] Gift card customers: ", customers.size());
+		
+		model.addAttribute("customers", customers);
 		model.addAttribute("stores", stores);
 		model.addAttribute("statuss", statuss);
 		model.addAttribute("giftcard", giftcard);

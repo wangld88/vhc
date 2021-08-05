@@ -71,6 +71,11 @@ public class Giftcard implements Serializable {
 	@ApiObjectField(description="Gift card Status", required=true)
 	private Status status;
 
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="customerid")
+	@ApiObjectField(description="Gift card Customer", required=true)
+	private Customer customer;
+
 	@Column(nullable=true, length=800)
 	@Size(max=800)
 	@ApiObjectField(description="Comment notes", format="maxlength = 800", required=false)
@@ -159,6 +164,14 @@ public class Giftcard implements Serializable {
 
 	public void setComments(String comments) {
 		this.comments = comments;
+	}
+
+	public Customer getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
 	}
 
 }

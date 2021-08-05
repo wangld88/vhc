@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import com.vhc.security.CustomSuccessHandler;
 import com.vhc.security.SuperAdminSuccessHandler;
@@ -59,10 +60,12 @@ public class MultiHttpSecurityConfig {
 		    	.deleteCookies(new String[] {"remember-me"})
 		    	.logoutSuccessUrl("/admin/login")
 		    	.permitAll()
-		    .and()
-		    	.rememberMe()
 		    /*.and()
+		    	.rememberMe()
+		    .and()
 		    	.csrf().disable()*/;
+			
+			http.addFilterAfter(new WebSecurityFilter(), BasicAuthenticationFilter.class);
 		}
 	}
 
@@ -108,6 +111,8 @@ public class MultiHttpSecurityConfig {
 		            .permitAll();
 		    /*.and()
 		    	.csrf().disable();*/
+			http.addFilterAfter(new WebSecurityFilter(), BasicAuthenticationFilter.class);
+
 		}
 	}
 

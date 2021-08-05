@@ -81,6 +81,10 @@ public class ApplicationWebConfigurer extends WebMvcConfigurerAdapter {
     resolver.setDefaultLocale(new Locale("en"));
     resolver.setCookieName("vhcLocaleCookie");
     resolver.setCookieMaxAge(Integer.valueOf(4800));
+    resolver.setCookieHttpOnly(true);
+    resolver.setRejectInvalidCookies(true);
+    resolver.setCookieSecure(true);
+    
     return resolver;
   }
 

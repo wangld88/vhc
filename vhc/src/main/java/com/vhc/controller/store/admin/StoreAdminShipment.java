@@ -253,6 +253,9 @@ public class StoreAdminShipment extends StoreBase {
 
 		List<User> users = userService.getByRolename("ADMIN");
 
+		List<Status> statuss = statusService.getByReftbl("purchaseorders");
+
+		model.addAttribute("statuss", statuss);
 		model.addAttribute("users", users);
 		model.addAttribute("suppliers", suppliers);
 		model.addAttribute("store", store);
@@ -288,6 +291,9 @@ public class StoreAdminShipment extends StoreBase {
 
 		List<Shipment> shipments = shipmentService.getByPO(order);
 
+		List<Status> statuss = statusService.getByReftbl("purchaseorders");
+
+		model.addAttribute("statuss", statuss);
 		model.addAttribute("notShipped", shipments.isEmpty());
 		model.addAttribute("users", users);
 		model.addAttribute("items", items);
@@ -329,6 +335,8 @@ public class StoreAdminShipment extends StoreBase {
 		String comments = requestParams.get("comments");
 		String sentdate = requestParams.get("sentdate");
 		String expectdate = requestParams.get("expectdate");
+		String statusid = requestParams.get("statusid");
+		
 		SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 
 		Supplier supplier = supplierService.getById(Long.parseLong(supplierid));
@@ -352,6 +360,9 @@ public class StoreAdminShipment extends StoreBase {
 			order.setSentdate(rcdCal);
 		}
 
+		if(statusid != null && !statusid.equals("0")) {
+			order.setStatus(statusService.getByNameAndReftbl("Created", "purchaseorders"));
+		}
 		order.setComments(comments);
 		order.setSentdate(cal);
 		order.setRecordedby(loginUser);
@@ -691,6 +702,9 @@ public class StoreAdminShipment extends StoreBase {
 		inventory.setReceivedate(cal);
 		//try {
 		inventory = inventoryService.save(inventory);
+		
+		Purchaseorder purchorder = shipment.getPurchaseorder();
+		updatePOStatus(purchorder);
 		/*} catch(Exception e) {
 			e.
 		}*/
@@ -953,14 +967,15 @@ public class StoreAdminShipment extends StoreBase {
 						item.setCreatedby(loginUser);
 						item.setComments(comments);
 						item.setCreationdate(cal);
-
+						Purchaseorder purchorder = null;
+						
 						if(orderid != null && !orderid.isEmpty()) {
-							Purchaseorder purchorder = purchaseorderService.getById(Long.parseLong(orderid));
+							purchorder = purchaseorderService.getById(Long.parseLong(orderid));
 							if(purchorder != null) {
 								item.setPurchaseorder(purchorder);
 							}
 						} else if(ordercode != null && !ordercode.isEmpty()){
-							Purchaseorder purchorder = purchaseorderService.getByCode(ordercode);
+							purchorder = purchaseorderService.getByCode(ordercode);
 							if(purchorder != null) {
 								item.setPurchaseorder(purchorder);
 							}
@@ -1003,6 +1018,8 @@ public class StoreAdminShipment extends StoreBase {
 							}
 
 							inv = inventoryService.save(inv);
+							
+							updatePOStatus(purchorder);
 						}
 
 					}
@@ -1020,14 +1037,15 @@ public class StoreAdminShipment extends StoreBase {
 					item.setCreatedby(loginUser);
 					item.setComments(comments);
 					item.setCreationdate(cal);
-
+					Purchaseorder purchorder = null;
+					
 					if(orderid != null && !orderid.isEmpty()) {
-						Purchaseorder purchorder = purchaseorderService.getById(Long.parseLong(orderid));
+						purchorder = purchaseorderService.getById(Long.parseLong(orderid));
 						if(purchorder != null) {
 							item.setPurchaseorder(purchorder);
 						}
 					} else if(ordercode != null && !ordercode.isEmpty()){
-						Purchaseorder purchorder = purchaseorderService.getByCode(ordercode);
+						purchorder = purchaseorderService.getByCode(ordercode);
 						if(purchorder != null) {
 							item.setPurchaseorder(purchorder);
 						}
@@ -1071,6 +1089,8 @@ public class StoreAdminShipment extends StoreBase {
 						}
 
 						inv = inventoryService.save(inv);
+						
+						updatePOStatus(purchorder);
 					}
 				}
 				msg.setStatus(Message.SUCCESS);
@@ -1100,6 +1120,30 @@ public class StoreAdminShipment extends StoreBase {
 	}
 
 
+	private boolean updatePOStatus(Purchaseorder po) {
+		Status created = statusService.getByNameAndReftbl("Created", "purchaseorders");
+		Status completed = statusService.getByNameAndReftbl("Completed", "purchaseorders");
+		if(po == null) {
+			return false;
+		}
+		if(po.getStatus() == null) {
+			po.setStatus(created);
+			po = purchaseorderService.save(po);
+		}
+		if(po.getStatus().getStatusid() == completed.getStatusid()) {
+			return false;
+		}
+		for(Item i : po.getItems()) {
+			if(i.getInventories() == null || i.getInventories().isEmpty()) {
+				return false;
+			}
+		}
+		po.setStatus(completed);
+		purchaseorderService.save(po);
+		
+		return true;
+	}
+	
 	@RequestMapping(method={RequestMethod.GET}, value={"/inventories"})
 	public String dspInventories(ModelMap model, HttpSession httpSession) {
 		String rtn = "store/admin/inventories";
@@ -1377,6 +1421,7 @@ public class StoreAdminShipment extends StoreBase {
 		return rtn;
 	}
 
+	
 	@RequestMapping(method={RequestMethod.POST}, value={"/inventory/transfer"})
 	public String doTransfer(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession)
 		throws Exception {
@@ -1477,7 +1522,7 @@ System.out.print("[Store ADM] Transfer - uinventoryid: "+uinventoryid);
 		//logger.debug("[Store ADM] Cancel Transfer - Date: {}, By: {}", inventory.getSenddate(), inventory.getSentby().getUserid());
 		Status received = statusService.getByNameAndReftbl("Received", "inventories");
 		Status canceled = statusService.getByNameAndReftbl("Cancelled", "payments");
-		Item item = inventory.getItem();  //itemService.getById(Long.parseLong(itemid));
+		//Item item = inventory.getItem();  //itemService.getById(Long.parseLong(itemid));
 
 		inventory.setStatus(canceled);
 		inventory.setDeststore(null);

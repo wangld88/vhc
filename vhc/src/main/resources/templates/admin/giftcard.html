@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html layout:decorator="admin/layout/layout">
+<html xmlns:th="http://www.thymeleaf.org" 
+	layout:decorator="admin/layout/layout">
 
 	<div layout:fragment="content">
 
@@ -293,6 +294,14 @@
 										    <label for="balance" class="control-label col-lg-2">Balance </label>
 										    <div class="col-lg-10">
 										        <input class="form-control " id="balance" name="balance" type="text" th:value="${giftcard==null or giftcard.balance==null?'':#numbers.formatDecimal(giftcard.balance, 0, 2)}" />
+										    </div>
+										</div>
+										<div class="form-group">
+										    <label for="customerid" class="control-label col-lg-2">Customer </label>
+										    <div class="col-lg-10">
+												<select class="form-control" id="customerid" name="customerid">
+													<option th:each="customer: ${customers}" th:value="${customer.customerid}" th:text="${customer.user.firstname}" th:selected="${giftcard!=null and giftcard.customer!=null and giftcard.customer.customerid==customer.customerid}"></option>
+												</select>
 										    </div>
 										</div>
 										<div class="form-group">

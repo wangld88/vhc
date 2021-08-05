@@ -21,8 +21,6 @@ import javax.validation.constraints.Size;
 import org.jsondoc.core.annotation.ApiObjectField;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
 @Entity
@@ -77,6 +75,12 @@ public class Purchaseorder implements Serializable {
 	@OneToMany(cascade={javax.persistence.CascadeType.ALL}, mappedBy="purchaseorder", fetch=FetchType.LAZY)
 	@JsonBackReference
 	private List<Item> items = new ArrayList<>();
+
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="statusid")
+	@ApiObjectField(description="Order Status", required=true)
+	private Status status;
+
 
 	public Purchaseorder() {
 
@@ -162,6 +166,14 @@ public class Purchaseorder implements Serializable {
 
 	public void setItems(List<Item> items) {
 		this.items = items;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 
 }

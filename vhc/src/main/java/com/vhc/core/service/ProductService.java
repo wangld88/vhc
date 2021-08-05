@@ -57,19 +57,19 @@ public class ProductService {
 	}
 
 	public List<Product> getByBrands(List<Category> categories, List<Long> brandids) {
-		return productRepository.findByCategoriesAndBrand_brandidIn(categories, brandids);
+		return productRepository.findByCategoriesInAndBrand_brandidIn(categories, brandids);
 	}
 
 	public List<Product> getByBrandsDisplay(List<Category> categories, List<Long> brandids) {
-		return productRepository.findByCategoriesAndBrand_brandidInAndDisplay(categories, brandids, "1");
+		return productRepository.findByCategoriesInAndBrand_brandidInAndDisplay(categories, brandids, "1");
 	}
 
 	public List<Product> getByStyles(List<Category> categories, List<Long> styleids) {
-		return productRepository.findByCategoriesAndStyle_styleidIn(categories, styleids);
+		return productRepository.findByCategoriesInAndStyle_styleidIn(categories, styleids);
 	}
 
 	public List<Product> getByStylesDisplay(List<Category> categories, List<Long> styleids) {
-		return productRepository.findByCategoriesAndStyle_styleidInAndDisplay(categories, styleids, "1");
+		return productRepository.findByCategoriesInAndStyle_styleidInAndDisplay(categories, styleids, "1");
 	}
 
 	public List<Product> getByPrices(List<Category> categories, String[] priceids) {
@@ -77,7 +77,7 @@ public class ProductService {
 			String[] prices = priceids[0].split("<");
 			BigDecimal from = new BigDecimal(prices[0]);
 			BigDecimal to = new BigDecimal(prices[1]);
-			return productRepository.findByCategoriesAndDisplayAndRetailBetween(categories, "1", from, to);
+			return productRepository.findByCategoriesInAndDisplayAndRetailBetween(categories, "1", from, to);
 		} else if(priceids.length == 2) {
 
 			String[] prices = priceids[0].split("<");
@@ -86,7 +86,7 @@ public class ProductService {
 			String[] prices1 = priceids[1].split("<");
 			BigDecimal from1 = new BigDecimal(prices1[0]);
 			BigDecimal to1 = new BigDecimal(prices1[1]);
-			return productRepository.findByCategoriesAndDisplayAndRetailBetweenOrRetailBetween(categories, "1", from, to, from1, to1);
+			return productRepository.findByCategoriesInAndDisplayAndRetailBetweenOrRetailBetween(categories, "1", from, to, from1, to1);
 		} else if(priceids.length == 3) {
 
 			String[] prices = priceids[0].split("<");
@@ -98,7 +98,7 @@ public class ProductService {
 			String[] prices2 = priceids[2].split("<");
 			BigDecimal from2 = new BigDecimal(prices2[0]);
 			BigDecimal to2 = new BigDecimal(prices2[1]);
-			return productRepository.findByCategoriesAndDisplayAndRetailBetweenOrRetailBetweenOrRetailBetween(categories, "1", from, to, from1, to1, from2, to2);
+			return productRepository.findByCategoriesInAndDisplayAndRetailBetweenOrRetailBetweenOrRetailBetween(categories, "1", from, to, from1, to1, from2, to2);
 		} else {
 
 			String[] prices = priceids[0].split("<");
@@ -113,7 +113,7 @@ public class ProductService {
 			String[] prices3 = priceids[3].split("<");
 			BigDecimal from3 = new BigDecimal(prices3[0]);
 			BigDecimal to3 = new BigDecimal(prices3[1]);
-			return productRepository.findByCategoriesAndDisplayAndRetailBetweenOrRetailBetweenOrRetailBetweenOrRetailBetween(categories, "1", from, to, from1, to1, from2, to2, from3, to3);
+			return productRepository.findByCategoriesInAndDisplayAndRetailBetweenOrRetailBetweenOrRetailBetweenOrRetailBetween(categories, "1", from, to, from1, to1, from2, to2, from3, to3);
 		}
 
 	}
@@ -123,15 +123,15 @@ public class ProductService {
 	}
 
 	public List<Product> getByCategoryAndName(List<Category> categories, String name) {
-		return productRepository.findByCategoriesAndNameIgnoreCaseLike(categories, name);
+		return productRepository.findByCategoriesInAndNameIgnoreCaseLike(categories, name);
 	}
 
 	public List<Product> getByCategoryAndNameAndDisplay(List<Category> categories, String name) {
-		return productRepository.findByCategoriesAndNameIgnoreCaseLikeAndDisplay(categories, name, "1");
+		return productRepository.findByCategoriesInAndNameIgnoreCaseLikeAndDisplay(categories, name, "1");
 	}
 
 	public List<Product> getByCategoryAndPaging(List<Category> categories, Pageable pageable) {
-		return productRepository.findByCategoriesAndDisplay(categories, "1", pageable);
+		return productRepository.findByCategoriesInAndDisplay(categories, "1", pageable);
 	}
 
 

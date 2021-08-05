@@ -37,6 +37,7 @@
 										<th><i class="icon_contacts_alt"></i> Sent Date</th>
 										<th><i class="icon_pin_alt"></i> Recorded By</th>
 										<th><i class="icon_contacts_alt"></i> Record Date</th>
+										<th><i class="icon_contacts_alt"></i> Status</th>
 										<th><i class="icon_mail_alt"></i> Comments</th>
 										<th><i class="icon_cogs"></i> Action</th>
 									</tr>
@@ -51,6 +52,7 @@
 										<td th:text="${#calendars.format(order.sentdate,'dd MMMM yyyy')}"></td>
 										<td th:text="${order.recordedby.firstname+' '+order.recordedby.lastname}"></td>
 										<td th:text="${#calendars.format(order.recorddate,'dd MMMM yyyy')}"></td>
+										<td th:text="${order.status!=null?order.status.name:''}"></td>
 										<td th:text="${order.comments}"></td>
 										<td>
 											<div class="btn-group">

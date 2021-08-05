@@ -20,8 +20,6 @@ import javax.validation.constraints.Size;
 
 import org.jsondoc.core.annotation.ApiObjectField;
 
-import com.vhc.core.model.User;
-
 
 @Entity
 @Table(name="customers")

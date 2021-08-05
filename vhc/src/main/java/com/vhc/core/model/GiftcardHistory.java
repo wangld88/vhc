@@ -70,6 +70,11 @@ public class GiftcardHistory implements Serializable {
 	@ApiObjectField(description="Card balance", format="Not Null", required=true)
 	private BigDecimal balance;
 
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="customerid")
+	@ApiObjectField(description="Gift card Customer", required=true)
+	private Customer customer;
+
 
 	public GiftcardHistory() {
 
