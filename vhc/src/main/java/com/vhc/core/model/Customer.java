@@ -44,7 +44,7 @@ public class Customer implements Serializable {
 	private Calendar creationdate;
 
 	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="userid", insertable=false, updatable=false)
+	@JoinColumn(name="createdby", insertable=true, updatable=false)
 	@ApiObjectField(description="Created User", required=true)
 	private User createdby;
 
@@ -54,12 +54,12 @@ public class Customer implements Serializable {
 	private Calendar updatedate;
 
 	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="userid", insertable=false, updatable=false)
+	@JoinColumn(name="updatedby", insertable=true, updatable=true)
 	@ApiObjectField(description="Updated by User", required=false)
 	private User updatedby;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "userid", insertable=false, updatable=false)
+    @JoinColumn(nullable = false, name = "userid", insertable=true, updatable=false)
 	private User user;
 
 	@ManyToOne(fetch=FetchType.EAGER)

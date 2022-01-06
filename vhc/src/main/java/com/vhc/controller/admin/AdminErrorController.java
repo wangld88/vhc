@@ -5,7 +5,7 @@ import org.springframework.boot.web.servlet.error.ErrorController;
 
 public class AdminErrorController implements ErrorController {
 
-	@Override
+	//@Override
 	public String getErrorPath() {
 		// TODO Auto-generated method stub
 		return null;

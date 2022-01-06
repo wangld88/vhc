@@ -55,8 +55,13 @@ public class Inventory implements Serializable {
 
 	@Column(nullable=true, length=600)
 	@Size(max=600)
-	@ApiObjectField(description="Comment notes", format="maxlength = 600", required=false)
+	@ApiObjectField(description="Comments", format="maxlength = 600", required=false)
 	private String comments;
+
+	@Column(nullable=true, length=400)
+	@Size(max=400)
+	@ApiObjectField(description="Transfer notes", format="maxlength = 400", required=false)
+	private String notes;
 
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="storeid")
@@ -166,6 +171,14 @@ public class Inventory implements Serializable {
 
 	public void setComments(String comments) {
 		this.comments = comments;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 
 	public Location getLocation() {

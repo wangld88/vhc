@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vhc.core.model.Inventory;
-import com.vhc.core.model.InventoryHistory;
+import com.vhc.core.model.Inventoryhistory;
 import com.vhc.core.repository.InventoryHistoryRepository;
 
 @Service
@@ -16,19 +16,19 @@ public class InventoryHistoryService {
 	private InventoryHistoryRepository inventoryHistoryRepository;
 
 
-	public InventoryHistory getUnreceivedTransfer(Inventory inventory, String status) {
+	public Inventoryhistory getUnreceivedTransfer(Inventory inventory, String status) {
 
 		return this.inventoryHistoryRepository.findByInventory_inventoryidAndStatus_nameAndReceivedateIsNull(inventory.getInventoryid(), status);
 
 	}
 
-	public List<InventoryHistory> getByInventory(Inventory inventory) {
+	public List<Inventoryhistory> getByInventory(Inventory inventory) {
 
 		return this.inventoryHistoryRepository.findAllByInventory(inventory);
 
 	}
 
-	public InventoryHistory save(InventoryHistory inventoryHistory) {
+	public Inventoryhistory save(Inventoryhistory inventoryHistory) {
 
 		return this.inventoryHistoryRepository.save(inventoryHistory);
 

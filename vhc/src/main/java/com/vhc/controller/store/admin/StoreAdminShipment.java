@@ -27,7 +27,7 @@ import com.vhc.controller.store.StoreBase;
 import com.vhc.core.model.Address;
 import com.vhc.core.model.City;
 import com.vhc.core.model.Inventory;
-import com.vhc.core.model.InventoryHistory;
+import com.vhc.core.model.Inventoryhistory;
 import com.vhc.core.model.Item;
 import com.vhc.core.model.Location;
 import com.vhc.core.model.Product;
@@ -1261,7 +1261,7 @@ public class StoreAdminShipment extends StoreBase {
 
 		List<Status> statuses = statusService.getByReftbl("inventories");
 		List<Location> locations = locationService.getByStore(store);
-		List<InventoryHistory> histories = inventoryHistoryService.getByInventory(inv);
+		List<Inventoryhistory> histories = inventoryHistoryService.getByInventory(inv);
 
 		logger.info("[SAdm Inv] statuses.size: {}", statuses.size());
 
@@ -1316,6 +1316,7 @@ public class StoreAdminShipment extends StoreBase {
 		String uinventoryid = requestParams.get("uinventoryid");
 		String inventoryid = requestParams.get("inventoryid");
 		String tstoreid = requestParams.get("tstoreid");
+		String notes = requestParams.get("notes");
 
 		Inventory inventory = new Inventory();
 
@@ -1334,7 +1335,7 @@ public class StoreAdminShipment extends StoreBase {
 		Calendar cal = Calendar.getInstance();
 		Item item = itemService.getById(Long.parseLong(itemid));
 		Status status = statusService.getById(Long.parseLong(statusid));
-		InventoryHistory history = null;
+		Inventoryhistory history = null;
 
 		inventory.setItem(item);
 
@@ -1360,6 +1361,9 @@ public class StoreAdminShipment extends StoreBase {
 		inventory.setReceivedby(loginUser);
 		inventory.setReceivedate(cal);
 
+		if(notes != null && !notes.isEmpty()) {
+			inventory.setNotes(notes);
+		}
 		//System.out.println("Before Receive history status ID: "+inventory.getStatus().getStatusid());
 		//Receive from Transfer
 		if(inventory.getStatus() != null &&
@@ -1369,7 +1373,7 @@ public class StoreAdminShipment extends StoreBase {
 			//System.out.println("INSIDE Receive history: "+history);
 
 			if(history == null) {
-				history = new InventoryHistory(inventory);
+				history = new Inventoryhistory(inventory);
 			} else {
 				history.setReceivedby(loginUser);
 				history.setReceivedate(cal);
@@ -1392,7 +1396,7 @@ public class StoreAdminShipment extends StoreBase {
 
 		//new Inventory
 		if(inventoryid == null || status.getName().equals("Transferred")) {
-			history = new InventoryHistory(inventory);
+			history = new Inventoryhistory(inventory);
 			history = inventoryHistoryService.save(history);
 		}
 		/*} catch(Exception e) {
@@ -1458,7 +1462,7 @@ System.out.print("[Store ADM] Transfer - uinventoryid: "+uinventoryid);
 		Store deststore = storeService.getById(Long.parseLong(tstoreid));
 		Status transferred = statusService.getByNameAndReftbl("Transferred", "inventories");
 
-		InventoryHistory history = new InventoryHistory(inventory);
+		Inventoryhistory history = new Inventoryhistory(inventory);
 
 		history = inventoryHistoryService.save(history);
 
@@ -1532,12 +1536,12 @@ System.out.print("[Store ADM] Transfer - uinventoryid: "+uinventoryid);
 
 		inventory = inventoryService.save(inventory);
 
-		InventoryHistory history1 = new InventoryHistory(inventory);
+		Inventoryhistory history1 = new Inventoryhistory(inventory);
 		history1 = inventoryHistoryService.save(history1);
 
 		inventory.setStatus(received);
 		inventory = inventoryService.save(inventory);
-		InventoryHistory history = new InventoryHistory(inventory);
+		Inventoryhistory history = new Inventoryhistory(inventory);
 		history = inventoryHistoryService.save(history);
 
 //		Store store = staff.getStore();

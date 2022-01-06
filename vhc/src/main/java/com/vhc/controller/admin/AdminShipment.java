@@ -1119,12 +1119,12 @@ public class AdminShipment extends AdminBase {
 			List<Countlog> logs = new ArrayList<>();
 
 			List<Status> status = statusService.getByReftblExclude("Delivered", "inventories");
-			logger.warn("Size of the upload cards: {}", logs.size());
 
 			long total = 0;
 			Calendar cal = Calendar.getInstance();
 
 			String countid = requestParams.get("countid");
+			logger.warn("Size of the inventory countid: {}", countid);
 
 			Inventorycount count = inventorycountService.getById(Long.parseLong(countid));
 

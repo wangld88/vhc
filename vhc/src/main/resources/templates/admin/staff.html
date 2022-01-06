@@ -36,7 +36,7 @@
 										    <label for="store" class="control-label col-lg-2">Store </label>
 										    <div class="col-lg-10">
 												<select class="form-control" id="storeid" name="storeid">
-													<option th:each="store: ${stores}" th:value="${store.storeid}" th:text="${store.name}"></option>
+													<option th:each="store: ${stores}" th:value="${store.storeid}" th:text="${store.name}" th:selected="${store.storeid == staff.store.storeid}"></option>
 												</select>
 										    </div>
 										</div>

@@ -86,7 +86,7 @@ public class Item implements Serializable {
 	@JsonManagedReference
 	private Product product;
 
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="sizeid")
 	@ApiObjectField(description="Product Size", required=true)
 	@JsonManagedReference

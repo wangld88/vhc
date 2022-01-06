@@ -126,7 +126,10 @@ public class Productview {
 	@ApiObjectField(description="Unique name", format="Not Null, maxlength = 50", required=false)
 	private String color;
 
+	@Column(name = "categoryid", updatable = false, nullable = true)
+	private Long categoryid;
 
+	
 	public void productview() {
 
 	}
@@ -369,6 +372,16 @@ public class Productview {
 
 	public void setColor(String color) {
 		this.color = color;
+	}
+
+
+	public Long getCategoryid() {
+		return categoryid;
+	}
+
+
+	public void setCategoryid(Long categoryid) {
+		this.categoryid = categoryid;
 	}
 
 }

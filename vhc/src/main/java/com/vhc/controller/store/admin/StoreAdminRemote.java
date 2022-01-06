@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
@@ -22,11 +25,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.WebUtils;
 
 import com.vhc.controller.store.StoreBase;
 import com.vhc.dto.CustomerDTO;
 import com.vhc.dto.InventoryDTO;
 import com.vhc.dto.OrderDTO;
+import com.vhc.util.Message;
 import com.vhc.core.model.Account;
 import com.vhc.core.model.Address;
 import com.vhc.core.model.City;
@@ -158,7 +163,7 @@ public class StoreAdminRemote extends StoreBase {
 		User createUser = userService.getById(Long.parseLong(createdby));
 
 		if(username == null || username.isEmpty()) {
-			username = cell;
+			username = cell + "@vhc.ca";
 		}
 
 		User user = userService.getByUsername(username);
@@ -192,14 +197,16 @@ public class StoreAdminRemote extends StoreBase {
 
 				user.setCreatedby(createUser);
 				user = userService.save(user);
-				logger.debug("[Store adm] Saved User: "+user.getUserid());
+				logger.info("[Store adm] Saved User ID: {}", user.getUserid());
 
 				Role role = roleService.getByName("CUSTOMER");
 				Userrole ur = new Userrole();
 				ur.setUser(user);
 				ur.setRole(role);
 				ur = userroleService.save(ur);
-				user = userService.getById(user.getUserid());
+				logger.info("[Store adm] Saved User Role ID : {}"+ur.getUserroleid());
+				
+				//user = userService.getById(user.getUserid());
 
 				ads = addressService.save(ads);
 
@@ -212,9 +219,11 @@ public class StoreAdminRemote extends StoreBase {
 
 				customer = customerService.save(customer);
 
+				logger.info("[Store adm] customer created ID: {}", customer.getCustomerid());
+				
 				// create account
 				Account acct = new Account();
-				Status status = statusService.getByName("Active");
+				Status status = statusService.getByNameAndReftbl("Active", "general");
 
 				acct.setCustomer(customer);
 				acct.setStatus(status);
@@ -222,6 +231,8 @@ public class StoreAdminRemote extends StoreBase {
 				acct.setCreationdate(cal);
 
 				acct = accountService.save(acct);
+				
+				logger.info("[Store adm] account created ID: {}", acct.getAccountid());
 
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -300,7 +311,7 @@ public class StoreAdminRemote extends StoreBase {
 	@RequestMapping(method=RequestMethod.POST, value="/sales/add")
 	public InventoryDTO addSale(@RequestParam Map<String,String> requestParams, ModelMap model, HttpSession httpSession) {
 
-		logger.info("Product sales add is called");
+		logger.info("[ST ADM] Point of sales add is called");
 
 		String staffid = requestParams.get("staffid");
 		Staff staff = staffService.getById(Long.parseLong(staffid));
@@ -316,17 +327,90 @@ public class StoreAdminRemote extends StoreBase {
 		statuss.add(received);
 		statuss.add(returned);
 
-		System.out.println("sku: "+sku+", storeid: "+store.getStoreid()+", status: "+received.getStatusid());
+		logger.info("[ST ADM] sku: "+sku+", storeid: "+store.getStoreid()+", status: "+received.getStatusid());
 		List<Inventory> inventories = inventoryService.getByStoreAvaiableUPC(sku, store.getStoreid(), statuss); //received);
 
 		if(inventories != null && !inventories.isEmpty()) {
-			System.out.println("!!!!!!inventories: "+inventories.get(0).getItem().getItemid());
-			return new InventoryDTO(inventories.get(0));
+			logger.info("[ST ADM] Point Sale inventories: {}, selected itemid: {}", inventories.size(), inventories.get(0).getItem().getItemid());
+			
+			Object mutex = WebUtils.getSessionMutex(httpSession);
+			Inventory current = null;
+					
+			synchronized(mutex) {
+				List<Inventory> saleList = null;
+				if(httpSession.getAttribute("saleList") != null) {
+					saleList = (List<Inventory>) httpSession.getAttribute("saleList");
+				} else {
+					saleList = new ArrayList<>();
+				}
+
+				logger.info("[ST ADM] inventory is found:"+inventories.size()+", sku: "+sku);
+
+				if(inventories.size() > 1) {
+					inventories = removeAdded(inventories, saleList);
+				}
+				
+				if(inventories.isEmpty()) {
+					logger.error("[ST ADM] There is no inventory available.");
+					return null;
+				} else {
+					current = inventories.get(0);
+	
+					if(isSkuNotSelected(saleList,current)) {
+						saleList.add(current);
+						httpSession.setAttribute("saleList", saleList);
+					} else {
+						logger.info("[ST ADM] The item (" + sku + ") has been added already.");
+					}
+				}
+			}
+			return new InventoryDTO(current);
 		}
 
 		return null;
 	}
 
+	
+	@RequestMapping(method=RequestMethod.POST, value="/sales/remove")
+	public void removeSale(@RequestBody String json, 
+			HttpServletRequest request, ModelMap model, HttpSession httpSession) {
+		logger.info("Product sales remove is called");
+
+		JSONObject obj = new JSONObject(json);
+		String staffid = obj.getString("staffid");
+		Long inventoryid = obj.getLong("inventoryid");
+		
+		if(staffid != null && !staffid.isEmpty() && inventoryid != null) {
+			Staff staff = staffService.getById(Long.parseLong(staffid));
+			Store store = staff.getStore();
+			
+			Object mutex = WebUtils.getSessionMutex(httpSession);
+			synchronized(mutex) {
+				List<Inventory> saleList = null;
+				Inventory inv = inventoryService.getById(inventoryid);
+				if(inv.getStore().equals(store)) {
+					if(httpSession.getAttribute("saleList") != null) {
+						saleList = (List<Inventory>) httpSession.getAttribute("saleList");
+						for(Inventory i : saleList) {
+							if(i.getInventoryid() == inventoryid) {
+								saleList.remove(i);
+								logger.info("[ST ADM] The inventory item {} is removed from shopping cart.", i.getInventoryid());
+								break;
+							}
+						}
+						httpSession.setAttribute("saleList", saleList);
+					} else {
+						logger.error("[ST ADM] The shopping cart is empty, can't remove the item.");
+					}
+				} else {
+					logger.error("[ST ADM] The remove item does not belong to this store {}.", store.getStoreid());
+				}
+			}
+		} else {
+			logger.error("[ST ADM] Passed parameters are invalid!");
+		}
+	}
+	
 	@RequestMapping(method=RequestMethod.POST, value = "/api/inventories/{storeid}")
 	public @ResponseBody DataTablesOutput<Inventory> getInventories(
 			@PathVariable Long storeid,
@@ -359,6 +443,29 @@ public class StoreAdminRemote extends StoreBase {
 
 		return itemService.getAllByStore(input, store);
 
+	}
+
+
+	private List<Inventory> removeAdded(List<Inventory> target, List<Inventory> saleList) {
+		/*List<Inventory> inventories = new ArrayList<>();
+
+		for(Inventory inv : saleList) {
+			for(Inventory t : target) {
+				if(inv.getInventoryid() != t.getInventoryid()) {
+
+				}
+			}
+		}*/
+		List<Inventory> result = target.stream().filter(inv -> saleList.stream().allMatch(t -> inv.getInventoryid() != t.getInventoryid())).collect(Collectors.toList());
+
+		return result;
+	}
+
+	private boolean isSkuNotSelected(List<Inventory> saleList, Inventory inventory) {
+
+		List<Inventory> result = saleList.stream().filter(inv -> inv.getInventoryid() == inventory.getInventoryid()).collect(Collectors.toList());
+
+		return result.isEmpty();
 	}
 
 }

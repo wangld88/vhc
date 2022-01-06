@@ -5,13 +5,13 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
 import com.vhc.core.model.Inventory;
-import com.vhc.core.model.InventoryHistory;
+import com.vhc.core.model.Inventoryhistory;
 
 
-public interface InventoryHistoryRepository extends CrudRepository<InventoryHistory, Long> {
+public interface InventoryHistoryRepository extends CrudRepository<Inventoryhistory, Long> {
 
-	InventoryHistory findByInventory_inventoryidAndStatus_nameAndReceivedateIsNull(long inventoryid, String status);
+	Inventoryhistory findByInventory_inventoryidAndStatus_nameAndReceivedateIsNull(long inventoryid, String status);
 
-	List<InventoryHistory> findAllByInventory(Inventory inventory);
+	List<Inventoryhistory> findAllByInventory(Inventory inventory);
 
 }

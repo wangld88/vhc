@@ -19,9 +19,9 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 
 @Entity
-@Table(name="inventoryHistories")
-@NamedQuery(name="InventoryHistory.findAll", query="SELECT i FROM InventoryHistory i")
-public class InventoryHistory implements Serializable {
+@Table(name="inventoryhistories")
+@NamedQuery(name="Inventoryhistory.findAll", query="SELECT i FROM Inventoryhistory i")
+public class Inventoryhistory implements Serializable {
 
 	private static final long serialVersionUID = -748565879849839762L;
 
@@ -63,6 +63,11 @@ public class InventoryHistory implements Serializable {
 	@ApiObjectField(description="Comment notes", format="maxlength = 600", required=false)
 	private String comments;
 
+	@Column(nullable=true, length=400)
+	@Size(max=400)
+	@ApiObjectField(description="Transfer notes", format="maxlength = 400", required=false)
+	private String notes;
+
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="storeid")
 	@ApiObjectField(description="Unique Store", required=true)
@@ -89,11 +94,11 @@ public class InventoryHistory implements Serializable {
 	private Store deststore;
 
 
-	public InventoryHistory() {
+	public Inventoryhistory() {
 
 	}
 
-	public InventoryHistory(Inventory inventory) {
+	public Inventoryhistory(Inventory inventory) {
 		this.inventory = inventory;
 		this.item = inventory.getItem();
 		this.store = inventory.getStore();
@@ -106,6 +111,10 @@ public class InventoryHistory implements Serializable {
 		this.receivedate = inventory.getReceivedate();
 		this.comments = inventory.getComments();
 		this.deststore = inventory.getDeststore();
+		
+		if(notes != null && !notes.isEmpty()) {
+			this.notes = inventory.getNotes();
+		}
 	}
 
 	public Inventory getInventory() {
@@ -186,6 +195,14 @@ public class InventoryHistory implements Serializable {
 
 	public void setComments(String comments) {
 		this.comments = comments;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 
 	public Location getLocation() {

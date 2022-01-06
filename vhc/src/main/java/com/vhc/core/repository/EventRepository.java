@@ -17,6 +17,8 @@ public interface EventRepository extends CrudRepository<Event, Long> {
 
 	Event findByEnddateAndStatus(Calendar ed, Status status);
 
+	List<Event> findByEnddateBeforeAndStatus(Calendar ed, Status status);
+
 	List<Event> findAll();
 
 }

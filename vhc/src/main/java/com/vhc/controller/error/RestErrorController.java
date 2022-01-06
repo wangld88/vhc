@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
@@ -77,28 +78,31 @@ public class RestErrorController implements ErrorController {
 	}
 
 
-    @Override
+    //@Override
     public String getErrorPath() {
         return PATH;
     }
 
     private Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         //RequestAttributes requestAttributes = new ServletRequestAttributes(request);
-        return errorAttributes.getErrorAttributes(webRequest, includeStackTrace);
+    	ErrorAttributeOptions options = ErrorAttributeOptions.defaults();
+    	if(includeStackTrace) {
+    		options.including(ErrorAttributeOptions.Include.MESSAGE);
+    	}
+        return errorAttributes.getErrorAttributes(webRequest, options);
     }
 
     private ModelAndView setErrorView(HttpServletRequest request, HttpServletResponse response, Map<String, Object> att, HttpStatus httpStatus) {
         response.setStatus(httpStatus.value());
 
         ModelAndView mav = new ModelAndView();
-        //ModelAndView mav = new ModelAndView();
         Message message = new Message();
 
         if (att != null) {
         	String view = "/error/error";
         	mav.setViewName(view);
         	String msg = (String) att.get("message");
-        	if(msg.contains("Invalid CSRF Token") || msg.contains("CSRF token not found")) {
+        	if(msg != null && (msg.contains("Invalid CSRF Token") || msg.contains("CSRF token not found"))) {
         		message.setMessage("Your session is expired, please try again");
                 mav.addObject("stackTrace", "Your session is expired, please <a href='" + (String) att.get("path") + "'>Login</a> again");
         	} else {

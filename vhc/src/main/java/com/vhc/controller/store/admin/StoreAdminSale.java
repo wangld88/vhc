@@ -149,6 +149,14 @@ public class StoreAdminSale extends StoreBase {
 			logger.error("The login user {} is not a store admin.", loginUser.getUserid());
 			return "redirect:/store/admin/logout";
 		}
+		
+		Object mutex = WebUtils.getSessionMutex(httpSession);
+		synchronized(mutex) {
+			List<Inventory> saleList = null;
+			httpSession.removeAttribute("saleList");
+			httpSession.removeAttribute("invoiceList");
+			model.addAttribute("saleList", saleList);
+		}
 
 		Store store = staff.getStore();
 
@@ -266,24 +274,30 @@ public class StoreAdminSale extends StoreBase {
 
 				logger.info("inventory is found:"+inventories.size()+", sku: "+sku);
 
-				Inventory current = inventories.get(0);
-
-				if(isSkuNotSelected(saleList,current)) {
-					saleList.add(current);
-					////subTotal = subTotal.add(current.getItem().getProduct().getFinalprice());
-					//logger.info("PRICE: "+current.getItem().getProduct().getFinalprice()+", subTotal: "+subTotal);
-					httpSession.setAttribute("saleList", saleList);
+				if(inventories.isEmpty()) {
+					logger.error("[Store Adm] There is no inventory available.");
+					msg.setStatus(Message.ERROR);
+					msg.setMessage("No item being found, please try a different UPC");
 				} else {
-					msg.setStatus(Message.ERROR);
-					msg.setMessage("The item (" + sku + ") has been added already.");
+					Inventory current = inventories.get(0);
+	
+					if(isSkuNotSelected(saleList, current)) {
+						saleList.add(current);
+						////subTotal = subTotal.add(current.getItem().getProduct().getFinalprice());
+						logger.info("[Sale] items in cart: "+saleList.size());
+						httpSession.setAttribute("saleList", saleList);
+					} else {
+						msg.setStatus(Message.ERROR);
+						msg.setMessage("The item (" + sku + ") has been added already.");
+					}
+					/*} else {
+						msg.setStatus(Message.ERROR);
+						msg.setMessage("Can not find the given item in inventories.");
+					}*/
+					model.addAttribute("saleList", saleList);
+	
+					processCart(model, saleList, null);
 				}
-				/*} else {
-					msg.setStatus(Message.ERROR);
-					msg.setMessage("Can not find the given item in inventories.");
-				}*/
-				model.addAttribute("saleList", saleList);
-
-				processCart(model, saleList, null);
 			}
 
 		} else {
@@ -387,13 +401,9 @@ public class StoreAdminSale extends StoreBase {
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("menu", "Sales");
 
-		logger.info("doItemSale is called");
-
 		Status delivered = statusService.getByName("Delivered");
 
 		List<Inventory> inventories = new ArrayList<>();
-
-		List<String> methodids = Arrays.asList(methodid);
 
 		String cardcode = requestParams.get("cardcode");
 		String cardnum = requestParams.get("cardnum");
@@ -408,7 +418,9 @@ public class StoreAdminSale extends StoreBase {
 		Invoice invoice = new Invoice();
 		Transaction trx = new Transaction();
 
-		if(methodids != null && !methodids.isEmpty()) {
+		if(methodid != null && methodid.length != 0) {
+
+			List<String> methodids = Arrays.asList(methodid);
 
 			try {
 
@@ -420,6 +432,7 @@ public class StoreAdminSale extends StoreBase {
 					model.addAttribute("message", msg);
 					return "redirect:/store/admin/itemsale"; // Why return -1???
 				}
+				logger.info("[StoAdmin Sale] itemsale, Payment method: {}", methodids);
 
 				Giftcard giftcard = null;
 
@@ -453,6 +466,8 @@ public class StoreAdminSale extends StoreBase {
 					}
 				}
 
+				logger.info("[StoAdmin Sale] itemsale, doItemSale is called");
+
 				Object mutex = WebUtils.getSessionMutex(httpSession);
 
 				synchronized(mutex) {
@@ -460,7 +475,7 @@ public class StoreAdminSale extends StoreBase {
 					if(httpSession.getAttribute("saleList") != null) {
 						saleList = (List<Inventory>) httpSession.getAttribute("saleList");
 						if(saleList == null || saleList.isEmpty()) {
-							logger.error("There is no sale item, current loginUser ID {}", loginUser.getUserid());
+							logger.error("[StoAdmin Sale] itemsale, There is no sale item, current loginUser ID {}", loginUser.getUserid());
 							Message msg = new Message();
 							msg.setStatus(Message.ERROR);
 							msg.setMessage("Please add shopping item, now the cart is empty.");
@@ -493,6 +508,7 @@ public class StoreAdminSale extends StoreBase {
 						Type type = typeService.getByNameReftbl("Sell", "transactions");
 						GiftcardHistory gfHistory = new GiftcardHistory();
 
+						logger.info("[StoAdmin Sale] itemsale, inventory list size: {}", saleList.size());
 						for(Inventory inventory: saleList) {
 							inventory.setStatus(delivered);
 							inventory.setSentby(loginUser);
@@ -556,11 +572,11 @@ public class StoreAdminSale extends StoreBase {
 
 						List<Paymentdetail> details = new ArrayList<>();
 						Status status = statusService.getByNameAndReftbl("Completed","payments");
-						logger.info("Payment method: {}", methodids);
+						logger.info("[StoAdmin Sale] itemsale, Payment method: {}", methodids);
 
 						//multiple payment methods
 						if(methodids.contains("1")) {
-							logger.info("Credit card payment");
+							logger.info("[StoAdmin Sale] itemsale, Credit card payment");
 							BigDecimal credit = convertAmount(requestParams.get("creditamount"));
 							sum = sum.add(credit);
 
@@ -580,6 +596,7 @@ public class StoreAdminSale extends StoreBase {
 						}
 
 						if(methodids.contains("2")) {
+							logger.info("[StoAdmin Sale] itemsale, Debit payment");
 							BigDecimal debit = convertAmount(requestParams.get("debitamount"));
 							sum = sum.add(debit);
 
@@ -632,6 +649,7 @@ public class StoreAdminSale extends StoreBase {
 						}
 
 						if (methodids.contains("4")) {
+							logger.info("[StoAdmin Sale] itemsale, Cash payment");
 							BigDecimal cash = convertAmount(requestParams.get("cashamount"));
 							Paymentmethod method = paymentmethodService.getById(4);
 							BigDecimal backchange = BigDecimal.ZERO;
@@ -663,7 +681,7 @@ public class StoreAdminSale extends StoreBase {
 
 						if(amount.compareTo(sum) != 0) {
 							//Error amount are different
-							logger.error("Item amount: " + amount.doubleValue()+", payment amount: "+sum.doubleValue());
+							logger.error("[StoAdmin Sale] itemsale, Item amount: " + amount.doubleValue()+", payment amount: "+sum.doubleValue());
 							Message msg = new Message();
 							msg.setStatus(Message.ERROR);
 							msg.setMessage("Please add shopping item, now the cart is empty.");
@@ -707,15 +725,19 @@ public class StoreAdminSale extends StoreBase {
 							giftcardHistoryService.save(gfHistory);
 						}
 
-						logger.info("The transaction completed, trx ID:" + trx.getTransactionid());
+						logger.info("[StoAdmin Sale] itemsale, The transaction completed, trx ID:" + trx.getTransactionid());
 						model.addAttribute("saleList", saleList);
 						httpSession.setAttribute("invoice", invoice);
 						httpSession.setAttribute("invoiceList", saleList);
 						httpSession.removeAttribute("saleList");
+					} else {
+						logger.error("[StoAdmin Sale] itemsale, saleList is null");
 					}
 				}
 
 			} catch(Exception e) {
+				e.printStackTrace();
+				logger.error("[StoAdmin Sale] itemsale, an error occurred while process the payment: {}", e.getMessage());
 				Message msg = new Message();
 				msg.setStatus(Message.ERROR);
 				msg.setMessage("There is an error while process the payment: " + e.getMessage());
@@ -1396,8 +1418,8 @@ System.out.println("Giftcard transferbalance");
 					balance = balance.add(amount1);
 					System.out.println("Giftcard balance1: "+balance);
 					giftcard0.setBalance(balance);
-					giftcardService.save(giftcard1);
-					giftcardService.save(giftcard0);
+					giftcard1 = giftcardService.save(giftcard1);
+					giftcard0 = giftcardService.save(giftcard0);
 
 					GiftcardHistory gfHistory0 = new GiftcardHistory();
 					GiftcardHistory gfHistory1 = new GiftcardHistory();
@@ -1410,6 +1432,7 @@ System.out.println("Giftcard transferbalance");
 					gfHistory0.setRefcard(giftcard1);
 					gfHistory0.setOperatedate(Calendar.getInstance());
 					gfHistory0.setOperatedby(loginUser);
+					gfHistory0.setBalance(balance);
 					gfHistory0 = giftcardHistoryService.save(gfHistory0);
 
 					gfHistory1.setType(gfType1);
@@ -1418,6 +1441,7 @@ System.out.println("Giftcard transferbalance");
 					gfHistory1.setRefcard(giftcard0);
 					gfHistory1.setOperatedate(Calendar.getInstance());
 					gfHistory1.setOperatedby(loginUser);
+					gfHistory1.setBalance(balance1.subtract(amount1));
 					gfHistory1 = giftcardHistoryService.save(gfHistory1);
 					msg = "From card #" + cardnum1 + " transferred amount:  CA$" + transfer1;
 				}
@@ -1438,7 +1462,7 @@ System.out.println("Giftcard transferbalance");
 					System.out.println("Giftcard balance2: "+balance);
 					giftcard0.setBalance(balance);
 					giftcardService.save(giftcard2);
-					giftcardService.save(giftcard0);
+					giftcard0 = giftcardService.save(giftcard0);
 					GiftcardHistory gfHistory0 = new GiftcardHistory();
 					GiftcardHistory gfHistory2 = new GiftcardHistory();
 					//History
@@ -1450,6 +1474,7 @@ System.out.println("Giftcard transferbalance");
 					gfHistory0.setRefcard(giftcard2);
 					gfHistory0.setOperatedate(Calendar.getInstance());
 					gfHistory0.setOperatedby(loginUser);
+					gfHistory0.setBalance(balance);
 					gfHistory0 = giftcardHistoryService.save(gfHistory0);
 
 					gfHistory2.setType(gfType1);
@@ -1458,6 +1483,7 @@ System.out.println("Giftcard transferbalance");
 					gfHistory2.setRefcard(giftcard0);
 					gfHistory2.setOperatedate(Calendar.getInstance());
 					gfHistory2.setOperatedby(loginUser);
+					gfHistory2.setBalance(balance2.subtract(amount2));
 					gfHistory2 = giftcardHistoryService.save(gfHistory2);
 					msg += "<br/> From card #" + cardnum2 + " transferred amount:  CA$" + transfer2;
 				}
@@ -1492,6 +1518,7 @@ System.out.println("Giftcard transferbalance");
 					gfHistory0.setRefcard(giftcard3);
 					gfHistory0.setOperatedate(Calendar.getInstance());
 					gfHistory0.setOperatedby(loginUser);
+					gfHistory0.setBalance(balance);
 					gfHistory0 = giftcardHistoryService.save(gfHistory0);
 
 					gfHistory3.setType(gfType1);
@@ -1500,6 +1527,7 @@ System.out.println("Giftcard transferbalance");
 					gfHistory3.setRefcard(giftcard0);
 					gfHistory3.setOperatedate(Calendar.getInstance());
 					gfHistory3.setOperatedby(loginUser);
+					gfHistory3.setBalance(balance3.subtract(amount3));
 					gfHistory3 = giftcardHistoryService.save(gfHistory3);
 					msg += "<br/> From card #" + cardnum3 + " transferred amount:  CA$" + transfer3;
 				}

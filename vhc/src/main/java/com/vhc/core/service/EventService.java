@@ -26,10 +26,16 @@ public class EventService {
 	}
 
 	@Transactional(readOnly=true)
+	public List<Event> getPastEvent(Status status) {
+		Calendar today = Calendar.getInstance();
+		return eventRepository.findByEnddateBeforeAndStatus(today, status);
+	}
+	
+	@Transactional(readOnly=true)
 	public Event getCurrentEvent(Status status) {
 
 		Calendar yesterday = Calendar.getInstance();
-		yesterday.add(Calendar.DATE, 1);
+		yesterday.add(Calendar.DATE, -1);
 		Calendar tomorrow = Calendar.getInstance();
 		tomorrow.add(Calendar.DATE, 1);
 

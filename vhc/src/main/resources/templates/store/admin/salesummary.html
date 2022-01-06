@@ -26,7 +26,7 @@
 							<table id="salesummaryTable" class="table table-striped table-bordered" th:if="${txs != null}">
 								<thead>
 									<tr>
-										<!-- <th>ID</th> -->
+										<th>ID</th>
 										<th><i class="icon_calendar"></i>Date</th>
 										<th><i class="icon_cogs"></i>Invoice No.</th>
 										<th><i class="icon_cogs"></i>Amount</th>
@@ -34,14 +34,15 @@
 										<th><i class="icon_cogs"></i>Invoice</th>
 									</tr>
 								</thead>
-								<tbody>
+								<tbody id="records">
 									<tr th:each="tx:${txs}" th:if="${tx.invoice!=null}">
-										<!-- <td th:text="${tx.transactionid}"></td> -->
+										<td th:text="${tx.invoice.invoiceid}"></td>
 										<td th:text="${#calendars.format(tx.recorddate, 'yyyy/MM/dd')}"></td>
 										<td th:text="${tx.invoice.invoicenum}"></td>
 										<td th:text="${tx.invoice.amount}"></td>
 										<td th:text="${tx.recordedby.firstname} + ' ' + ${tx.recordedby.lastname}"></td>
-										<td><a id="print" class="btn btn-primary" href="#" th:onclick="${'printInvoice('+tx.invoice.invoiceid+')'}"><i class="fa fa-file-text"></i> Print</a></td>
+										<!-- <td><a id="print" class="btn btn-primary" href="#" th:onclick="${'('+tx.invoice.invoiceid+')'}"><i class="fa fa-file-text"></i> Print</a></td> -->
+										<td><button id="print" class="btn btn-primary"><i class="fa fa-file-text"></i> Print</button></td>
 									</tr>
 								</tbody>
 							</table>
@@ -54,23 +55,35 @@
 
 		<script th:src="@{/js/jquery-1.10.2.min.js}"></script>
 		<script th:src="@{/js/jquery-ui-1.12.1.js}"></script>
-		<script >
-		function printInvoice(invoiceid) {
-			window.open("salesummary/printinvoice/"+invoiceid);
-			return false;
-		}
+		<script src="/vhc/js/jquery.dataTables.min.js"></script>
+		<script src="/vhc/js/dataTables.bootstrap.min.js"></script>
+		<script>
+			table = $('#salesummaryTable').DataTable({
+				'paging'      : true,
+				'lengthChange': false,
+				'searching'   : true,
+				'info'        : true,
+				'autoWidth'   : false,
+				responsive	: true,
+				'order'		: [ [0, 'desc'] ],
+				'columnDefs'	: [
+					{"targets": 0, visible: false, searchable: false},
+					{"targets": 1, "type": "date"}, 
+					{'targets': 3, 'orderable': false}
+				]
+			});
 
-		$(function () {
-			$('#salesummaryTable').DataTable({
-			  'paging'      : true,
-			  'lengthChange': false,
-			  'searching'   : true,
-			  'info'        : true,
-			  'autoWidth'   : false,
-			  'order'		: [[0, 'desc']],
-			  'columnDefs'	: [{"targets": 0, "type": "date"}, {'targets': 3, 'orderable': false}]
+			$("#records").on("click", "#print", function(e) {
+				var rowData = table.row($(this).parents("tr")).data();
+				window.open("salesummary/printinvoice/"+rowData[0]);
+			});
+			function printInvoice(invoiceid) {
+				window.open("salesummary/printinvoice/"+invoiceid);
+				return false;
+			}
+	
+			$(function () {
 			})
-		})
 		</script>
 	</div>
 </html>

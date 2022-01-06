@@ -142,6 +142,12 @@
 										</div>
 									</div>
 									<div class="form-group">
+										<label for="receivedate" class="control-label col-lg-2">Notes </label>
+										<div class="col-lg-10">
+											<span th:text="${inventory.notes!=null?inventory.notes:''}" class="form-control"></span>
+										</div>
+									</div>
+									<div class="form-group">
 									    <div class="col-lg-offset-2 col-lg-10">
 									        <button class="btn btn-primary" type="submit"> Cancel Transfer </button>
 									        <!-- <a th:href="@{/store/admin/inventory/}+${inventory.inventoryid}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a> -->
@@ -208,6 +214,12 @@
 									    </div>
 									</div>
 									<div class="form-group">
+										<label for="receivedate" class="control-label col-lg-2">Notes </label>
+										<div class="col-lg-10">
+											<span th:text="${inventory.notes!=null?inventory.notes:''}" class="form-control"></span>
+										</div>
+									</div>
+									<div class="form-group">
 									    <div class="col-lg-offset-2 col-lg-10">
 									        <button class="btn btn-primary" type="submit"> Receive </button>
 									        <a th:href="@{/store/admin/inventories}" class="btn btn-primary btn-label-left"><span><i class="fa fa-remove"></i></span> Cancel</a>
@@ -269,6 +281,12 @@
 												<option th:each="store: ${stores}" th:value="${store.storeid}" th:text="${store.name}"></option>
 											</select>
 									    </div>
+									</div>
+									<div class="form-group">
+										<label for="receivedate" class="control-label col-lg-2">Notes </label>
+										<div class="col-lg-10">
+											<textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
+										</div>
 									</div>
 									<div class="form-group">
 									    <div class="col-lg-offset-2 col-lg-10">
